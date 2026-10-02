@@ -59,18 +59,22 @@ class _DashboardViewState extends State<DashboardView> {
     try {
       final release = await UpdaterService.checkLatestRelease();
       if (release != null && mounted) {
-        if (UpdaterService.isNewerVersion(release.tag) || (manual && release.exeDownloadUrl != null)) {
+        final hasNewVersion = UpdaterService.isNewerVersion(release);
+        if (hasNewVersion) {
           setState(() => _latestRelease = release);
           if (manual) {
             UpdaterService.showUpdateModal(context, release);
           }
-        } else if (manual) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: AppColors.success,
-              content: Text('Você já está na versão mais recente do Informatica - BINFAE-GL!'),
-            ),
-          );
+        } else {
+          setState(() => _latestRelease = null);
+          if (manual) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                backgroundColor: AppColors.success,
+                content: Text('Você já está na versão mais recente do Informatica - BINFAE-GL! (${UpdaterService.currentVersion})'),
+              ),
+            );
+          }
         }
       }
     } catch (_) {}
@@ -507,7 +511,7 @@ class _DashboardViewState extends State<DashboardView> {
                                       const Icon(Icons.download_rounded, size: 14, color: Colors.white),
                                       const SizedBox(width: 6),
                                       Text(
-                                        '[${_latestRelease!.tag} disponível]',
+                                        '[${_latestRelease!.version.isNotEmpty ? "v${_latestRelease!.version}" : _latestRelease!.tag} disponível]',
                                         style: const TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,

@@ -6,8 +6,9 @@ import '../theme/app_theme.dart';
 
 class LocationFormDialog extends StatefulWidget {
   final LocationModel? location;
+  final int? initialParentId;
 
-  const LocationFormDialog({super.key, this.location});
+  const LocationFormDialog({super.key, this.location, this.initialParentId});
 
   @override
   State<LocationFormDialog> createState() => _LocationFormDialogState();
@@ -38,8 +39,8 @@ class _LocationFormDialogState extends State<LocationFormDialog> {
     final loc = widget.location;
     _nomeController = TextEditingController(text: loc?.nome ?? '');
     _descricaoController = TextEditingController(text: loc?.descricao ?? '');
-    _tipo = loc?.tipo ?? 'DEPOSITO';
-    _selectedParentId = loc?.parentId;
+    _tipo = loc?.tipo ?? (widget.initialParentId != null ? 'ARMARIO' : 'DEPOSITO');
+    _selectedParentId = loc?.parentId ?? widget.initialParentId;
   }
 
   @override

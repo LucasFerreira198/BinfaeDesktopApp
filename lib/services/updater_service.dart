@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 
 class ReleaseInfo {
   final String tag;
+  final String version;
   final String title;
   final String body;
   final String? exeDownloadUrl;
@@ -13,6 +14,7 @@ class ReleaseInfo {
 
   ReleaseInfo({
     required this.tag,
+    required this.version,
     required this.title,
     required this.body,
     this.exeDownloadUrl,
@@ -21,9 +23,23 @@ class ReleaseInfo {
 }
 
 class UpdaterService {
-  static const String currentVersion = 'v2.0.1';
+  static const String currentVersion = 'v2.0.2';
   static const String repoOwner = 'LucasFerreira198';
   static const String repoName = 'BinfaeDesktopApp';
+
+  static String extractVersion(String tag, String title) {
+    if (tag.toLowerCase() != 'latest') {
+      final tagMatch = RegExp(r'(\d+\.\d+(?:\.\d+)?)').firstMatch(tag);
+      if (tagMatch != null) {
+        return tagMatch.group(1)!;
+      }
+    }
+    final titleMatch = RegExp(r'v?(\d+\.\d+(?:\.\d+)?)').firstMatch(title);
+    if (titleMatch != null) {
+      return titleMatch.group(1)!;
+    }
+    return '';
+  }
 
   static Future<ReleaseInfo?> checkLatestRelease() async {
     try {
@@ -37,6 +53,7 @@ class UpdaterService {
         final tag = data['tag_name'] as String? ?? '';
         final title = data['name'] as String? ?? 'Atualização';
         final body = data['body'] as String? ?? '';
+        final version = extractVersion(tag, title);
 
         String? downloadUrl;
         int? size;
@@ -53,6 +70,7 @@ class UpdaterService {
 
         return ReleaseInfo(
           tag: tag,
+          version: version,
           title: title,
           body: body,
           exeDownloadUrl: downloadUrl,
@@ -63,11 +81,11 @@ class UpdaterService {
     return null;
   }
 
-  static bool isNewerVersion(String latestTag) {
-    final cleanLatest = latestTag.replaceAll(RegExp(r'[^0-9.]'), '');
-    final cleanCurrent = currentVersion.replaceAll(RegExp(r'[^0-9.]'), '');
+  static bool isNewerVersion(ReleaseInfo release) {
+    if (release.version.isEmpty) return false;
 
-    final latestParts = cleanLatest.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final latestParts = release.version.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final cleanCurrent = currentVersion.replaceAll(RegExp(r'[^0-9.]'), '');
     final currentParts = cleanCurrent.split('.').map((e) => int.tryParse(e) ?? 0).toList();
 
     while (latestParts.length < 3) {
@@ -245,7 +263,7 @@ class _UpdateDialogState extends State<_UpdateDialog> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Versão disponível: ${widget.release.tag}',
+                        'Versão disponível: ${widget.release.version.isNotEmpty ? "v${widget.release.version}" : widget.release.tag}',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
