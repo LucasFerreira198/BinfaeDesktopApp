@@ -23,7 +23,7 @@ class _MovementDialogState extends State<MovementDialog> {
   @override
   void initState() {
     super.initState();
-    _tipo = widget.item.status == 'CAUTELADO' ? 'DEVOLUCAO' : 'CAUTELA';
+    _tipo = widget.item.status == 'CAUTELADO' ? 'DEVOLUCAO' : 'TRANSFERENCIA';
     _destinoLocalId = widget.item.localId;
   }
 
@@ -43,16 +43,16 @@ class _MovementDialogState extends State<MovementDialog> {
       return;
     }
 
-    if (qty > widget.item.quantidade && widget.item.tipoControle == 'UNITARIO') {
+    if (qty > widget.item.quantidade && widget.item.tipoControle == 'UNITARIO' && _tipo != 'DEVOLUCAO') {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Quantidade máxima disponível: ${widget.item.quantidade}')),
+        SnackBar(content: Text('Quantidade máxima disponível em estoque: ${widget.item.quantidade}')),
       );
       return;
     }
 
-    if (_motivoController.text.trim().isEmpty) {
+    if (_tipo == 'TRANSFERENCIA' && _destinoLocalId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Informe o motivo ou militar responsável.')),
+        const SnackBar(content: Text('Selecione o local de destino para a transferência.')),
       );
       return;
     }
@@ -61,12 +61,14 @@ class _MovementDialogState extends State<MovementDialog> {
 
     try {
       final stockProvider = Provider.of<StockProvider>(context, listen: false);
+      final motivo = _motivoController.text.trim().isNotEmpty ? _motivoController.text.trim() : null;
+
       await stockProvider.moveItem(
         itemId: widget.item.id,
         tipoMovimentacao: _tipo,
         quantidade: qty,
         destinoLocalId: _tipo == 'TRANSFERENCIA' ? _destinoLocalId : widget.item.localId,
-        motivo: _motivoController.text.trim(),
+        motivo: motivo,
       );
 
       if (mounted) {
@@ -92,17 +94,88 @@ class _MovementDialogState extends State<MovementDialog> {
     }
   }
 
+  void _showLocationPicker(List<LocationModel> locations) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setPickerState) {
+            final filtered = locations.where((l) {
+              if (query.isEmpty) return true;
+              final q = query.toLowerCase();
+              return l.nome.toLowerCase().contains(q) || (l.caminhoCompleto?.toLowerCase().contains(q) ?? false);
+            }).toList();
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Selecionar Local de Destino'),
+              content: SizedBox(
+                width: 460,
+                height: 380,
+                child: Column(
+                  children: [
+                    TextField(
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        hintText: 'Pesquisar local por nome ou caminho...',
+                        prefixIcon: Icon(Icons.search, size: 20),
+                      ),
+                      onChanged: (v) => setPickerState(() => query = v.trim()),
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? const Center(child: Text('Nenhum local encontrado.'))
+                          : ListView.builder(
+                              itemCount: filtered.length,
+                              itemBuilder: (context, idx) {
+                                final loc = filtered[idx];
+                                final isSelected = loc.id == _destinoLocalId;
+
+                                return ListTile(
+                                  selected: isSelected,
+                                  leading: Icon(
+                                    Icons.place_outlined,
+                                    color: isSelected ? AppColors.primary : Colors.grey,
+                                  ),
+                                  title: Text(loc.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  subtitle: loc.caminhoCompleto != null ? Text(loc.caminhoCompleto!, style: const TextStyle(fontSize: 11)) : null,
+                                  trailing: isSelected ? const Icon(Icons.check, color: AppColors.primary) : null,
+                                  onTap: () {
+                                    setState(() => _destinoLocalId = loc.id);
+                                    Navigator.pop(ctx);
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Fechar')),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final stockProvider = Provider.of<StockProvider>(context);
 
+    final selectedLoc = stockProvider.getLocationById(_destinoLocalId ?? -1);
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        width: 500,
-        padding: const EdgeInsets.all(24),
+        width: 520,
+        padding: const EdgeInsets.all(26),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,16 +212,16 @@ class _MovementDialogState extends State<MovementDialog> {
             ),
             const SizedBox(height: 20),
 
-            // Tipo de Movimentação
+            // Tipo de Operação
             const Text('Tipo de Operação', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Row(
               children: [
+                _buildTypeChip('TRANSFERENCIA', 'Transferir', AppColors.primary),
+                const SizedBox(width: 8),
                 _buildTypeChip('CAUTELA', 'Cautela', AppColors.warning),
                 const SizedBox(width: 8),
                 _buildTypeChip('DEVOLUCAO', 'Devolução', AppColors.success),
-                const SizedBox(width: 8),
-                _buildTypeChip('TRANSFERENCIA', 'Transferir', AppColors.primary),
                 const SizedBox(width: 8),
                 _buildTypeChip('MANUTENCAO', 'Manutenção', AppColors.danger),
               ],
@@ -176,32 +249,49 @@ class _MovementDialogState extends State<MovementDialog> {
             ),
             const SizedBox(height: 16),
 
-            // Local Destino (se for transferência)
+            // Seletor Hierárquico de Local Destino para Transferência
             if (_tipo == 'TRANSFERENCIA') ...[
-              const Text('Novo Local Físico', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              const Text('Novo Local Físico (Destino) *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
-              DropdownButtonFormField<int>(
-                value: _destinoLocalId,
-                items: stockProvider.locations.map((loc) {
-                  return DropdownMenuItem<int>(
-                    value: loc.id,
-                    child: Text(loc.caminhoCompleto ?? loc.nome),
-                  );
-                }).toList(),
-                onChanged: (val) => setState(() => _destinoLocalId = val),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              InkWell(
+                onTap: () => _showLocationPicker(stockProvider.locations),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: isDark ? const Color(0xFF27354F) : const Color(0xFFCBD5E1)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.place_outlined, size: 20, color: AppColors.primary),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          selectedLoc != null
+                              ? (selectedLoc.caminhoCompleto ?? selectedLoc.nome)
+                              : 'Clique para escolher o local de destino...',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: selectedLoc != null ? (isDark ? Colors.white : Colors.black87) : Colors.grey,
+                            fontWeight: selectedLoc != null ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
             ],
 
-            // Motivo
+            // Justificativa / Motivo (OPCIONAL)
             Text(
-              _tipo == 'CAUTELA' ? 'Militar Responsável / Operação' : 'Justificativa / Motivo',
+              _tipo == 'CAUTELA'
+                  ? 'Militar Responsável / Operação (Opcional)'
+                  : 'Justificativa / Motivo (Opcional)',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
@@ -209,7 +299,7 @@ class _MovementDialogState extends State<MovementDialog> {
               controller: _motivoController,
               maxLines: 2,
               decoration: InputDecoration(
-                hintText: _tipo == 'CAUTELA' ? 'Ex: 3S Silva - Operação Ágata' : 'Ex: Revisão concluída',
+                hintText: _tipo == 'CAUTELA' ? 'Ex: 3S Silva - Operação Ágata' : 'Ex: Transferência de almoxarifado',
                 filled: true,
                 fillColor: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(

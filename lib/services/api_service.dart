@@ -112,20 +112,178 @@ class ApiService {
     return list.map((json) => ItemModel.fromJson(json)).toList();
   }
 
+  String _extractError(http.Response response, String defaultMsg) {
+    try {
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      if (decoded is Map && decoded['detail'] != null) {
+        if (decoded['detail'] is List) {
+          final list = decoded['detail'] as List;
+          return list.map((e) => e['msg'] ?? e.toString()).join(', ');
+        }
+        return decoded['detail'].toString();
+      }
+    } catch (_) {}
+    return defaultMsg;
+  }
+
   Future<List<GroupModel>> fetchGroups() async {
     final uri = Uri.parse('$_baseUrl/stock/groups');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 12));
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => GroupModel.fromJson(json)).toList();
   }
 
+  Future<List<SubgroupModel>> fetchSubgroups() async {
+    final uri = Uri.parse('$_baseUrl/stock/subgroups');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => SubgroupModel.fromJson(json)).toList();
+  }
+
+  Future<GroupModel> createGroup(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/groups');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar grupo (${response.statusCode})'));
+    }
+    return GroupModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<GroupModel> updateGroup(int id, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/groups/$id');
+    final response = await http.put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar grupo (${response.statusCode})'));
+    }
+    return GroupModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteGroup(int id) async {
+    final uri = Uri.parse('$_baseUrl/stock/groups/$id');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir grupo (${response.statusCode})'));
+    }
+  }
+
+  Future<SubgroupModel> createSubgroup(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/subgroups');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar subgrupo (${response.statusCode})'));
+    }
+    return SubgroupModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<SubgroupModel> updateSubgroup(int id, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/subgroups/$id');
+    final response = await http.put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar subgrupo (${response.statusCode})'));
+    }
+    return SubgroupModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteSubgroup(int id) async {
+    final uri = Uri.parse('$_baseUrl/stock/subgroups/$id');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir subgrupo (${response.statusCode})'));
+    }
+  }
+
   Future<List<LocationModel>> fetchLocations() async {
     final uri = Uri.parse('$_baseUrl/stock/locations');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 12));
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => LocationModel.fromJson(json)).toList();
+  }
+
+  Future<LocationModel> createLocation(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/locations');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar local (${response.statusCode})'));
+    }
+    return LocationModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<LocationModel> updateLocation(int id, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/locations/$id');
+    final response = await http.patch(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar local (${response.statusCode})'));
+    }
+    return LocationModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteLocation(int id) async {
+    final uri = Uri.parse('$_baseUrl/stock/locations/$id');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir local (${response.statusCode})'));
+    }
+  }
+
+  Future<ItemModel> createItem(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/items');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 20));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao cadastrar material (${response.statusCode})'));
+    }
+    return ItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<ItemModel> updateItem(int id, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/stock/items/$id');
+    final response = await http.patch(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 20));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar material (${response.statusCode})'));
+    }
+    return ItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteItem(int id) async {
+    final uri = Uri.parse('$_baseUrl/stock/items/$id');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir material (${response.statusCode})'));
+    }
   }
 
   Future<ItemModel> moveItem({
@@ -148,14 +306,146 @@ class ApiService {
     ).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      String msg = 'Erro ao registrar movimentação';
-      try {
-        final decoded = jsonDecode(response.body);
-        if (decoded['detail'] != null) msg = decoded['detail'];
-      } catch (_) {}
-      throw Exception(msg);
+      throw Exception(_extractError(response, 'Erro ao registrar movimentação'));
     }
 
     return ItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<List<ItemMovementModel>> fetchMovements({int? itemId}) async {
+    final query = itemId != null ? '?item_id=$itemId' : '';
+    final uri = Uri.parse('$_baseUrl/stock/movements$query');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 20));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => ItemMovementModel.fromJson(json)).toList();
+  }
+
+  // --- Gestão de Usuários (Admin) ---
+  Future<List<UserModel>> listUsers() async {
+    final uri = Uri.parse('$_baseUrl/users/listUsers');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao listar usuários'));
+    }
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => UserModel.fromJson(json)).toList();
+  }
+
+  Future<UserModel> createUser({
+    int? saram,
+    String? username,
+    required String password,
+    bool admin = false,
+    bool ativo = true,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/users/createUser');
+    final body = <String, dynamic>{
+      'password': password,
+      'admin': admin,
+      'ativo': ativo,
+    };
+    if (saram != null) body['saram'] = saram;
+    if (username != null && username.isNotEmpty) body['username'] = username;
+
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar usuário (${response.statusCode})'));
+    }
+    return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<UserModel> updateUser(
+    int identifier, {
+    bool? admin,
+    bool? ativo,
+    String? password,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/users/update/$identifier');
+    final body = <String, dynamic>{};
+    if (admin != null) body['admin'] = admin;
+    if (ativo != null) body['ativo'] = ativo;
+    if (password != null && password.isNotEmpty) body['password'] = password;
+
+    final response = await http.patch(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar usuário (${response.statusCode})'));
+    }
+    return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteUser(int identifier) async {
+    final uri = Uri.parse('$_baseUrl/users/delete/$identifier');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir usuário (${response.statusCode})'));
+    }
+  }
+
+  // --- Gestão de Militares (Admin) ---
+  Future<List<MilitaryModel>> listMilitaries() async {
+    final uri = Uri.parse('$_baseUrl/military/list');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao listar efetivo militar'));
+    }
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => MilitaryModel.fromJson(json)).toList();
+  }
+
+  Future<MilitaryModel> createMilitary(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/military/create');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao cadastrar militar (${response.statusCode})'));
+    }
+    return MilitaryModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<MilitaryModel> updateMilitary(int saram, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/military/update/$saram');
+    final response = await http.patch(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar militar (${response.statusCode})'));
+    }
+    return MilitaryModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteMilitary(int saram) async {
+    final uri = Uri.parse('$_baseUrl/military/delete/$saram');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir militar (${response.statusCode})'));
+    }
+  }
+
+  // --- Verificação de Versão / Auto-Updater ---
+  Future<Map<String, dynamic>?> checkLatestRelease() async {
+    try {
+      final uri = Uri.parse('https://api.github.com/repos/LucasFerreira198/BinfaeDesktopApp/releases/latest');
+      final response = await http.get(uri, headers: {
+        'Accept': 'application/vnd.github.v3+json',
+      }).timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      }
+    } catch (_) {}
+    return null;
   }
 }

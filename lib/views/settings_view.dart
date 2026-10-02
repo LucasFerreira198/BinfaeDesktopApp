@@ -189,7 +189,7 @@ class _SettingsViewState extends State<SettingsView> {
           const SizedBox(height: 20),
 
           // 3. Seção do Banco de Dados Local Offline (0ms)
-          _buildSectionHeader('BANCO DE DADOS LOCAL (0MS)', isDark),
+          _buildSectionHeader('SINCRONIZAÇÃO E BASE LOCAL', isDark),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -199,89 +199,49 @@ class _SettingsViewState extends State<SettingsView> {
                 color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
               ),
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(10),
+                    Text(
+                      'Última Sincronização com o Servidor',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
-                      child: const Icon(Icons.storage, color: AppColors.primary, size: 20),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Materiais Indexados na Memória',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                          Text(
-                            '${stock.allItems.length} itens prontos para consulta em 0ms',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 2),
+                    Text(
+                      stock.lastSync != null
+                          ? DateFormat("dd/MM/yyyy 'às' HH:mm").format(stock.lastSync!)
+                          : 'Nunca sincronizado',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Divider(height: 1, color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Última Sincronização',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                        Text(
-                          stock.lastSync != null
-                              ? DateFormat("dd/MM/yyyy 'às' HH:mm").format(stock.lastSync!)
-                              : 'Nunca sincronizado',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: stock.isSyncing ? null : () => stock.syncData(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      icon: stock.isSyncing
-                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Icon(Icons.sync, size: 16),
-                      label: Text(stock.isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'),
-                    ),
-                  ],
+                ElevatedButton.icon(
+                  onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: stock.isSyncing
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.sync, size: 16),
+                  label: Text(stock.isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
+
 
           // 4. Seção Servidor e Rede
           _buildSectionHeader('SERVIDOR BACKEND', isDark),

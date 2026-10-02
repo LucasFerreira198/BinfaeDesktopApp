@@ -14,10 +14,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  final TextEditingController _urlController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _showServerConfig = false;
   bool? _serverOnline;
 
   @override
@@ -30,13 +28,11 @@ class _LoginViewState extends State<LoginView> {
   void dispose() {
     _userController.dispose();
     _passController.dispose();
-    _urlController.dispose();
     super.dispose();
   }
 
   Future<void> _checkServer() async {
     final apiService = Provider.of<ApiService>(context, listen: false);
-    _urlController.text = apiService.baseUrl;
     final online = await apiService.checkHealth();
     if (mounted) {
       setState(() => _serverOnline = online);
@@ -67,17 +63,6 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-  Future<void> _saveServerUrl() async {
-    final apiService = Provider.of<ApiService>(context, listen: false);
-    await apiService.setBaseUrl(_urlController.text.trim());
-    setState(() => _showServerConfig = false);
-    _checkServer();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Endereço do servidor atualizado!')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,35 +219,6 @@ class _LoginViewState extends State<LoginView> {
                         : const Text('Entrar no Sistema', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                const SizedBox(height: 14),
-
-                // Configurar Servidor
-                TextButton.icon(
-                  onPressed: () => setState(() => _showServerConfig = !_showServerConfig),
-                  icon: const Icon(Icons.dns_outlined, size: 16),
-                  label: Text(_showServerConfig ? 'Ocultar Configuração' : 'Configurar Servidor'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                    textStyle: const TextStyle(fontSize: 12),
-                  ),
-                ),
-
-                if (_showServerConfig) ...[
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _urlController,
-                    decoration: InputDecoration(
-                      labelText: 'URL da API Backend',
-                      filled: true,
-                      fillColor: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.save, size: 18),
-                        onPressed: _saveServerUrl,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
@@ -271,3 +227,4 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+

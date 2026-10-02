@@ -5,16 +5,19 @@ import '../models/item.dart';
 class StorageService {
   static const String _keyItems = 'binfae_desktop_cached_items';
   static const String _keyGroups = 'binfae_desktop_cached_groups';
+  static const String _keySubgroups = 'binfae_desktop_cached_subgroups';
   static const String _keyLocations = 'binfae_desktop_cached_locations';
   static const String _keyLastSync = 'binfae_desktop_last_sync';
 
   List<ItemModel> _memoryItems = [];
   List<GroupModel> _memoryGroups = [];
+  List<SubgroupModel> _memorySubgroups = [];
   List<LocationModel> _memoryLocations = [];
   DateTime? _lastSync;
 
   List<ItemModel> get items => _memoryItems;
   List<GroupModel> get groups => _memoryGroups;
+  List<SubgroupModel> get subgroups => _memorySubgroups;
   List<LocationModel> get locations => _memoryLocations;
   DateTime? get lastSync => _lastSync;
 
@@ -23,6 +26,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final rawItems = prefs.getString(_keyItems);
       final rawGroups = prefs.getString(_keyGroups);
+      final rawSubgroups = prefs.getString(_keySubgroups);
       final rawLocations = prefs.getString(_keyLocations);
       final rawSync = prefs.getString(_keyLastSync);
 
@@ -34,6 +38,11 @@ class StorageService {
       if (rawGroups != null) {
         final List list = jsonDecode(rawGroups);
         _memoryGroups = list.map((json) => GroupModel.fromJson(json)).toList();
+      }
+
+      if (rawSubgroups != null) {
+        final List list = jsonDecode(rawSubgroups);
+        _memorySubgroups = list.map((json) => SubgroupModel.fromJson(json)).toList();
       }
 
       if (rawLocations != null) {
@@ -52,11 +61,13 @@ class StorageService {
   Future<void> persistDatabase({
     required List<ItemModel> items,
     List<GroupModel>? groups,
+    List<SubgroupModel>? subgroups,
     List<LocationModel>? locations,
   }) async {
     _memoryItems = items;
     _lastSync = DateTime.now();
     if (groups != null) _memoryGroups = groups;
+    if (subgroups != null) _memorySubgroups = subgroups;
     if (locations != null) _memoryLocations = locations;
 
     final prefs = await SharedPreferences.getInstance();
@@ -66,6 +77,9 @@ class StorageService {
     if (groups != null) {
       await prefs.setString(_keyGroups, jsonEncode(groups.map((g) => g.toJson()).toList()));
     }
+    if (subgroups != null) {
+      await prefs.setString(_keySubgroups, jsonEncode(subgroups.map((s) => s.toJson()).toList()));
+    }
     if (locations != null) {
       await prefs.setString(_keyLocations, jsonEncode(locations.map((l) => l.toJson()).toList()));
     }
@@ -74,6 +88,7 @@ class StorageService {
   List<ItemModel> filterLocalItems({
     String search = '',
     String? status,
+    int? groupId,
     int? subgroupId,
     int? locationId,
     bool lowStockOnly = false,
@@ -82,6 +97,7 @@ class StorageService {
 
     return _memoryItems.where((item) {
       if (status != null && item.status != status) return false;
+      if (groupId != null && item.subgrupo?.grupoId != groupId) return false;
       if (subgroupId != null && item.subgrupoId != subgroupId) return false;
       if (locationId != null && item.localId != locationId) return false;
       if (lowStockOnly) {

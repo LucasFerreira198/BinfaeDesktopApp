@@ -207,6 +207,8 @@ class ItemMovementModel {
   final String? criadoEm;
   final String? itemNome;
   final String? usuarioNome;
+  final LocationModel? origem;
+  final LocationModel? destino;
 
   ItemMovementModel({
     required this.id,
@@ -220,6 +222,8 @@ class ItemMovementModel {
     this.criadoEm,
     this.itemNome,
     this.usuarioNome,
+    this.origem,
+    this.destino,
   });
 
   factory ItemMovementModel.fromJson(Map<String, dynamic> json) {
@@ -232,9 +236,11 @@ class ItemMovementModel {
       tipoMovimentacao: json['tipo_movimentacao'] as String? ?? 'MOVIMENTACAO',
       quantidadeMovimentada: (json['quantidade_movimentada'] as num?)?.toDouble() ?? 1.0,
       motivo: json['motivo'] as String?,
-      criadoEm: json['criado_em'] as String?,
+      criadoEm: (json['data_hora'] ?? json['criado_em']) as String?,
       itemNome: json['item_nome'] as String?,
       usuarioNome: json['usuario_nome'] as String?,
+      origem: json['origem'] != null ? LocationModel.fromJson(json['origem']) : null,
+      destino: json['destino'] != null ? LocationModel.fromJson(json['destino']) : null,
     );
   }
 }
