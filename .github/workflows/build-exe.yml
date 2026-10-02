@@ -1,0 +1,52 @@
+name: Build & Release Windows Executable (.exe)
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows .exe Installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Executable via electron-builder
+        run: npm run dist
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: BinfaeDesktop-Windows-Executables
+          path: dist/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar Release com Download Direto do EXE
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+        with:
+          tag_name: latest
+          name: "Binfae Desktop - Aplicativo Windows (.exe)"
+          body: "Versão oficial para computadores Windows. Baixe o instalador (.exe) abaixo para instalar ou utilizar a versão portátil do sistema no seu PC."
+          files: dist/*.exe
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

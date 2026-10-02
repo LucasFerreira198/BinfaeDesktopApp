@@ -1,0 +1,54 @@
+{
+  "name": "Sistema de Informática - BINFAE",
+  "short_name": "BINFAE TI",
+  "description": "Sistema de Gestão de Materiais e Equipamentos de Informática - BINFAE",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a2540",
+  "theme_color": "#0a2540",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Leitor QR Code",
+      "short_name": "Scanner",
+      "description": "Abrir o leitor de QR Code / Código de Barras",
+      "url": "/#tab-content-scanner",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Materiais em Estoque",
+      "short_name": "Estoque",
+      "description": "Ver lista de materiais e equipamentos",
+      "url": "/#tab-content-materiais",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Locais Físicos",
+      "short_name": "Locais",
+      "description": "Ver locais físicos e suas alocações",
+      "url": "/#tab-content-locais",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
