@@ -22,7 +22,20 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   String? _militaryError;
 
   final List<String> _postosGraduacoes = [
-    'Soldado',
+    'S2',
+    'S1',
+    'CB',
+    '3S',
+    '2S',
+    '1S',
+    'SO',
+    'Asp',
+    '2T',
+    '1T',
+    'Cap',
+    'Maj',
+    'TC',
+    'Cel',
     'Cabo',
     '3º Sargento',
     '2º Sargento',
@@ -35,6 +48,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     'Major',
     'Tenente-Coronel',
     'Coronel',
+    'Civil',
   ];
 
   @override
@@ -371,7 +385,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     final secaoController = TextEditingController(text: military?.secao ?? '');
     final emailController = TextEditingController(text: military?.email ?? '');
     final celularController = TextEditingController(text: military?.celular ?? '');
-    String posto = military?.postoGraduacao ?? 'Soldado';
+    String posto = military?.postoGraduacao ?? 'S2';
 
     showDialog(
       context: context,
@@ -411,7 +425,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                 prefixIcon: Icon(Icons.military_tech_outlined, size: 18),
                               ),
                               items: _postosGraduacoes.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
-                              onChanged: (val) => setModalState(() => posto = val ?? 'Soldado'),
+                              onChanged: (val) => setModalState(() => posto = val ?? 'S2'),
                             ),
                           ),
                         ],

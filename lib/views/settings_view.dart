@@ -232,7 +232,7 @@ class _SettingsViewState extends State<SettingsView> {
           // Informações de Versão
           Center(
             child: Text(
-              'Informatica - BINFAE-GL v2.0.0 • Nativo Windows (120 FPS)',
+              'Informatica - BINFAE-GL v2.0.1 • Nativo Windows (120 FPS)',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

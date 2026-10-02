@@ -21,7 +21,7 @@ class ReleaseInfo {
 }
 
 class UpdaterService {
-  static const String currentVersion = 'v2.0.0';
+  static const String currentVersion = 'v2.0.1';
   static const String repoOwner = 'LucasFerreira198';
   static const String repoName = 'BinfaeDesktopApp';
 

@@ -61,9 +61,9 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.event_name == 'release'
         with:
           tag_name: latest
-          name: "Informatica - BINFAE-GL v2.0.0 - Aplicativo Nativo Windows (.exe)"
+          name: "Informatica - BINFAE-GL v2.0.1 - Aplicativo Nativo Windows (.exe)"
           body: |
-            ## Informatica - BINFAE-GL v2.0.0 - Versão Oficial Nativa Desktop 💻
+            ## Informatica - BINFAE-GL v2.0.1 - Versão Oficial Nativa Desktop 💻
             
             Aplicativo oficial 100% nativo desenvolvido em **Flutter Desktop (C++/DirectX)** com nova interface moderna v2.0, tema escuro profundo e acentos vibrantes de roxo e verde.
             
