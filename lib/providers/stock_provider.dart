@@ -32,6 +32,7 @@ class StockProvider extends ChangeNotifier {
   bool get lowStockOnly => _lowStockOnly;
 
   List<ItemModel> get allItems => _storageService.items;
+  List<ItemModel> get items => _storageService.items;
   List<GroupModel> get groups => _storageService.groups;
   List<SubgroupModel> get subgroups => _storageService.subgroups;
   List<LocationModel> get locations => _storageService.locations;

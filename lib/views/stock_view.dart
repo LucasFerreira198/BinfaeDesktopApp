@@ -471,7 +471,7 @@ class _StockViewState extends State<StockView> {
               child: Row(
                 children: topLocations.map((loc) {
                   final isSelected = stock.selectedLocationId == loc.id;
-                  final count = stock.items.where((it) => it.localId == loc.id).length;
+                  final count = stock.allItems.where((it) => it.localId == loc.id).length;
 
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
