@@ -14,7 +14,6 @@ class MovementDialog extends StatefulWidget {
 }
 
 class _MovementDialogState extends State<MovementDialog> {
-  late String _tipo;
   final TextEditingController _qtdController = TextEditingController(text: '1');
   final TextEditingController _motivoController = TextEditingController();
   int? _destinoLocalId;
@@ -23,7 +22,6 @@ class _MovementDialogState extends State<MovementDialog> {
   @override
   void initState() {
     super.initState();
-    _tipo = widget.item.status == 'CAUTELADO' ? 'DEVOLUCAO' : 'TRANSFERENCIA';
     _destinoLocalId = widget.item.localId;
   }
 
@@ -43,16 +41,16 @@ class _MovementDialogState extends State<MovementDialog> {
       return;
     }
 
-    if (qty > widget.item.quantidade && widget.item.tipoControle == 'UNITARIO' && _tipo != 'DEVOLUCAO') {
+    if (qty > widget.item.quantidade && widget.item.tipoControle == 'UNITARIO') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Quantidade máxima disponível em estoque: ${widget.item.quantidade}')),
       );
       return;
     }
 
-    if (_tipo == 'TRANSFERENCIA' && _destinoLocalId == null) {
+    if (_destinoLocalId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione o local de destino para a transferência.')),
+        const SnackBar(content: Text('Selecione o local físico de destino.')),
       );
       return;
     }
@@ -65,9 +63,9 @@ class _MovementDialogState extends State<MovementDialog> {
 
       await stockProvider.moveItem(
         itemId: widget.item.id,
-        tipoMovimentacao: _tipo,
+        tipoMovimentacao: 'TRANSFERENCIA',
         quantidade: qty,
-        destinoLocalId: _tipo == 'TRANSFERENCIA' ? _destinoLocalId : widget.item.localId,
+        destinoLocalId: _destinoLocalId,
         motivo: motivo,
       );
 
@@ -76,7 +74,7 @@ class _MovementDialogState extends State<MovementDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: AppColors.success,
-            content: Text('Movimentação registrada com sucesso!'),
+            content: Text('Material transferido com sucesso!'),
           ),
         );
       }
@@ -99,53 +97,150 @@ class _MovementDialogState extends State<MovementDialog> {
       context: context,
       builder: (ctx) {
         String query = '';
+        String filterTipo = 'TODOS';
+
         return StatefulBuilder(
           builder: (context, setPickerState) {
             final filtered = locations.where((l) {
-              if (query.isEmpty) return true;
               final q = query.toLowerCase();
-              return l.nome.toLowerCase().contains(q) || (l.caminhoCompleto?.toLowerCase().contains(q) ?? false);
+              final matchesQuery = query.isEmpty ||
+                  l.nome.toLowerCase().contains(q) ||
+                  (l.caminhoCompleto?.toLowerCase().contains(q) ?? false) ||
+                  (l.tipo?.toLowerCase().contains(q) ?? false);
+
+              final matchesType = filterTipo == 'TODOS' ||
+                  (l.tipo?.toUpperCase() == filterTipo);
+
+              return matchesQuery && matchesType;
             }).toList();
 
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Selecionar Local de Destino'),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              backgroundColor: isDark ? const Color(0xFF0E1422) : Colors.white,
+              title: Row(
+                children: [
+                  const Icon(Icons.place_outlined, color: AppColors.primaryLight, size: 22),
+                  const SizedBox(width: 10),
+                  const Text('Selecionar Local de Destino', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
               content: SizedBox(
-                width: 460,
-                height: 380,
+                width: 520,
+                height: 440,
                 child: Column(
                   children: [
+                    // Campo de Busca Rápida
                     TextField(
                       autofocus: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Pesquisar local por nome ou caminho...',
-                        prefixIcon: Icon(Icons.search, size: 20),
+                      decoration: InputDecoration(
+                        hintText: 'Pesquisar local por nome, armário ou caminho...',
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        suffixIcon: query.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () => setPickerState(() => query = ''),
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       ),
                       onChanged: (v) => setPickerState(() => query = v.trim()),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
+
+                    // Filtros por Tipo de Estrutura
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildTypePickerChip('TODOS', 'Todos', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
+                          _buildTypePickerChip('DEPOSITO', 'Depósitos', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
+                          _buildTypePickerChip('ARMARIO', 'Armários', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
+                          _buildTypePickerChip('PRATELEIRA', 'Prateleiras', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
+                          _buildTypePickerChip('BANCADA', 'Bancadas', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Lista de Locais Filtrados
                     Expanded(
                       child: filtered.isEmpty
-                          ? const Center(child: Text('Nenhum local encontrado.'))
-                          : ListView.builder(
+                          ? Center(
+                              child: Text(
+                                'Nenhum local físico encontrado com "${query}".',
+                                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                              ),
+                            )
+                          : ListView.separated(
                               itemCount: filtered.length,
+                              separatorBuilder: (_, __) => Divider(
+                                height: 1,
+                                color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9),
+                              ),
                               itemBuilder: (context, idx) {
                                 final loc = filtered[idx];
                                 final isSelected = loc.id == _destinoLocalId;
+                                final isCurrent = loc.id == widget.item.localId;
 
-                                return ListTile(
-                                  selected: isSelected,
-                                  leading: Icon(
-                                    Icons.place_outlined,
-                                    color: isSelected ? AppColors.primary : Colors.grey,
+                                final pathFormatted = (loc.caminhoCompleto ?? loc.nome)
+                                    .replaceAll(' > ', ' ➔ ')
+                                    .replaceAll(' / ', ' ➔ ')
+                                    .replaceAll('/', ' ➔ ');
+
+                                return MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: ListTile(
+                                    selected: isSelected,
+                                    selectedTileColor: AppColors.primary.withOpacity(0.12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? AppColors.primary.withOpacity(0.2)
+                                            : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        _getLocationIcon(loc.tipo),
+                                        size: 18,
+                                        color: isSelected ? AppColors.primaryLight : Colors.grey,
+                                      ),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        Text(loc.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                        if (isCurrent) ...[
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: const Text('Atual', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    subtitle: Text(pathFormatted, style: const TextStyle(fontSize: 11)),
+                                    trailing: isSelected
+                                        ? const Icon(Icons.check_circle, color: AppColors.primaryLight, size: 20)
+                                        : null,
+                                    onTap: () {
+                                      setState(() => _destinoLocalId = loc.id);
+                                      Navigator.pop(ctx);
+                                    },
                                   ),
-                                  title: Text(loc.nome, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                  subtitle: loc.caminhoCompleto != null ? Text(loc.caminhoCompleto!, style: const TextStyle(fontSize: 11)) : null,
-                                  trailing: isSelected ? const Icon(Icons.check, color: AppColors.primary) : null,
-                                  onTap: () {
-                                    setState(() => _destinoLocalId = loc.id);
-                                    Navigator.pop(ctx);
-                                  },
                                 );
                               },
                             ),
@@ -163,6 +258,46 @@ class _MovementDialogState extends State<MovementDialog> {
     );
   }
 
+  Widget _buildTypePickerChip(String type, String label, String currentType, Function(String) onSelect) {
+    final active = currentType == type;
+    return GestureDetector(
+      onTap: () => onSelect(type),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: active ? AppColors.primary : Colors.grey.withOpacity(0.4)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: active ? Colors.white : Colors.grey,
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getLocationIcon(String? tipo) {
+    switch (tipo?.toUpperCase()) {
+      case 'DEPOSITO':
+        return Icons.warehouse_outlined;
+      case 'ARMARIO':
+        return Icons.door_sliding_outlined;
+      case 'PRATELEIRA':
+        return Icons.shelves;
+      case 'GAVETA':
+        return Icons.inventory_2_outlined;
+      case 'BANCADA':
+        return Icons.handyman_outlined;
+      default:
+        return Icons.place_outlined;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -170,16 +305,33 @@ class _MovementDialogState extends State<MovementDialog> {
     final stockProvider = Provider.of<StockProvider>(context);
 
     final selectedLoc = stockProvider.getLocationById(_destinoLocalId ?? -1);
+    final currentLoc = widget.item.local;
+
+    final currentLocPath = currentLoc != null
+        ? (currentLoc.caminhoCompleto ?? currentLoc.nome).replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ')
+        : 'Sem local';
+
+    final destLocPath = selectedLoc != null
+        ? (selectedLoc.caminhoCompleto ?? selectedLoc.nome).replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ')
+        : null;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: isDark ? const Color(0xFF0E1422) : Colors.white,
       child: Container(
         width: 520,
         padding: const EdgeInsets.all(26),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
+          ),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -187,7 +339,7 @@ class _MovementDialogState extends State<MovementDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Registrar Movimentação',
+                      'Transferir Local Físico',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -210,27 +362,71 @@ class _MovementDialogState extends State<MovementDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
-            // Tipo de Operação
-            const Text('Tipo de Operação', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _buildTypeChip('TRANSFERENCIA', 'Transferir', AppColors.primary),
-                const SizedBox(width: 8),
-                _buildTypeChip('CAUTELA', 'Cautela', AppColors.warning),
-                const SizedBox(width: 8),
-                _buildTypeChip('DEVOLUCAO', 'Devolução', AppColors.success),
-                const SizedBox(width: 8),
-                _buildTypeChip('MANUTENCAO', 'Manutenção', AppColors.danger),
-              ],
+            // Card Localização Atual
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.my_location, size: 16, color: AppColors.primaryLight),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Local Atual:', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                        Text(currentLocPath, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Seletor de Local Físico de Destino (Novo Local)
+            const Text('Local Físico de Destino *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            InkWell(
+              onTap: () => _showLocationPicker(stockProvider.locations),
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: isDark ? const Color(0xFF27354F) : const Color(0xFFCBD5E1)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.place_outlined, size: 20, color: AppColors.primary),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        destLocPath ?? 'Clique para pesquisar e escolher o local de destino...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: destLocPath != null ? (isDark ? Colors.white : Colors.black87) : Colors.grey,
+                          fontWeight: destLocPath != null ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 16),
 
             // Quantidade
             Text(
-              'Quantidade (${widget.item.unidadeMedida})',
+              'Quantidade a Transferir (${widget.item.unidadeMedida})',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
@@ -249,57 +445,17 @@ class _MovementDialogState extends State<MovementDialog> {
             ),
             const SizedBox(height: 16),
 
-            // Seletor Hierárquico de Local Destino para Transferência
-            if (_tipo == 'TRANSFERENCIA') ...[
-              const Text('Novo Local Físico (Destino) *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: () => _showLocationPicker(stockProvider.locations),
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: isDark ? const Color(0xFF27354F) : const Color(0xFFCBD5E1)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.place_outlined, size: 20, color: AppColors.primary),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          selectedLoc != null
-                              ? (selectedLoc.caminhoCompleto ?? selectedLoc.nome)
-                              : 'Clique para escolher o local de destino...',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: selectedLoc != null ? (isDark ? Colors.white : Colors.black87) : Colors.grey,
-                            fontWeight: selectedLoc != null ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
             // Justificativa / Motivo (OPCIONAL)
-            Text(
-              _tipo == 'CAUTELA'
-                  ? 'Militar Responsável / Operação (Opcional)'
-                  : 'Justificativa / Motivo (Opcional)',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            const Text(
+              'Justificativa / Observação (Opcional)',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
             TextField(
               controller: _motivoController,
               maxLines: 2,
               decoration: InputDecoration(
-                hintText: _tipo == 'CAUTELA' ? 'Ex: 3S Silva - Operação Ágata' : 'Ex: Transferência de almoxarifado',
+                hintText: 'Ex: Reorganização de estoque, alocação de posto de trabalho...',
                 filled: true,
                 fillColor: isDark ? const Color(0xFF131A2A) : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
@@ -311,7 +467,7 @@ class _MovementDialogState extends State<MovementDialog> {
             ),
             const SizedBox(height: 24),
 
-            // Botão Confirmar
+            // Botão Confirmar Transferência
             SizedBox(
               width: double.infinity,
               height: 46,
@@ -321,43 +477,18 @@ class _MovementDialogState extends State<MovementDialog> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
                 ),
                 icon: _isSubmitting
                     ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                     : const Icon(Icons.check, size: 20),
                 label: Text(
-                  _isSubmitting ? 'Registrando...' : 'Confirmar Operação',
+                  _isSubmitting ? 'Transferindo...' : 'Confirmar Transferência de Local',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTypeChip(String type, String label, Color color) {
-    final active = _tipo == type;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _tipo = type),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: active ? color : color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: active ? color : Colors.transparent),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: active ? FontWeight.bold : FontWeight.w500,
-              color: active ? Colors.white : color,
-            ),
-          ),
         ),
       ),
     );

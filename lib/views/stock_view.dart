@@ -59,7 +59,7 @@ class _StockViewState extends State<StockView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Faixa de Métricas Instantâneas (0ms de resposta da RAM)
+          // 1. Contadores de Resumo (5 Cartões 3D com Hover Glow e Micro-interações)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -69,7 +69,7 @@ class _StockViewState extends State<StockView> {
                   count: metrics.total,
                   icon: Icons.inventory_2_outlined,
                   color: AppColors.primary,
-                  bgColor: AppColors.primary.withOpacity(0.12),
+                  bgColor: AppColors.primary.withOpacity(0.15),
                   isActive: stock.selectedStatus == null && !stock.lowStockOnly,
                   onTap: () => stock.clearFilters(),
                 ),
@@ -79,7 +79,7 @@ class _StockViewState extends State<StockView> {
                   count: metrics.disponivel,
                   icon: Icons.check_circle_outline,
                   color: AppColors.success,
-                  bgColor: AppColors.success.withOpacity(0.12),
+                  bgColor: AppColors.success.withOpacity(0.15),
                   isActive: stock.selectedStatus == 'DISPONIVEL',
                   onTap: () => stock.setStatus('DISPONIVEL'),
                 ),
@@ -89,7 +89,7 @@ class _StockViewState extends State<StockView> {
                   count: metrics.cautelado,
                   icon: Icons.schedule,
                   color: AppColors.warning,
-                  bgColor: AppColors.warning.withOpacity(0.12),
+                  bgColor: AppColors.warning.withOpacity(0.15),
                   isActive: stock.selectedStatus == 'CAUTELADO',
                   onTap: () => stock.setStatus('CAUTELADO'),
                 ),
@@ -98,8 +98,8 @@ class _StockViewState extends State<StockView> {
                   label: 'Manutenção',
                   count: metrics.manutencao,
                   icon: Icons.build_outlined,
-                  color: AppColors.danger,
-                  bgColor: AppColors.danger.withOpacity(0.12),
+                  color: AppColors.maintenance,
+                  bgColor: AppColors.maintenance.withOpacity(0.15),
                   isActive: stock.selectedStatus == 'EM_MANUTENCAO',
                   onTap: () => stock.setStatus('EM_MANUTENCAO'),
                 ),
@@ -108,19 +108,24 @@ class _StockViewState extends State<StockView> {
                   label: 'Estoque Baixo',
                   count: metrics.baixoEstoque,
                   icon: Icons.warning_amber_rounded,
-                  color: const Color(0xFFEC4899),
-                  bgColor: const Color(0xFFEC4899).withOpacity(0.12),
+                  color: AppColors.danger,
+                  bgColor: AppColors.danger.withOpacity(0.15),
                   isActive: stock.lowStockOnly,
                   onTap: () => stock.toggleLowStockOnly(),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
-          // 2. Barra de Busca, Ações e Cascata de Filtros
+          // 2. Painel: Visão Geral da Localização com Mini-dashboards Rápidos
+          _buildLocationOverviewPanel(stock, isDark),
+          const SizedBox(height: 16),
+
+          // 3. Barra de Pesquisa, Ações e Filtros
           Row(
             children: [
+              // Barra de Pesquisa Clean (Ctrl+F)
               Expanded(
                 child: TextField(
                   controller: _searchController,
@@ -128,7 +133,11 @@ class _StockViewState extends State<StockView> {
                   onChanged: (val) => stock.setSearch(val),
                   decoration: InputDecoration(
                     hintText: 'Buscar por nome, BMP, código interno, serial ou observação... (Ctrl+F)',
-                    prefixIcon: const Icon(Icons.search, size: 20),
+                    hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    ),
+                    prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.primaryLight),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear, size: 18),
@@ -144,13 +153,21 @@ class _StockViewState extends State<StockView> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
 
-              // Botão [+ Novo Material]
+              // Botão [+ Novo Material (Ctrl+N)] Roxo Proeminente
               ElevatedButton.icon(
                 onPressed: () {
                   showDialog(
@@ -161,18 +178,20 @@ class _StockViewState extends State<StockView> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 3,
+                  shadowColor: AppColors.primary.withOpacity(0.4),
                 ),
                 icon: const Icon(Icons.add_box_outlined, size: 18),
-                label: const Text('Novo Material (Ctrl+N)', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text('+ Novo Material (Ctrl+N)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(width: 10),
 
-              // Botão Sincronizar
+              // Botão Sincronizar Menor (F5)
               IconButton(
                 onPressed: stock.isSyncing ? null : () => stock.syncData(),
-                tooltip: 'Sincronizar dados com o servidor (F5)',
+                tooltip: 'Sincronizar dados (F5)',
                 style: IconButton.styleFrom(
                   backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                   padding: const EdgeInsets.all(12),
@@ -186,36 +205,45 @@ class _StockViewState extends State<StockView> {
           ),
           const SizedBox(height: 12),
 
-          // Linha de Filtros Combinados (Status, Grupo, Subgrupo, Local)
+          // 4. Linha de Filtros Combinados (Chips de Status e Dropdowns)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, () => stock.clearFilters(), isDark),
+                _buildStatusFilterChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, null, () => stock.clearFilters(), isDark),
                 const SizedBox(width: 8),
-                _buildFilterChip('Disponíveis', stock.selectedStatus == 'DISPONIVEL', () => stock.setStatus('DISPONIVEL'), isDark),
+                _buildStatusFilterChip('Disponíveis', stock.selectedStatus == 'DISPONIVEL', AppColors.success, () => stock.setStatus('DISPONIVEL'), isDark),
                 const SizedBox(width: 8),
-                _buildFilterChip('Cautelados', stock.selectedStatus == 'CAUTELADO', () => stock.setStatus('CAUTELADO'), isDark),
+                _buildStatusFilterChip('Cautelados', stock.selectedStatus == 'CAUTELADO', AppColors.warning, () => stock.setStatus('CAUTELADO'), isDark),
                 const SizedBox(width: 8),
-                _buildFilterChip('Manutenção', stock.selectedStatus == 'EM_MANUTENCAO', () => stock.setStatus('EM_MANUTENCAO'), isDark),
+                _buildStatusFilterChip('Manutenção', stock.selectedStatus == 'EM_MANUTENCAO', AppColors.maintenance, () => stock.setStatus('EM_MANUTENCAO'), isDark),
                 const SizedBox(width: 16),
 
                 // Filtro Grupo
                 DropdownButtonHideUnderline(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                     ),
-                    child: DropdownButton<int?>(
-                      value: stock.selectedGroupId,
-                      hint: const Text('Grupo: Todos', style: TextStyle(fontSize: 12)),
-                      items: [
-                        const DropdownMenuItem(value: null, child: Text('Grupo: Todos', style: TextStyle(fontSize: 12))),
-                        ...groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 12)))),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.category_outlined, size: 15, color: AppColors.primaryLight),
+                        const SizedBox(width: 6),
+                        DropdownButton<int?>(
+                          value: stock.selectedGroupId,
+                          isDense: true,
+                          hint: const Text('Grupo: Todos', style: TextStyle(fontSize: 12)),
+                          items: [
+                            const DropdownMenuItem(value: null, child: Text('Grupo: Todos', style: TextStyle(fontSize: 12))),
+                            ...groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 12)))),
+                          ],
+                          onChanged: (v) => stock.setGroup(v),
+                        ),
                       ],
-                      onChanged: (v) => stock.setGroup(v),
                     ),
                   ),
                 ),
@@ -224,19 +252,28 @@ class _StockViewState extends State<StockView> {
                 // Filtro Subgrupo
                 DropdownButtonHideUnderline(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                     ),
-                    child: DropdownButton<int?>(
-                      value: stock.selectedSubgroupId,
-                      hint: const Text('Subgrupo: Todos', style: TextStyle(fontSize: 12)),
-                      items: [
-                        const DropdownMenuItem(value: null, child: Text('Subgrupo: Todos', style: TextStyle(fontSize: 12))),
-                        ...filteredSubgroups.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nome, style: const TextStyle(fontSize: 12)))),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.account_tree_outlined, size: 15, color: AppColors.primaryLight),
+                        const SizedBox(width: 6),
+                        DropdownButton<int?>(
+                          value: stock.selectedSubgroupId,
+                          isDense: true,
+                          hint: const Text('Subgrupo: Todos', style: TextStyle(fontSize: 12)),
+                          items: [
+                            const DropdownMenuItem(value: null, child: Text('Subgrupo: Todos', style: TextStyle(fontSize: 12))),
+                            ...filteredSubgroups.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nome, style: const TextStyle(fontSize: 12)))),
+                          ],
+                          onChanged: (v) => stock.setSubgroup(v),
+                        ),
                       ],
-                      onChanged: (v) => stock.setSubgroup(v),
                     ),
                   ),
                 ),
@@ -245,48 +282,75 @@ class _StockViewState extends State<StockView> {
                 // Filtro Local
                 DropdownButtonHideUnderline(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                     ),
-                    child: DropdownButton<int?>(
-                      value: stock.selectedLocationId,
-                      hint: const Text('Local: Todos', style: TextStyle(fontSize: 12)),
-                      items: [
-                        const DropdownMenuItem(value: null, child: Text('Local: Todos', style: TextStyle(fontSize: 12))),
-                        ...stock.locations.map((loc) => DropdownMenuItem(
-                              value: loc.id,
-                              child: Text(loc.caminhoCompleto ?? loc.nome, style: const TextStyle(fontSize: 12)),
-                            )),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.place_outlined, size: 15, color: AppColors.primaryLight),
+                        const SizedBox(width: 6),
+                        DropdownButton<int?>(
+                          value: stock.selectedLocationId,
+                          isDense: true,
+                          hint: const Text('Local: Todos', style: TextStyle(fontSize: 12)),
+                          items: [
+                            const DropdownMenuItem(value: null, child: Text('Local: Todos', style: TextStyle(fontSize: 12))),
+                            ...stock.locations.map((loc) => DropdownMenuItem(
+                                  value: loc.id,
+                                  child: Text(_formatLocationTree(loc.caminhoCompleto ?? loc.nome), style: const TextStyle(fontSize: 12)),
+                                )),
+                          ],
+                          onChanged: (v) => stock.setLocation(v),
+                        ),
                       ],
-                      onChanged: (v) => stock.setLocation(v),
                     ),
                   ),
                 ),
 
-                // Chip Local Ativo com limpeza
+                // Chip Local Ativo com Botão de Limpeza Rápida
                 if (selectedLocation != null) ...[
-                  const SizedBox(width: 8),
-                  InputChip(
-                    label: Text(selectedLocation.nome, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                    avatar: const Icon(Icons.place, size: 14, color: AppColors.primary),
-                    onDeleted: () => stock.clearLocationFilter(),
-                    deleteIconColor: Colors.grey,
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.primaryLight),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.place, size: 14, color: AppColors.primaryLight),
+                        const SizedBox(width: 6),
+                        Text(
+                          _formatLocationTree(selectedLocation.caminhoCompleto ?? selectedLocation.nome),
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
+                        ),
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => stock.clearLocationFilter(),
+                          child: const Icon(Icons.close, size: 14, color: AppColors.primaryLight),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // Contador de Resultados
+          // Contador de Resultados e Limpar Filtros
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${items.length} ${items.length == 1 ? "material listado" : "materiais listados"} (consulta em 0ms)',
-                style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B)),
+                '${items.length} ${items.length == 1 ? "material listado" : "materiais listados"} (pesquisa instantânea em 0ms)',
+                style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
               ),
               if (stock.searchQuery.isNotEmpty || stock.selectedStatus != null || stock.selectedGroupId != null || stock.selectedLocationId != null || stock.lowStockOnly)
                 TextButton.icon(
@@ -299,27 +363,27 @@ class _StockViewState extends State<StockView> {
                 ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
-          // 3. Tabela de Materiais Avançada com Comportamento Contextual de Busca Vazia
+          // 5. Listagem de Itens Mais Rica com Miniaturas, Árvore de Localização e Mouse Hover States
           Expanded(
             child: items.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.inventory_2_outlined, size: 56, color: Colors.grey.withOpacity(0.5)),
+                        Icon(Icons.inventory_2_outlined, size: 56, color: Colors.grey.withOpacity(0.4)),
                         const SizedBox(height: 14),
                         Text(
                           selectedLocation != null
-                              ? 'Nenhum material encontrado no(a) ${selectedLocation.caminhoCompleto ?? selectedLocation.nome}'
-                              : 'Nenhum material encontrado',
+                              ? 'Nenhum material encontrado em ${_formatLocationTree(selectedLocation.caminhoCompleto ?? selectedLocation.nome)}'
+                              : 'Nenhum material localizado',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         if (selectedLocation != null) ...[
-                          const Text('Não há materiais com esses critérios armazenados nesta localização específica.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Text('Não há materiais com esses critérios nesta localização específica.', style: TextStyle(fontSize: 12, color: Colors.grey)),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
                             onPressed: () => stock.clearLocationFilter(),
@@ -330,10 +394,10 @@ class _StockViewState extends State<StockView> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             icon: const Icon(Icons.search, size: 16),
-                            label: const Text('Sair deste local e pesquisar em todos os estoques'),
+                            label: const Text('Pesquisar em todas as localizações'),
                           ),
                         ] else ...[
-                          const Text('Tente buscar por outro termo, código interno ou limpe os filtros ativos.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Text('Tente buscar por outro termo, BMP, código interno ou limpe os filtros.', style: TextStyle(fontSize: 12, color: Colors.grey)),
                         ],
                       ],
                     ),
@@ -354,7 +418,11 @@ class _StockViewState extends State<StockView> {
                         ),
                         itemBuilder: (context, index) {
                           final item = items[index];
-                          return _buildItemRow(context, item, isDark);
+                          return _ItemTableRow(
+                            key: ValueKey(item.id),
+                            item: item,
+                            isDark: isDark,
+                          );
                         },
                       ),
                     ),
@@ -365,173 +433,399 @@ class _StockViewState extends State<StockView> {
     );
   }
 
-  Widget _buildFilterChip(String label, bool active, VoidCallback onTap, bool isDark) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: active ? AppColors.primary : (isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
-          borderRadius: BorderRadius.circular(20),
+  // Painel Visão Geral da Localização com mini-dashboards rápidos
+  Widget _buildLocationOverviewPanel(StockProvider stock, bool isDark) {
+    final topLocations = stock.locations.take(6).toList();
+    if (topLocations.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF111827) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1F293D) : const Color(0xFFE2E8F0),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: active ? FontWeight.bold : FontWeight.w500,
-            color: active ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF475569)),
+      ),
+      child: Row(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.insights, size: 16, color: AppColors.primaryLight),
+              const SizedBox(width: 8),
+              Text(
+                'Visão Geral dos Locais:',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                  color: isDark ? Colors.white70 : const Color(0xFF475569),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: topLocations.map((loc) {
+                  final isSelected = stock.selectedLocationId == loc.id;
+                  final count = stock.items.where((it) => it.localId == loc.id).length;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (isSelected) {
+                            stock.clearLocationFilter();
+                          } else {
+                            stock.setLocation(loc.id);
+                          }
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : (isDark ? const Color(0xFF1B243B) : Colors.white),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : (isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                loc.nome,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF334155)),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.white.withOpacity(0.2)
+                                      : (isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected ? Colors.white : AppColors.primaryLight,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusFilterChip(String label, bool active, Color? dotColor, VoidCallback onTap, bool isDark) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.primary
+                : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: active ? AppColors.primary : Colors.transparent,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (dotColor != null) ...[
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: dotColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: active ? FontWeight.bold : FontWeight.w500,
+                  color: active ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildItemRow(BuildContext context, ItemModel item, bool isDark) {
+  static String _formatLocationTree(String path) {
+    return path.replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ');
+  }
+}
+
+class _ItemTableRow extends StatefulWidget {
+  final ItemModel item;
+  final bool isDark;
+
+  const _ItemTableRow({super.key, required this.item, required this.isDark});
+
+  @override
+  State<_ItemTableRow> createState() => _ItemTableRowState();
+}
+
+class _ItemTableRowState extends State<_ItemTableRow> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+    final isDark = widget.isDark;
     final statusColor = _getStatusColor(item.status);
 
-    return InkWell(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (ctx) => ItemDetailDialog(item: item),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        child: Row(
-          children: [
-            // Identificador BMP ou Código
-            Container(
-              width: 86,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: item.bmp != null
-                    ? AppColors.primary.withOpacity(0.12)
-                    : (isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                item.bmp != null ? 'BMP ${item.bmp}' : (item.codigoInterno ?? 'ID #${item.id}'),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: item.bmp != null ? AppColors.primaryLight : Colors.grey,
-                ),
+    final rowBg = _isHovered
+        ? (isDark ? const Color(0xFF1B243B) : const Color(0xFFF8FAFC))
+        : Colors.transparent;
+
+    final locationTree = item.local != null
+        ? (item.local!.caminhoCompleto ?? item.local!.nome).replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ')
+        : 'Sem local físico';
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => ItemDetailDialog(item: item),
+          );
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          decoration: BoxDecoration(
+            color: rowBg,
+            border: Border(
+              left: BorderSide(
+                color: _isHovered ? AppColors.primary : Colors.transparent,
+                width: 3,
               ),
             ),
-            const SizedBox(width: 16),
-
-            // Nome e Hierarquia (Local + Subgrupo)
-            Expanded(
-              flex: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.nome,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
+          ),
+          child: Row(
+            children: [
+              // Miniatura Sutil do Item / Ícone de Hardware
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [const Color(0xFF1E293B), const Color(0xFF151D2F)]
+                        : [const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${item.subgrupo?.nome ?? "Geral"} • 📍 ${item.local?.caminhoCompleto ?? item.local?.nome ?? "Sem local físico"}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                    ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _isHovered ? AppColors.primaryLight.withOpacity(0.5) : (isDark ? const Color(0xFF243049) : const Color(0xFFCBD5E1)),
                   ),
-                ],
-              ),
-            ),
-
-            // Estado de Conservação
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                item.estadoConservacao.replaceAll('_', ' '),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                ),
+                child: Center(
+                  child: Icon(
+                    _getItemIcon(item.nome),
+                    size: 20,
+                    color: _isHovered ? AppColors.primaryLight : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
+              const SizedBox(width: 14),
 
-            // Status Badge
-            Container(
-              width: 100,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                item.status,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: statusColor,
+              // Identificador BMP ou Código Interno
+              Container(
+                width: 90,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: item.bmp != null
+                      ? AppColors.primary.withOpacity(0.12)
+                      : (isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  item.bmp != null ? 'BMP ${item.bmp}' : (item.codigoInterno ?? 'ID #${item.id}'),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: item.bmp != null ? AppColors.primaryLight : Colors.grey,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 20),
+              const SizedBox(width: 16),
 
-            // Saldo Atual
-            SizedBox(
-              width: 90,
-              child: Text(
-                '${item.quantidade} ${item.unidadeMedida.toLowerCase()}',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+              // Nome e Representação em Árvore da Localização (ex: Depósito ➔ Armário 1)
+              Expanded(
+                flex: 4,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.nome,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          item.subgrupo?.nome ?? 'Geral',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text('•', style: TextStyle(fontSize: 11, color: isDark ? Colors.white30 : Colors.black26)),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.account_tree_outlined, size: 12, color: AppColors.primaryLight),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            locationTree,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
 
-            // Ações Rápidas
-            IconButton(
-              icon: const Icon(Icons.swap_horiz, size: 20),
-              tooltip: 'Movimentar / Transferir',
-              color: AppColors.primary,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => MovementDialog(item: item),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 18),
-              tooltip: 'Editar Material',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => ItemFormDialog(item: item),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right, size: 20),
-              tooltip: 'Detalhes e QR Code',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => ItemDetailDialog(item: item),
-                );
-              },
-            ),
-          ],
+              // Estado de Conservação
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  item.estadoConservacao.replaceAll('_', ' '),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+
+              // Status Badge
+              Container(
+                width: 105,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  item.status,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+
+              // Saldo Atual
+              SizedBox(
+                width: 90,
+                child: Text(
+                  '${item.quantidade} ${item.unidadeMedida.toLowerCase()}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+              ),
+
+              // Ações Rápidas com Tooltip
+              IconButton(
+                icon: const Icon(Icons.swap_horiz, size: 20),
+                tooltip: 'Transferir Local',
+                color: AppColors.primaryLight,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => MovementDialog(item: item),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                tooltip: 'Editar Material',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => ItemFormDialog(item: item),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right, size: 20),
+                tooltip: 'Detalhes e QR Code',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => ItemDetailDialog(item: item),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -544,9 +838,29 @@ class _StockViewState extends State<StockView> {
       case 'CAUTELADO':
         return AppColors.warning;
       case 'EM_MANUTENCAO':
-        return AppColors.danger;
+        return AppColors.maintenance;
       default:
         return AppColors.info;
     }
+  }
+
+  IconData _getItemIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('optiplex') || lower.contains('computador') || lower.contains('desktop') || lower.contains('pc')) {
+      return Icons.computer;
+    } else if (lower.contains('notebook') || lower.contains('laptop') || lower.contains('dell')) {
+      return Icons.laptop_chromebook;
+    } else if (lower.contains('monitor') || lower.contains('tela')) {
+      return Icons.desktop_windows_outlined;
+    } else if (lower.contains('impressora') || lower.contains('laser')) {
+      return Icons.print_outlined;
+    } else if (lower.contains('switch') || lower.contains('roteador') || lower.contains('rede')) {
+      return Icons.router_outlined;
+    } else if (lower.contains('teclado') || lower.contains('mouse')) {
+      return Icons.keyboard_outlined;
+    } else if (lower.contains('cabo')) {
+      return Icons.cable;
+    }
+    return Icons.devices_other;
   }
 }

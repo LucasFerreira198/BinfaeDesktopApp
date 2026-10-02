@@ -173,7 +173,12 @@ class _LocationsViewState extends State<LocationsView> {
                           final loc = filteredLocations[index];
                           final itemCount = stock.allItems.where((i) => i.localId == loc.id).length;
 
-                          return _buildLocationRow(context, loc, itemCount, isDark);
+                          return _LocationRowItem(
+                            key: ValueKey(loc.id),
+                            loc: loc,
+                            itemCount: itemCount,
+                            isDark: isDark,
+                          );
                         },
                       ),
                     ),
@@ -183,8 +188,33 @@ class _LocationsViewState extends State<LocationsView> {
       ),
     );
   }
+}
 
-  Widget _buildLocationRow(BuildContext context, LocationModel loc, int itemCount, bool isDark) {
+class _LocationRowItem extends StatefulWidget {
+  final LocationModel loc;
+  final int itemCount;
+  final bool isDark;
+
+  const _LocationRowItem({
+    super.key,
+    required this.loc,
+    required this.itemCount,
+    required this.isDark,
+  });
+
+  @override
+  State<_LocationRowItem> createState() => _LocationRowItemState();
+}
+
+class _LocationRowItemState extends State<_LocationRowItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = widget.loc;
+    final itemCount = widget.itemCount;
+    final isDark = widget.isDark;
+
     IconData icon;
     Color iconColor;
     final tipo = loc.tipo?.toUpperCase() ?? 'DEPOSITO';
@@ -219,109 +249,136 @@ class _LocationsViewState extends State<LocationsView> {
         iconColor = AppColors.primary;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      child: Row(
-        children: [
-          // Ícone do Tipo de Estrutura
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(width: 16),
+    final pathFormatted = (loc.caminhoCompleto ?? loc.nome)
+        .replaceAll(' > ', ' ➔ ')
+        .replaceAll(' / ', ' ➔ ')
+        .replaceAll('/', ' ➔ ');
 
-          // Nome do Local e Caminho Completo
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      loc.nome,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        tipo,
+    final rowBg = _isHovered
+        ? (isDark ? const Color(0xFF1B243B) : const Color(0xFFF8FAFC))
+        : Colors.transparent;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        decoration: BoxDecoration(
+          color: rowBg,
+          border: Border(
+            left: BorderSide(
+              color: _isHovered ? AppColors.primary : Colors.transparent,
+              width: 3,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            // Ícone do Tipo de Estrutura
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _isHovered ? iconColor.withOpacity(0.4) : Colors.transparent,
+                ),
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 16),
+
+            // Nome do Local e Caminho Completo em Árvore
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        loc.nome,
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          tipo,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    pathFormatted,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  if (loc.descricao != null && loc.descricao!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      loc.descricao!,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  loc.caminhoCompleto ?? loc.nome,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                  ),
-                ),
-                if (loc.descricao != null && loc.descricao!.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    loc.descricao!,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    ),
-                  ),
                 ],
-              ],
-            ),
-          ),
-
-          // Badge de Quantidade de Materiais Vinculados
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: itemCount > 0
-                  ? AppColors.primary.withOpacity(0.12)
-                  : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              itemCount == 1 ? '1 material' : '$itemCount materiais',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: itemCount > 0 ? AppColors.primary : Colors.grey,
               ),
             ),
-          ),
-          const SizedBox(width: 14),
 
-          // Botão Editar
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, size: 18),
-            tooltip: 'Editar Local',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (ctx) => LocationFormDialog(location: loc),
-              );
-            },
-          ),
-        ],
+            // Badge de Quantidade de Materiais Vinculados
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: itemCount > 0
+                    ? AppColors.primary.withOpacity(0.12)
+                    : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                itemCount == 1 ? '1 material' : '$itemCount materiais',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: itemCount > 0 ? AppColors.primaryLight : Colors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // Botão Editar
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              tooltip: 'Editar Local',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => LocationFormDialog(location: loc),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

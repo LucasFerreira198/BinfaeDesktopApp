@@ -48,7 +48,7 @@ class BinfaeDesktopApp extends StatelessWidget {
     return Consumer2<ThemeProvider, AuthProvider>(
       builder: (context, themeProv, authProv, child) {
         return MaterialApp(
-          title: 'BINFAE Desktop',
+          title: 'Informatica - BINFAE-GL',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

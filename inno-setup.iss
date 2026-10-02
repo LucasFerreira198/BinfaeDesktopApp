@@ -1,9 +1,9 @@
-; Script Inno Setup para BINFAE Desktop (Flutter Windows Nativo)
+; Script Inno Setup para Informatica - BINFAE-GL (Flutter Windows Nativo)
 [Setup]
-AppName=BINFAE Desktop
-AppVersion=1.0.0
-DefaultDirName={autopf}\BINFAE Desktop
-DefaultGroupName=BINFAE Desktop
+AppName=Informatica - BINFAE-GL
+AppVersion=2.0.0
+DefaultDirName={autopf}\Informatica - BINFAE-GL
+DefaultGroupName=Informatica - BINFAE-GL
 OutputDir=dist
 OutputBaseFilename=BinfaeDesktop-Setup
 Compression=lzma2
@@ -19,8 +19,8 @@ Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortugue
 Source: "build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\BINFAE Desktop"; Filename: "{app}\binfae_desktop.exe"
-Name: "{autodesktop}\BINFAE Desktop"; Filename: "{app}\binfae_desktop.exe"
+Name: "{group}\Informatica - BINFAE-GL"; Filename: "{app}\binfae_desktop.exe"
+Name: "{autodesktop}\Informatica - BINFAE-GL"; Filename: "{app}\binfae_desktop.exe"
 
 [Run]
-Filename: "{app}\binfae_desktop.exe"; Description: "{cm:LaunchProgram,BINFAE Desktop}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\binfae_desktop.exe"; Description: "{cm:LaunchProgram,Informatica - BINFAE-GL}"; Flags: nowait postinstall skipifsilent

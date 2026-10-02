@@ -94,45 +94,66 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Logo Icon
+                // Logo Icon - Escudo Estilizado com Micro-servidor
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(18),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.4),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
+                        color: AppColors.primary.withOpacity(0.45),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.shield, color: Colors.white, size: 34),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Icon(Icons.shield_outlined, color: Colors.white, size: 42),
+                      Positioned(
+                        bottom: 22,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Icon(Icons.dns, color: Colors.white, size: 14),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
 
-                // Títulos
+                // Títulos Oficiais
                 Text(
-                  'BINFAE Desktop',
+                  'Informatica - BINFAE-GL',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Sistema Nativo de Informática e Controle de Estoque',
+                  'Gestão de Patrimônio & TI • Versão Nativa Desktop',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 // Status da Conexão
                 Container(

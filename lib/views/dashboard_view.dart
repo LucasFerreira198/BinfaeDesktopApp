@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/stock_provider.dart';
 import '../providers/theme_provider.dart';
-import '../services/api_service.dart';
+import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/item_detail_dialog.dart';
 import '../widgets/item_form_dialog.dart';
@@ -32,15 +32,13 @@ class _DashboardViewState extends State<DashboardView> {
   DateTime? _firstCharTime;
 
   // Auto-updater state
-  String? _newReleaseTag;
-  String? _newReleaseUrl;
-  bool _dismissedUpdate = false;
+  ReleaseInfo? _latestRelease;
 
   @override
   void initState() {
     super.initState();
 
-    // Sincronização inicial em background
+    // Sincronização inicial em background e checagem de atualizações
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<StockProvider>(context, listen: false).syncData();
       _checkForUpdates();
@@ -57,28 +55,22 @@ class _DashboardViewState extends State<DashboardView> {
     super.dispose();
   }
 
-  Future<void> _checkForUpdates() async {
+  Future<void> _checkForUpdates({bool manual = false}) async {
     try {
-      final api = Provider.of<ApiService>(context, listen: false);
-      final release = await api.checkLatestRelease();
-      if (release != null && release['tag_name'] != null) {
-        final tag = release['tag_name'] as String;
-        // Se a tag for diferente da versão atual v1.0.0
-        if (tag != 'v1.0.0' && tag != '1.0.0' && mounted) {
-          String? downloadUrl;
-          if (release['assets'] is List) {
-            for (final asset in release['assets']) {
-              final name = asset['name'] as String? ?? '';
-              if (name.endsWith('.exe')) {
-                downloadUrl = asset['browser_download_url'] as String?;
-                break;
-              }
-            }
+      final release = await UpdaterService.checkLatestRelease();
+      if (release != null && mounted) {
+        if (UpdaterService.isNewerVersion(release.tag) || (manual && release.exeDownloadUrl != null)) {
+          setState(() => _latestRelease = release);
+          if (manual) {
+            UpdaterService.showUpdateModal(context, release);
           }
-          setState(() {
-            _newReleaseTag = tag;
-            _newReleaseUrl = downloadUrl ?? release['html_url'] as String?;
-          });
+        } else if (manual) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: AppColors.success,
+              content: Text('Você já está na versão mais recente do Informatica - BINFAE-GL!'),
+            ),
+          );
         }
       }
     } catch (_) {}
@@ -189,28 +181,36 @@ class _DashboardViewState extends State<DashboardView> {
       const SettingsView(),
     ];
 
-    // Ajusta o índice se o painel admin for oculto
     if (!isAdmin && _selectedIndex == 4) {
       _selectedIndex = 0;
     }
 
     final titles = [
-      'Inventário e Gestão de Materiais',
+      'Materiais e Gestão de Estoque',
       'Locais Físicos e Estrutura',
       'Grupos e Subgrupos',
-      'Histórico de Movimentações',
+      'Histórico Geral de Movimentações',
       if (isAdmin) 'Painel Administrativo',
       'Configurações e Perfil',
+    ];
+
+    final icons = [
+      Icons.inventory_2_outlined,
+      Icons.place_outlined,
+      Icons.category_outlined,
+      Icons.history_outlined,
+      if (isAdmin) Icons.admin_panel_settings_outlined,
+      Icons.settings_outlined,
     ];
 
     return Scaffold(
       body: Row(
         children: [
-          // Sidebar de Navegação Widescreen Persistente
+          // Sidebar Esquerda Refinada
           Container(
-            width: 240,
+            width: 250,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F1626) : Colors.white,
+              color: isDark ? const Color(0xFF0B0F19) : Colors.white,
               border: Border(
                 right: BorderSide(
                   color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
@@ -220,45 +220,67 @@ class _DashboardViewState extends State<DashboardView> {
             ),
             child: Column(
               children: [
-                // Top Header Brand
+                // Top Header Brand (Escudo Estilizado com Micro-servidor)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        width: 42,
+                        height: 42,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(10),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                              color: AppColors.primary.withOpacity(0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.shield, color: Colors.white, size: 22),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Icon(Icons.shield_outlined, color: Colors.white, size: 24),
+                            Positioned(
+                              bottom: 11,
+                              child: Container(
+                                padding: const EdgeInsets.all(1.5),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                                child: const Icon(Icons.dns, color: Colors.white, size: 9),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'BINFAE',
+                            'Informatica',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
+                              letterSpacing: 0.3,
                               color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
                           ),
                           Text(
-                            'Gestão de Patrimônio & TI',
+                            'BINFAE-GL',
                             style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryLight,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
@@ -266,26 +288,95 @@ class _DashboardViewState extends State<DashboardView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 6),
+                const Divider(height: 1, thickness: 1),
+                const SizedBox(height: 10),
 
-                // Itens de Navegação
-                _buildNavItem(0, 'Materiais e Estoque', Icons.inventory_2_outlined, isDark),
-                _buildNavItem(1, 'Locais Físicos', Icons.place_outlined, isDark),
-                _buildNavItem(2, 'Grupos e Subgrupos', Icons.category_outlined, isDark),
-                _buildNavItem(3, 'Histórico Geral', Icons.history_outlined, isDark),
+                // Itens de Navegação com Indicador de Mouse Hover e Badges
+                _NavHoverItem(
+                  index: 0,
+                  currentIndex: _selectedIndex,
+                  label: 'Materiais e Estoque',
+                  icon: Icons.inventory_2_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 0),
+                ),
+                _NavHoverItem(
+                  index: 1,
+                  currentIndex: _selectedIndex,
+                  label: 'Locais Físicos',
+                  icon: Icons.place_outlined,
+                  isDark: isDark,
+                  badgeWidget: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.16),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.insights, size: 10, color: AppColors.primaryLight),
+                        SizedBox(width: 2),
+                        Text('Árvore', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
+                      ],
+                    ),
+                  ),
+                  onTap: () => setState(() => _selectedIndex = 1),
+                ),
+                _NavHoverItem(
+                  index: 2,
+                  currentIndex: _selectedIndex,
+                  label: 'Grupos e Subgrupos',
+                  icon: Icons.category_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 2),
+                ),
+                _NavHoverItem(
+                  index: 3,
+                  currentIndex: _selectedIndex,
+                  label: 'Histórico Geral',
+                  icon: Icons.history_outlined,
+                  isDark: isDark,
+                  badgeWidget: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      '1 Novo',
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                  onTap: () => setState(() => _selectedIndex = 3),
+                ),
                 if (isAdmin)
-                  _buildNavItem(4, 'Painel Administrativo', Icons.admin_panel_settings_outlined, isDark),
-                _buildNavItem(isAdmin ? 5 : 4, 'Configurações', Icons.settings_outlined, isDark),
+                  _NavHoverItem(
+                    index: 4,
+                    currentIndex: _selectedIndex,
+                    label: 'Painel Administrativo',
+                    icon: Icons.admin_panel_settings_outlined,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 4),
+                  ),
+                _NavHoverItem(
+                  index: isAdmin ? 5 : 4,
+                  currentIndex: _selectedIndex,
+                  label: 'Configurações',
+                  icon: Icons.settings_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = isAdmin ? 5 : 4),
+                ),
 
                 const Spacer(),
 
-                // Indicador de Leitor USB de Código de Barras Conectado
+                // Indicador de Leitor USB Wedge
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Row(
                     children: [
-                      const Icon(Icons.qr_code_scanner, size: 14, color: AppColors.primary),
-                      const SizedBox(width: 6),
+                      const Icon(Icons.qr_code_scanner, size: 14, color: AppColors.primaryLight),
+                      const SizedBox(width: 8),
                       Text(
                         'Leitor USB Wedge Ativo',
                         style: TextStyle(
@@ -298,9 +389,9 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ),
 
-                // Status de Sincronização no Rodapé da Barra
+                // Status de Sincronização em RAM no Rodapé da Barra
                 Container(
-                  margin: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(14),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC),
@@ -321,7 +412,7 @@ class _DashboardViewState extends State<DashboardView> {
                               : (stock.isSyncing ? AppColors.warning : AppColors.success),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           stock.isSyncing
@@ -350,39 +441,7 @@ class _DashboardViewState extends State<DashboardView> {
           Expanded(
             child: Column(
               children: [
-                // Banner de Nova Atualização Disponível (se houver)
-                if (_newReleaseTag != null && !_dismissedUpdate)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    color: AppColors.primary.withOpacity(0.12),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.system_update_alt, size: 18, color: AppColors.primary),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Nova versão ($_newReleaseTag) do BINFAE Desktop disponível para instalação.',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
-                          ),
-                        ),
-                        if (_newReleaseUrl != null)
-                          TextButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Baixe a nova versão no GitHub: $_newReleaseUrl')),
-                              );
-                            },
-                            child: const Text('Baixar Instalador', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 16),
-                          onPressed: () => setState(() => _dismissedUpdate = true),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                // Barra Superior do Desktop
+                // Header Superior Evoluído
                 Container(
                   height: 64,
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -398,16 +457,71 @@ class _DashboardViewState extends State<DashboardView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        _selectedIndex < titles.length ? titles[_selectedIndex] : 'BINFAE',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
-                      ),
+                      // Título da View Atual com Ícone
                       Row(
                         children: [
+                          Icon(
+                            _selectedIndex < icons.length ? icons[_selectedIndex] : Icons.inventory_2_outlined,
+                            size: 20,
+                            color: AppColors.primaryLight,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            _selectedIndex < titles.length ? titles[_selectedIndex] : 'Informatica - BINFAE-GL',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Ações do Header (Notificação Discreta de Download + Tema + Perfil Dropdown)
+                      Row(
+                        children: [
+                          // Notificação discreta de Atualização [v... disponível]
+                          if (_latestRelease != null) ...[
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () => UpdaterService.showUpdateModal(context, _latestRelease!),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withOpacity(0.35),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.download_rounded, size: 14, color: Colors.white),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '[${_latestRelease!.tag} disponível]',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+
                           // Botão de Tema
                           IconButton(
                             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
@@ -416,37 +530,122 @@ class _DashboardViewState extends State<DashboardView> {
                           ),
                           const SizedBox(width: 12),
 
-                          // Usuário Militar
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(20),
+                          // Dropdown de Perfil Militar (S2 D. PAULA / Usuário)
+                          PopupMenuButton<String>(
+                            tooltip: 'Opções de Conta',
+                            offset: const Offset(0, 48),
+                            color: isDark ? const Color(0xFF151D2F) : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              side: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.person, size: 16, color: AppColors.primary),
-                                const SizedBox(width: 8),
-                                Text(
-                                  user?.displayName ?? 'Militar',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            onSelected: (val) {
+                              if (val == 'settings') {
+                                setState(() => _selectedIndex = isAdmin ? 5 : 4);
+                              } else if (val == 'update') {
+                                _checkForUpdates(manual: true);
+                              } else if (val == 'theme') {
+                                themeProv.toggleTheme();
+                              } else if (val == 'logout') {
+                                auth.logout();
+                              }
+                            },
+                            itemBuilder: (ctx) => [
+                              PopupMenuItem(
+                                value: 'settings',
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.person_outline, size: 18),
+                                    const SizedBox(width: 10),
+                                    Text(user?.displayName ?? 'S2 D. PAULA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuDivider(),
+                              const PopupMenuItem(
+                                value: 'update',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.system_update_alt, size: 18, color: AppColors.primaryLight),
+                                    SizedBox(width: 10),
+                                    Text('Verificar Atualizações', style: TextStyle(fontSize: 13)),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'theme',
+                                child: Row(
+                                  children: [
+                                    Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 18),
+                                    const SizedBox(width: 10),
+                                    Text(isDark ? 'Modo Claro' : 'Modo Escuro', style: const TextStyle(fontSize: 13)),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuDivider(),
+                              const PopupMenuItem(
+                                value: 'logout',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.logout, size: 18, color: AppColors.danger),
+                                    SizedBox(width: 10),
+                                    Text('Encerrar Sessão', style: TextStyle(fontSize: 13, color: AppColors.danger)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
                                   ),
                                 ),
-                                if (isAdmin) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(10),
+                                child: Row(
+                                  children: [
+                                    // Avatar com anel de gradiente
+                                    Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          colors: [Color(0xFF7C3AED), Color(0xFF10B981)],
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(Icons.shield, color: Colors.white, size: 15),
+                                      ),
                                     ),
-                                    child: const Text('ADMIN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
-                                  ),
-                                ],
-                              ],
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      user?.displayName ?? 'S2 D. PAULA',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                    if (isAdmin) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Text('ADMIN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
+                                      ),
+                                    ],
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.arrow_drop_down, size: 18),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -466,46 +665,94 @@ class _DashboardViewState extends State<DashboardView> {
       ),
     );
   }
+}
 
-  Widget _buildNavItem(int index, String label, IconData icon, bool isDark) {
-    final active = _selectedIndex == index;
+class _NavHoverItem extends StatefulWidget {
+  final int index;
+  final int currentIndex;
+  final String label;
+  final IconData icon;
+  final bool isDark;
+  final Widget? badgeWidget;
+  final VoidCallback onTap;
+
+  const _NavHoverItem({
+    required this.index,
+    required this.currentIndex,
+    required this.label,
+    required this.icon,
+    required this.isDark,
+    this.badgeWidget,
+    required this.onTap,
+  });
+
+  @override
+  State<_NavHoverItem> createState() => _NavHoverItemState();
+}
+
+class _NavHoverItemState extends State<_NavHoverItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final active = widget.currentIndex == widget.index;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-      child: InkWell(
-        onTap: () => setState(() => _selectedIndex = index),
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: active
-                ? (isDark ? const Color(0xFF1E293B) : const Color(0xFFEEF2FF))
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: active
-                    ? AppColors.primary
-                    : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: active ? FontWeight.bold : FontWeight.w500,
-                    color: active
-                        ? (isDark ? Colors.white : AppColors.primary)
-                        : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF475569)),
-                  ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: active
+                  ? (widget.isDark ? const Color(0xFF1E293B) : const Color(0xFFEEF2FF))
+                  : (_isHovered
+                      ? (widget.isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC))
+                      : Colors.transparent),
+              borderRadius: BorderRadius.circular(10),
+              border: Border(
+                left: BorderSide(
+                  color: active
+                      ? AppColors.primary
+                      : (_isHovered ? AppColors.primaryLight.withOpacity(0.6) : Colors.transparent),
+                  width: 3,
                 ),
               ),
-            ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  widget.icon,
+                  size: 19,
+                  color: active
+                      ? AppColors.primary
+                      : (_isHovered
+                          ? AppColors.primaryLight
+                          : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: active ? FontWeight.bold : (_isHovered ? FontWeight.w600 : FontWeight.w500),
+                      color: active
+                          ? (widget.isDark ? Colors.white : AppColors.primary)
+                          : (_isHovered
+                              ? (widget.isDark ? Colors.white : const Color(0xFF0F172A))
+                              : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569))),
+                    ),
+                  ),
+                ),
+                if (widget.badgeWidget != null) widget.badgeWidget!,
+              ],
+            ),
           ),
         ),
       ),

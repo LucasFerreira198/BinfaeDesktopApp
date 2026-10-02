@@ -61,21 +61,22 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.event_name == 'release'
         with:
           tag_name: latest
-          name: "Binfae Desktop - Aplicativo Nativo Windows (.exe)"
+          name: "Informatica - BINFAE-GL v2.0.0 - Aplicativo Nativo Windows (.exe)"
           body: |
-            ## BINFAE Desktop - Versão Oficial para Computadores Windows 💻
+            ## Informatica - BINFAE-GL v2.0.0 - Versão Oficial Nativa Desktop 💻
             
-            Aplicativo 100% nativo desenvolvido em **Flutter Desktop (C++/DirectX)** para máxima performance e fluidez, sem Electron.
+            Aplicativo oficial 100% nativo desenvolvido em **Flutter Desktop (C++/DirectX)** com nova interface moderna v2.0, tema escuro profundo e acentos vibrantes de roxo e verde.
             
             ### 📥 Opções de Download:
-            - **[BinfaeDesktop-Setup.exe](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Setup.exe)**: Instalador automático que cria atalhos no Desktop e Menu Iniciar.
+            - **[BinfaeDesktop-Setup.exe](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Setup.exe)**: Instalador automático que cria atalhos no Desktop e Menu Iniciar com suporte a atualização direta no app.
             - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
             
-            ### 🚀 Destaques:
-            - ⚡ **Banco Local de 0ms**: Busca instantânea de materiais e cautelas.
-            - 🌓 **Modo Escuro / Claro**: Interface adaptativa de alta densidade.
-            - 🏷️ **QR Code Patrimonial**: Visualização e impressão de etiquetas.
-            - 🔄 **Sincronização em Tempo Real**: Conexão automática com a API de produção.
+            ### 🚀 Novidades da Versão 2.0.0:
+            - 🔄 **Auto-atualização In-App**: Atualização direta pelo próprio aplicativo com barra de progresso.
+            - 🎨 **Interface Moderna v2.0**: Tema escuro profundo (carvão/azul-noite), acentos vibrantes e glassmorphism.
+            - 🖱️ **Micro-interações de Hover**: Indicador visual dinâmico em todos os botões, cards e linhas de materiais.
+            - 📍 **Visão Geral dos Locais**: Mini-dashboards rápidos de locais físicos e visualização em árvore.
+            - 📋 **Modal de Detalhes Completo**: Galeria de fotos, histórico de cautela integrado e ações rápidas.
           files: |
             dist/BinfaeDesktop-Setup.exe
             dist/BinfaeDesktop-Portable-x64.zip
