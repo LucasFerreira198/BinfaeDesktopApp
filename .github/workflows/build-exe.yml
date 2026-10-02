@@ -80,6 +80,8 @@ jobs:
             dist/BinfaeDesktop-Setup.exe
             dist/BinfaeDesktop-Portable-x64.zip
           prerelease: false
-          overwrite: true
+          overwrite_files: true
+          make_latest: "true"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
