@@ -360,13 +360,15 @@ class ApiService {
   }
 
   Future<UserModel> updateUser(
-    int identifier, {
+    dynamic identifier, {
+    String? username,
     bool? admin,
     bool? ativo,
     String? password,
   }) async {
     final uri = Uri.parse('$_baseUrl/users/update/$identifier');
     final body = <String, dynamic>{};
+    if (username != null) body['username'] = username;
     if (admin != null) body['admin'] = admin;
     if (ativo != null) body['ativo'] = ativo;
     if (password != null && password.isNotEmpty) body['password'] = password;
@@ -382,7 +384,7 @@ class ApiService {
     return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
-  Future<void> deleteUser(int identifier) async {
+  Future<void> deleteUser(dynamic identifier) async {
     final uri = Uri.parse('$_baseUrl/users/delete/$identifier');
     final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200 && response.statusCode != 204) {

@@ -288,6 +288,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   void _openEditUserDialog(UserModel user) {
     bool isAdmin = user.admin;
     bool isAtivo = user.ativo;
+    final usernameController = TextEditingController(text: user.username);
     final passwordController = TextEditingController();
 
     showDialog(
@@ -296,16 +297,25 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
         bool isSubmitting = false;
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final identifier = user.militar?.saram ?? user.id;
+            final identifier = user.militar?.saram ?? (user.username.isNotEmpty ? user.username : user.id);
 
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text('Editar Usuário: ${user.displayName}'),
               content: SizedBox(
-                width: 440,
+                width: 460,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    TextField(
+                      controller: usernameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nome de Usuário (Username)',
+                        hintText: 'Ex: admin.ti, lucas.silva...',
+                        prefixIcon: Icon(Icons.alternate_email, size: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     SwitchListTile(
                       title: const Text('Perfil Administrador', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       subtitle: const Text('Acesso ao painel administrativo e configurações avançadas', style: TextStyle(fontSize: 11)),
@@ -336,38 +346,61 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 ),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-                ElevatedButton(
-                  onPressed: isSubmitting
-                      ? null
-                      : () async {
-                          setModalState(() => isSubmitting = true);
-                          try {
-                            final api = Provider.of<ApiService>(context, listen: false);
-                            await api.updateUser(
-                              identifier,
-                              admin: isAdmin,
-                              ativo: isAtivo,
-                              password: passwordController.text.trim().isNotEmpty ? passwordController.text.trim() : null,
-                            );
-                            if (mounted) {
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: isSubmitting
+                          ? null
+                          : () {
                               Navigator.pop(ctx);
-                              _loadUsers();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(backgroundColor: AppColors.success, content: Text('Usuário atualizado!')),
-                              );
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(backgroundColor: AppColors.danger, content: Text(e.toString().replaceAll('Exception: ', ''))),
-                              );
-                            }
-                          } finally {
-                            setModalState(() => isSubmitting = false);
-                          }
-                        },
-                  child: const Text('Salvar'),
+                              _confirmDeleteUser(user);
+                            },
+                      style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                      icon: const Icon(Icons.delete_outline, size: 16),
+                      label: const Text('Excluir Conta'),
+                    ),
+                    Row(
+                      children: [
+                        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: isSubmitting
+                              ? null
+                              : () async {
+                                  setModalState(() => isSubmitting = true);
+                                  try {
+                                    final api = Provider.of<ApiService>(context, listen: false);
+                                    final newUsername = usernameController.text.trim();
+                                    await api.updateUser(
+                                      identifier,
+                                      username: newUsername.isNotEmpty ? newUsername : null,
+                                      admin: isAdmin,
+                                      ativo: isAtivo,
+                                      password: passwordController.text.trim().isNotEmpty ? passwordController.text.trim() : null,
+                                    );
+                                    if (mounted) {
+                                      Navigator.pop(ctx);
+                                      _loadUsers();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(backgroundColor: AppColors.success, content: Text('Usuário atualizado com sucesso!')),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(backgroundColor: AppColors.danger, content: Text(e.toString().replaceAll('Exception: ', ''))),
+                                      );
+                                    }
+                                  } finally {
+                                    setModalState(() => isSubmitting = false);
+                                  }
+                                },
+                          child: const Text('Salvar'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             );
@@ -375,6 +408,89 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
         );
       },
     );
+  }
+
+  // --- Confirmação e Exclusão de Usuário ---
+  Future<void> _confirmDeleteUser(UserModel user) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final identifier = user.militar?.saram ?? (user.username.isNotEmpty ? user.username : user.id);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 24),
+            SizedBox(width: 10),
+            Text('Excluir Conta de Usuário', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Deseja realmente excluir permanentemente a conta de acesso de "${user.displayName}"?'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.danger.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+              ),
+              child: Text(
+                user.militar != null
+                    ? 'O militar ${user.militar!.nomeGuerra} continuará cadastrado no efetivo militar, mas sua conta de login e permissões serão removidas.'
+                    : 'A conta de administrador @${user.username} será completamente removida do sistema.',
+                style: const TextStyle(fontSize: 12, color: AppColors.danger, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Excluir Usuário'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final api = Provider.of<ApiService>(context, listen: false);
+        await api.deleteUser(identifier);
+        if (mounted) {
+          _loadUsers();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: AppColors.success,
+              content: Text('Conta de usuário excluída com sucesso!'),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.danger,
+              content: Text(e.toString().replaceAll('Exception: ', '')),
+            ),
+          );
+        }
+      }
+    }
   }
 
   // --- Diálogo: Cadastrar / Editar Militar ---
@@ -741,11 +857,17 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
+                                  const SizedBox(width: 8),
                                   IconButton(
                                     icon: const Icon(Icons.edit_outlined, size: 18),
-                                    tooltip: 'Editar Permissões e Senha',
+                                    tooltip: 'Editar Usuário e Permissões',
                                     onPressed: () => _openEditUserDialog(u),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, size: 18),
+                                    tooltip: 'Excluir Usuário',
+                                    color: AppColors.danger.withOpacity(0.85),
+                                    onPressed: () => _confirmDeleteUser(u),
                                   ),
                                 ],
                               ),
