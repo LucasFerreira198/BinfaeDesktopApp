@@ -1,4 +1,19 @@
-node_modules/
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Windows native build outputs
+windows/flutter/ephemeral/
+*.exe
+*.dll
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Dist
 dist/
-*.log
-.DS_Store

@@ -12,40 +12,73 @@ permissions:
 
 jobs:
   build-windows:
-    name: Build Windows .exe Installer
+    name: Build Native Windows Flutter .exe
     runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
         with:
-          node-version: 20
+          channel: 'stable'
+          cache: true
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Configurar Plataforma Windows
+        run: |
+          flutter config --enable-windows-desktop
+          flutter create . --platforms=windows --project-name=binfae_desktop
+          flutter pub get
 
-      - name: Build Executable via electron-builder
-        run: npm run dist
+      - name: Compilar Release Nativo Windows
+        run: flutter build windows --release
 
-      - name: Upload Artifacts
+      - name: Criar Pacote Portátil ZIP
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath dist\BinfaeDesktop-Portable-x64.zip
+
+      - name: Compilar Instalador Oficial (.exe) com Inno Setup
+        shell: powershell
+        run: |
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y
+          }
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" inno-setup.iss
+
+      - name: Enviar Artefatos de Build
         uses: actions/upload-artifact@v4
         with:
-          name: BinfaeDesktop-Windows-Executables
-          path: dist/*.exe
+          name: BinfaeDesktop-Windows-Release
+          path: dist/*
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publicar Release com Download Direto do EXE
+      - name: Publicar Release no GitHub com Download do .exe
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main' || github.event_name == 'release'
         with:
           tag_name: latest
-          name: "Binfae Desktop - Aplicativo Windows (.exe)"
-          body: "Versão oficial para computadores Windows. Baixe o instalador (.exe) abaixo para instalar ou utilizar a versão portátil do sistema no seu PC."
-          files: dist/*.exe
+          name: "Binfae Desktop - Aplicativo Nativo Windows (.exe)"
+          body: |
+            ## BINFAE Desktop - Versão Oficial para Computadores Windows 💻
+            
+            Aplicativo 100% nativo desenvolvido em **Flutter Desktop (C++/DirectX)** para máxima performance e fluidez, sem Electron.
+            
+            ### 📥 Opções de Download:
+            - **[BinfaeDesktop-Setup.exe](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Setup.exe)**: Instalador automático que cria atalhos no Desktop e Menu Iniciar.
+            - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
+            
+            ### 🚀 Destaques:
+            - ⚡ **Banco Local de 0ms**: Busca instantânea de materiais e cautelas.
+            - 🌓 **Modo Escuro / Claro**: Interface adaptativa de alta densidade.
+            - 🏷️ **QR Code Patrimonial**: Visualização e impressão de etiquetas.
+            - 🔄 **Sincronização em Tempo Real**: Conexão automática com a API de produção.
+          files: |
+            dist/BinfaeDesktop-Setup.exe
+            dist/BinfaeDesktop-Portable-x64.zip
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
