@@ -219,6 +219,285 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
     }
   }
 
+  void _showItemOptionsModal(CautelaItemModel item) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.inventory_2_outlined, color: AppColors.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                item.item?.nome ?? 'Material #${item.itemId}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 440,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'BMP: ${item.item?.bmp ?? 'Não informado'} | Responsável: ${item.militar?.postoGraduacao ?? ''} ${item.militar?.nomeGuerra ?? ''}',
+                style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : const Color(0xFF64748B)),
+              ),
+              const SizedBox(height: 18),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0)),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.qr_code_scanner, color: AppColors.primary),
+                ),
+                title: const Text('Escanear QR Code deste Material', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: const Text('Apenas o código deste material será aceito na leitura', style: TextStyle(fontSize: 11)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _openTargetedScanDialog(item);
+                },
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0)),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.assignment_turned_in, color: AppColors.success),
+                ),
+                title: const Text('Descautelar Manualmente', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: const Text('Confirmar devolução e estado do material sem scanner', style: TextStyle(fontSize: 11)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _confirmDevolverItem(item);
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openTargetedScanDialog(CautelaItemModel item) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final scanController = TextEditingController();
+    final focusNode = FocusNode();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => focusNode.requestFocus());
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            bool scanning = false;
+            String? scanMsg;
+            bool isError = false;
+
+            Future<void> submitCode(String code) async {
+              final trimmed = code.trim();
+              if (trimmed.isEmpty) return;
+
+              final validCodes = <String>{
+                if (item.item?.bmp != null && item.item!.bmp!.isNotEmpty) item.item!.bmp!.trim().toLowerCase(),
+                if (item.item?.codigoInterno != null && item.item!.codigoInterno!.isNotEmpty) item.item!.codigoInterno!.trim().toLowerCase(),
+                if (item.item?.numeroSerie != null && item.item!.numeroSerie!.isNotEmpty) item.item!.numeroSerie!.trim().toLowerCase(),
+                item.itemId.toString().trim().toLowerCase(),
+              };
+
+              if (!validCodes.contains(trimmed.toLowerCase())) {
+                setModalState(() {
+                  scanning = false;
+                  isError = true;
+                  scanMsg = 'Código Inválido! O código "$trimmed" não pertence ao material selecionado (${item.item?.nome ?? 'ID ${item.itemId}'}).';
+                });
+                scanController.clear();
+                focusNode.requestFocus();
+                return;
+              }
+
+              setModalState(() {
+                scanning = true;
+                scanMsg = null;
+                isError = false;
+              });
+
+              try {
+                final api = Provider.of<ApiService>(context, listen: false);
+                final stock = Provider.of<StockProvider>(context, listen: false);
+                final res = await api.scanDevolverItem(trimmed);
+                await stock.syncData();
+                await _refreshDetails();
+
+                if (context.mounted) {
+                  setModalState(() {
+                    scanning = false;
+                    isError = false;
+                    scanMsg = 'Sucesso! Material "${res.item?.nome ?? trimmed}" devolvido.';
+                  });
+                  Future.delayed(const Duration(milliseconds: 1400), () {
+                    if (context.mounted) Navigator.of(ctx).pop();
+                  });
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  setModalState(() {
+                    scanning = false;
+                    isError = true;
+                    scanMsg = 'Erro: ${e.toString().replaceAll('Exception: ', '')}';
+                  });
+                  scanController.clear();
+                  focusNode.requestFocus();
+                }
+              }
+            }
+
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.qr_code_scanner, color: AppColors.primary),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text('Escanear Material Específico'),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 460,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.item?.nome ?? 'Material #${item.itemId}',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'BMP Esperado: ${item.item?.bmp ?? 'Nenhum'} | Responsável: ${item.militar?.nomeGuerra ?? '-'}',
+                            style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Passe o leitor USB ou digite o código deste material específico:',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: isDark ? Colors.white70 : const Color(0xFF475569),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: scanController,
+                      focusNode: focusNode,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Aguardando leitura do leitor ou digitação...',
+                        prefixIcon: const Icon(Icons.qr_code, color: AppColors.primaryLight),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onSubmitted: (code) => submitCode(code),
+                    ),
+                    if (scanning) ...[
+                      const SizedBox(height: 12),
+                      const LinearProgressIndicator(),
+                    ],
+                    if (scanMsg != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isError
+                              ? AppColors.danger.withOpacity(0.15)
+                              : AppColors.success.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isError ? AppColors.danger.withOpacity(0.3) : AppColors.success.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              isError ? Icons.error_outline : Icons.check_circle_outline,
+                              color: isError ? AppColors.danger : AppColors.success,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                scanMsg!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isError ? AppColors.danger : AppColors.success,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Cancelar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _openAddMaterialsDialog() {
     showDialog(
       context: context,
@@ -638,10 +917,11 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                               ),
                               itemBuilder: (context, index) {
                                 final item = _cautela.itens[index];
-                                final isEmUso = item.status == 'EM_USO';
+                                final isEmUso = item.status == 'CAUTELADO' || item.status == 'EM_USO';
 
                                 return ListTile(
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  onTap: isEmUso ? () => _showItemOptionsModal(item) : null,
                                   leading: Container(
                                     width: 40,
                                     height: 40,
@@ -755,7 +1035,7 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                                             foregroundColor: Colors.white,
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                           ),
-                                          onPressed: () => _confirmDevolverItem(item),
+                                          onPressed: () => _showItemOptionsModal(item),
                                           icon: const Icon(Icons.assignment_turned_in, size: 15),
                                           label: const Text('Devolver', style: TextStyle(fontSize: 11.5)),
                                         )

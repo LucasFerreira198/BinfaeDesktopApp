@@ -145,8 +145,8 @@ class ApiService {
   Future<bool> checkHealth() async {
     try {
       final response = await http
-          .get(Uri.parse('$_baseUrl/'), headers: _headers())
-          .timeout(const Duration(seconds: 4));
+          .get(Uri.parse('$_baseUrl/'))
+          .timeout(const Duration(seconds: 12));
       return response.statusCode < 500;
     } catch (_) {
       return false;

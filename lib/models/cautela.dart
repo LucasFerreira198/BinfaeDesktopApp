@@ -16,6 +16,9 @@ class CautelaItemModel {
   final String? condicaoRetorno;
   final String? observacoes;
 
+  final int? militarSaramRaw;
+  final String? telefoneContatoRaw;
+
   CautelaItemModel({
     required this.id,
     required this.cautelaId,
@@ -30,17 +33,24 @@ class CautelaItemModel {
     this.condicaoSaida,
     this.condicaoRetorno,
     this.observacoes,
+    this.militarSaramRaw,
+    this.telefoneContatoRaw,
   });
 
   factory CautelaItemModel.fromJson(Map<String, dynamic> json) {
+    MilitaryModel? mil;
+    if (json['militar_responsavel'] != null) {
+      mil = MilitaryModel.fromJson(json['militar_responsavel']);
+    } else if (json['militar'] != null) {
+      mil = MilitaryModel.fromJson(json['militar']);
+    }
+
     return CautelaItemModel(
       id: json['id'] as int? ?? 0,
       cautelaId: json['cautela_id'] as int? ?? 0,
       itemId: json['item_id'] as int? ?? 0,
       item: json['item'] != null ? ItemModel.fromJson(json['item']) : null,
-      militarResponsavel: json['militar_responsavel'] != null
-          ? MilitaryModel.fromJson(json['militar_responsavel'])
-          : null,
+      militarResponsavel: mil,
       usuarioEntrega: json['usuario_entrega'] != null
           ? UserModel.fromJson(json['usuario_entrega'])
           : null,
@@ -49,7 +59,7 @@ class CautelaItemModel {
           : null,
       dataSaida: json['data_saida'] != null
           ? DateTime.parse(json['data_saida'])
-          : DateTime.now(),
+          : (json['data_cautela'] != null ? DateTime.parse(json['data_cautela']) : DateTime.now()),
       dataDevolucao: json['data_devolucao'] != null
           ? DateTime.tryParse(json['data_devolucao'])
           : null,
@@ -57,6 +67,8 @@ class CautelaItemModel {
       condicaoSaida: json['condicao_saida'] as String?,
       condicaoRetorno: json['condicao_retorno'] as String?,
       observacoes: json['observacoes'] as String?,
+      militarSaramRaw: json['militar_saram'] as int?,
+      telefoneContatoRaw: json['telefone_contato'] as String?,
     );
   }
 
@@ -74,11 +86,13 @@ class CautelaItemModel {
     'condicao_saida': condicaoSaida,
     'condicao_retorno': condicaoRetorno,
     'observacoes': observacoes,
+    'militar_saram': militarSaramRaw ?? militarResponsavel?.saram,
+    'telefone_contato': telefoneContatoRaw ?? militarResponsavel?.celular,
   };
 
   MilitaryModel? get militar => militarResponsavel;
-  String get militarSaram => militarResponsavel?.saram.toString() ?? '';
-  String? get telefoneContato => militarResponsavel?.celular;
+  String get militarSaram => (militarSaramRaw != null ? militarSaramRaw.toString() : (militarResponsavel?.saram.toString() ?? ''));
+  String? get telefoneContato => telefoneContatoRaw ?? militarResponsavel?.celular;
   DateTime get dataCautela => dataSaida;
 }
 
