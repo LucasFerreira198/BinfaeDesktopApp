@@ -75,6 +75,11 @@ class CautelaItemModel {
     'condicao_retorno': condicaoRetorno,
     'observacoes': observacoes,
   };
+
+  MilitaryModel? get militar => militarResponsavel;
+  String get militarSaram => militarResponsavel?.saram.toString() ?? '';
+  String? get telefoneContato => militarResponsavel?.celular;
+  DateTime get dataCautela => dataSaida;
 }
 
 class CautelaModel {
@@ -148,4 +153,7 @@ class CautelaModel {
     'itens_devolvidos': itensDevolvidos,
     'itens': itens.map((i) => i.toJson()).toList(),
   };
+
+  UserModel? get criador => criadoPor;
+  int get itensPendentes => itensCautelados;
 }

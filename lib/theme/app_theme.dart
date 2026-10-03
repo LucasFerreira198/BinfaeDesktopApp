@@ -33,7 +33,10 @@ class AppColors {
   static const Color lightBorder = Color(0xFFE2E8F0);
   static const Color lightBorderHover = Color(0xFF8B5CF6);
   static const Color lightText = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF475569);
+  // Aliases de conveniência para componentes administrativos e modais
+  static const Color cardBorder = darkBorder;
+  static const Color sidebarBackground = darkSurfaceVariant;
+  static const Color textPrimary = darkText;
 }
 
 class AppTheme {

@@ -42,6 +42,8 @@ class MilitaryModel {
     'email': email,
     'celular': celular,
   };
+
+  String? get telefone => celular;
 }
 
 class UserModel {
@@ -87,5 +89,10 @@ class UserModel {
     }
     return username;
   }
+
+  String get postoGraduacao => militar?.postoGraduacao ?? '';
+  String get nomeGuerra => militar?.nomeGuerra ?? username;
+  String? get celular => militar?.celular;
+  String? get telefone => militar?.celular;
 }
 
