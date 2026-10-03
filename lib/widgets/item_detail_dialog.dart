@@ -304,12 +304,12 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'MATERIAL EM CAUTELA ATIVA (${_currentItem.cautelaAtiva!.tipo == 'MISSAO' ? 'Missão Operacional' : 'Cautela Fixa'}: ${_currentItem.cautelaAtiva!.missaoNome})',
+                            'MATERIAL EM CAUTELA ATIVA (${(_currentItem.cautelaAtiva!['tipo'] ?? 'MISSAO') == 'MISSAO' ? 'Missão Operacional' : 'Cautela Fixa'}: ${_currentItem.cautelaAtiva!['missao_nome'] ?? _currentItem.cautelaAtiva!['missaoNome'] ?? ''})',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.amber[300] : Colors.amber[900]),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Responsável: ${_currentItem.cautelaAtiva!.militarPostoGraduacao} ${_currentItem.cautelaAtiva!.militarNomeGuerra} (SARAM ${_currentItem.cautelaAtiva!.militarResponsavelSaram}) • Contato: ${_currentItem.cautelaAtiva!.militarCelular ?? "Não informado"}',
+                            'Responsável: ${_currentItem.cautelaAtiva!['militar_posto_graduacao'] ?? _currentItem.cautelaAtiva!['militarPostoGraduacao'] ?? ''} ${_currentItem.cautelaAtiva!['militar_nome_guerra'] ?? _currentItem.cautelaAtiva!['militarNomeGuerra'] ?? ''} (SARAM ${_currentItem.cautelaAtiva!['militar_responsavel_saram'] ?? _currentItem.cautelaAtiva!['militarResponsavelSaram'] ?? ''}) • Contato: ${_currentItem.cautelaAtiva!['militar_celular'] ?? _currentItem.cautelaAtiva!['militarCelular'] ?? "Não informado"}',
                             style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87),
                           ),
                         ],

@@ -735,6 +735,8 @@ class _ItemTableRowState extends State<_ItemTableRow> {
                             ),
                           ),
                         ),
+                      ],
+                    ),
                     if (item.cautelaAtiva != null) ...[
                       const SizedBox(height: 4),
                       Container(
@@ -751,7 +753,7 @@ class _ItemTableRowState extends State<_ItemTableRow> {
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                'CAUTELADO: ${item.cautelaAtiva!.missaoNome} • Resp: ${item.cautelaAtiva!.militarPostoGraduacao} ${item.cautelaAtiva!.militarNomeGuerra}${item.cautelaAtiva!.militarCelular != null && item.cautelaAtiva!.militarCelular!.isNotEmpty ? " (Tel: ${item.cautelaAtiva!.militarCelular})" : ""}',
+                                'CAUTELADO: ${item.cautelaAtiva!['missao_nome'] ?? item.cautelaAtiva!['missaoNome'] ?? ''} • Resp: ${item.cautelaAtiva!['militar_posto_graduacao'] ?? item.cautelaAtiva!['militarPostoGraduacao'] ?? ''} ${item.cautelaAtiva!['militar_nome_guerra'] ?? item.cautelaAtiva!['militarNomeGuerra'] ?? ''}${((item.cautelaAtiva!['militar_celular'] ?? item.cautelaAtiva!['militarCelular']) != null && (item.cautelaAtiva!['militar_celular'] ?? item.cautelaAtiva!['militarCelular']).toString().isNotEmpty) ? " (Tel: ${item.cautelaAtiva!['militar_celular'] ?? item.cautelaAtiva!['militarCelular']})" : ""}',
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 10.5,
