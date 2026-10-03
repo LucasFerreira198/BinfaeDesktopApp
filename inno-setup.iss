@@ -1,7 +1,7 @@
 ; Script Inno Setup para Informatica - BINFAE-GL (Flutter Windows Nativo)
 [Setup]
 AppName=Informatica - BINFAE-GL
-AppVersion=2.0.3
+AppVersion=2.0.4
 DefaultDirName={autopf}\Informatica - BINFAE-GL
 DefaultGroupName=Informatica - BINFAE-GL
 OutputDir=dist

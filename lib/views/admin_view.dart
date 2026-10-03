@@ -122,6 +122,8 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     int? selectedSaram;
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
+    final militarySearchController = TextEditingController();
+    String militarySearchQuery = '';
     bool isAdmin = false;
     bool isAtivo = true;
     bool isMilitarLink = true;
@@ -136,7 +138,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: const Text('Cadastrar Novo Usuário'),
               content: SizedBox(
-                width: 480,
+                width: 520,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -171,19 +173,176 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                       const SizedBox(height: 10),
 
                       if (isMilitarLink) ...[
-                        DropdownButtonFormField<int>(
-                          value: selectedSaram,
-                          decoration: const InputDecoration(
-                            labelText: 'Selecione o Militar *',
-                            prefixIcon: Icon(Icons.shield, size: 18),
+                        if (selectedSaram != null) ...[
+                          Builder(
+                            builder: (context) {
+                              final sel = _militaries.firstWhere(
+                                (m) => m.saram == selectedSaram,
+                                orElse: () => MilitaryModel(
+                                  saram: selectedSaram!,
+                                  nomeCompleto: '',
+                                  nomeGuerra: '',
+                                  postoGraduacao: '',
+                                ),
+                              );
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${sel.postoGraduacao} ${sel.nomeGuerra} (SARAM: ${sel.saram})',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                          ),
+                                          Text(
+                                            '${sel.nomeCompleto}${sel.secao != null && sel.secao!.isNotEmpty ? " • Seção: ${sel.secao}" : ""}',
+                                            style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close, size: 16),
+                                      tooltip: 'Limpar seleção',
+                                      onPressed: () => setModalState(() => selectedSaram = null),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                          items: _militaries.map((m) {
-                            return DropdownMenuItem<int>(
-                              value: m.saram,
-                              child: Text('${m.postoGraduacao} ${m.nomeGuerra} (SARAM: ${m.saram})'),
+                        ],
+                        TextField(
+                          controller: militarySearchController,
+                          decoration: InputDecoration(
+                            hintText: 'Buscar por guerra, nome, SARAM ou seção...',
+                            prefixIcon: const Icon(Icons.search, size: 18),
+                            suffixIcon: militarySearchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, size: 16),
+                                    onPressed: () {
+                                      militarySearchController.clear();
+                                      setModalState(() => militarySearchQuery = '');
+                                    },
+                                  )
+                                : null,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                          onChanged: (val) => setModalState(() => militarySearchQuery = val.trim().toLowerCase()),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 230,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.cardBorder),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Builder(
+                              builder: (context) {
+                                final filtered = _militaries.where((m) {
+                                  if (militarySearchQuery.isEmpty) return true;
+                                  final g = m.nomeGuerra.toLowerCase();
+                                  final c = m.nomeCompleto.toLowerCase();
+                                  final s = m.saram.toString();
+                                  final sec = (m.secao ?? '').toLowerCase();
+                                  return g.contains(militarySearchQuery) ||
+                                      c.contains(militarySearchQuery) ||
+                                      s.contains(militarySearchQuery) ||
+                                      sec.contains(militarySearchQuery);
+                                }).toList();
+
+                                if (filtered.isEmpty) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Text(
+                                        'Nenhum militar encontrado',
+                                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return ListView.separated(
+                                  itemCount: filtered.length,
+                                  separatorBuilder: (_, __) => const Divider(height: 1),
+                                  itemBuilder: (context, index) {
+                                    final m = filtered[index];
+                                    final isSelected = selectedSaram == m.saram;
+                                    return ListTile(
+                                      dense: true,
+                                      selected: isSelected,
+                                      selectedTileColor: AppColors.primary.withOpacity(0.1),
+                                      leading: CircleAvatar(
+                                        radius: 16,
+                                        backgroundColor: isSelected ? AppColors.primary : AppColors.sidebarBackground,
+                                        child: Text(
+                                          m.postoGraduacao,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: isSelected ? Colors.white : AppColors.textPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text(
+                                        '${m.postoGraduacao} ${m.nomeGuerra}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: isSelected ? AppColors.primary : null,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '${m.nomeCompleto} • SARAM: ${m.saram}${m.secao != null && m.secao!.isNotEmpty ? " • ${m.secao}" : ""}',
+                                        style: const TextStyle(fontSize: 11),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      trailing: isSelected
+                                          ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
+                                          : const Icon(Icons.radio_button_unchecked, size: 18, color: Colors.grey),
+                                      onTap: () => setModalState(() => selectedSaram = m.saram),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Builder(
+                          builder: (context) {
+                            final filteredCount = _militaries.where((m) {
+                              if (militarySearchQuery.isEmpty) return true;
+                              final g = m.nomeGuerra.toLowerCase();
+                              final c = m.nomeCompleto.toLowerCase();
+                              final s = m.saram.toString();
+                              final sec = (m.secao ?? '').toLowerCase();
+                              return g.contains(militarySearchQuery) ||
+                                  c.contains(militarySearchQuery) ||
+                                  s.contains(militarySearchQuery) ||
+                                  sec.contains(militarySearchQuery);
+                            }).length;
+                            return Text(
+                              '$filteredCount militares listados • Clique para selecionar',
+                              style: const TextStyle(fontSize: 11, color: Colors.grey),
                             );
-                          }).toList(),
-                          onChanged: (val) => setModalState(() => selectedSaram = val),
+                          },
                         ),
                       ] else ...[
                         TextField(
