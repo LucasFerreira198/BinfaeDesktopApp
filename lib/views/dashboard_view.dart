@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/stock_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/api_service.dart';
 import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/item_detail_dialog.dart';
 import '../widgets/item_form_dialog.dart';
 import 'stock_view.dart';
+import 'cautelas_view.dart';
 import 'locations_view.dart';
 import 'groups_view.dart';
 import 'history_view.dart';
@@ -145,10 +147,142 @@ class _DashboardViewState extends State<DashboardView> {
     return false;
   }
 
-  void _processScannedBarcode(String code) {
-    final stock = Provider.of<StockProvider>(context, listen: false);
-    final item = stock.findItemByCode(code);
+  Future<void> _processScannedBarcode(String code) async {
+    final cleanCode = code.trim();
+    if (cleanCode.isEmpty) return;
 
+    final api = Provider.of<ApiService>(context, listen: false);
+    final stock = Provider.of<StockProvider>(context, listen: false);
+
+    // 1. Checa se o material escaneado está em Cautela Ativa
+    try {
+      final statusRes = await api.checkItemCautelaStatus(cleanCode);
+      if (statusRes['cautelado'] == true && statusRes['cautela'] != null) {
+        final cautelaInfo = statusRes['cautela'] as Map<String, dynamic>;
+        final militarInfo = cautelaInfo['militar'] as Map<String, dynamic>?;
+        final itemInfo = statusRes['item'] as Map<String, dynamic>?;
+
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        if (!mounted) return;
+
+        final shouldReturn = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                const Icon(Icons.assignment_return_outlined, color: AppColors.primary, size: 26),
+                const SizedBox(width: 10),
+                const Text('Material Cautelado Identificado'),
+              ],
+            ),
+            content: SizedBox(
+              width: 450,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'O material escaneado encontra-se sob cautela ativa:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white70 : const Color(0xFF475569),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          itemInfo?['nome'] ?? 'Material',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        if (itemInfo?['bmp'] != null) ...[
+                          const SizedBox(height: 4),
+                          Text('BMP: ${itemInfo!['bmp']}', style: const TextStyle(color: AppColors.primaryLight, fontWeight: FontWeight.bold, fontSize: 12)),
+                        ],
+                        const Divider(height: 16),
+                        Text(
+                          'Missão / Cautela: ${cautelaInfo['missao_nome'] ?? ''} (${cautelaInfo['tipo'] == 'MISSAO' ? 'Missão Operacional' : 'Cautela Fixa'})',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Militar Responsável: ${militarInfo?['posto_graduacao'] ?? ''} ${militarInfo?['nome_guerra'] ?? ''} (SARAM ${militarInfo?['saram'] ?? ''})',
+                          style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
+                        ),
+                        if (cautelaInfo['telefone_contato'] != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'Telefone: ${cautelaInfo['telefone_contato']}',
+                            style: const TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Deseja realizar a descautelação (devolução) deste material agora?',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Não Devolver'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => Navigator.of(ctx).pop(true),
+                icon: const Icon(Icons.check, size: 18),
+                label: const Text('Confirmar Devolução'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldReturn == true) {
+          try {
+            await api.scanDevolverItem(cleanCode);
+            await stock.syncData();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  backgroundColor: AppColors.success,
+                  content: Text('Material devolvido com sucesso! Status atualizado para DISPONÍVEL.'),
+                ),
+              );
+            }
+          } catch (err) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(backgroundColor: AppColors.danger, content: Text('Erro ao devolver: $err')),
+              );
+            }
+          }
+          return;
+        }
+      }
+    } catch (_) {}
+
+    // Caso não esteja cautelado (ou o usuário optou por não devolver), abre detalhes no estoque
+    final item = stock.findItemByCode(cleanCode);
     if (item != null) {
       showDialog(
         context: context,
@@ -158,7 +292,7 @@ class _DashboardViewState extends State<DashboardView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.warning,
-          content: Text('Código "$code" lido pelo scanner, mas nenhum material foi localizado.'),
+          content: Text('Código "$cleanCode" lido pelo scanner, mas nenhum material foi localizado.'),
         ),
       );
     }
@@ -178,6 +312,7 @@ class _DashboardViewState extends State<DashboardView> {
     // Lista de telas disponíveis
     final views = [
       StockView(searchFocusNode: _searchFocusNode),
+      const CautelasView(),
       const LocationsView(),
       const GroupsView(),
       const HistoryView(),
@@ -185,12 +320,13 @@ class _DashboardViewState extends State<DashboardView> {
       const SettingsView(),
     ];
 
-    if (!isAdmin && _selectedIndex == 4) {
+    if (!isAdmin && _selectedIndex == 5) {
       _selectedIndex = 0;
     }
 
     final titles = [
       'Materiais e Gestão de Estoque',
+      'Cautela de Materiais e Missões',
       'Locais Físicos e Estrutura',
       'Grupos e Subgrupos',
       'Histórico Geral de Movimentações',
@@ -200,12 +336,14 @@ class _DashboardViewState extends State<DashboardView> {
 
     final icons = [
       Icons.inventory_2_outlined,
+      Icons.assignment_turned_in_outlined,
       Icons.place_outlined,
       Icons.category_outlined,
       Icons.history_outlined,
       if (isAdmin) Icons.admin_panel_settings_outlined,
       Icons.settings_outlined,
     ];
+
 
     return Scaffold(
       body: Row(
@@ -307,6 +445,14 @@ class _DashboardViewState extends State<DashboardView> {
                 _NavHoverItem(
                   index: 1,
                   currentIndex: _selectedIndex,
+                  label: 'Cautelas e Missões',
+                  icon: Icons.assignment_turned_in_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 1),
+                ),
+                _NavHoverItem(
+                  index: 2,
+                  currentIndex: _selectedIndex,
                   label: 'Locais Físicos',
                   icon: Icons.place_outlined,
                   isDark: isDark,
@@ -325,51 +471,40 @@ class _DashboardViewState extends State<DashboardView> {
                       ],
                     ),
                   ),
-                  onTap: () => setState(() => _selectedIndex = 1),
-                ),
-                _NavHoverItem(
-                  index: 2,
-                  currentIndex: _selectedIndex,
-                  label: 'Grupos e Subgrupos',
-                  icon: Icons.category_outlined,
-                  isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 2),
                 ),
                 _NavHoverItem(
                   index: 3,
                   currentIndex: _selectedIndex,
+                  label: 'Grupos e Subgrupos',
+                  icon: Icons.category_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 3),
+                ),
+                _NavHoverItem(
+                  index: 4,
+                  currentIndex: _selectedIndex,
                   label: 'Histórico Geral',
                   icon: Icons.history_outlined,
                   isDark: isDark,
-                  badgeWidget: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      '1 Novo',
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                  onTap: () => setState(() => _selectedIndex = 3),
+                  onTap: () => setState(() => _selectedIndex = 4),
                 ),
                 if (isAdmin)
                   _NavHoverItem(
-                    index: 4,
+                    index: 5,
                     currentIndex: _selectedIndex,
                     label: 'Painel Administrativo',
                     icon: Icons.admin_panel_settings_outlined,
                     isDark: isDark,
-                    onTap: () => setState(() => _selectedIndex = 4),
+                    onTap: () => setState(() => _selectedIndex = 5),
                   ),
                 _NavHoverItem(
-                  index: isAdmin ? 5 : 4,
+                  index: isAdmin ? 6 : 5,
                   currentIndex: _selectedIndex,
                   label: 'Configurações',
                   icon: Icons.settings_outlined,
                   isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = isAdmin ? 5 : 4),
+                  onTap: () => setState(() => _selectedIndex = isAdmin ? 6 : 5),
                 ),
 
                 const Spacer(),

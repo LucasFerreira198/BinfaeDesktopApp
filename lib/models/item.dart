@@ -118,6 +118,7 @@ class ItemModel {
   final List<ItemModel>? componentes;
   final String? criadoEm;
   final String? atualizadoEm;
+  final Map<String, dynamic>? cautelaAtiva;
 
   ItemModel({
     required this.id,
@@ -141,6 +142,7 @@ class ItemModel {
     this.componentes,
     this.criadoEm,
     this.atualizadoEm,
+    this.cautelaAtiva,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -168,6 +170,7 @@ class ItemModel {
           : null,
       criadoEm: json['criado_em'] as String?,
       atualizadoEm: json['atualizado_em'] as String?,
+      cautelaAtiva: json['cautela_ativa'] as Map<String, dynamic>?,
     );
   }
 
@@ -192,6 +195,7 @@ class ItemModel {
     'subgrupo': subgrupo?.toJson(),
     'criado_em': criadoEm,
     'atualizado_em': atualizadoEm,
+    'cautela_ativa': cautelaAtiva,
   };
 }
 

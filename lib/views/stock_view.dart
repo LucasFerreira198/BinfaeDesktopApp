@@ -735,8 +735,35 @@ class _ItemTableRowState extends State<_ItemTableRow> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                    if (item.cautelaAtiva != null) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.amber.withOpacity(0.4)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.assignment_ind, size: 11, color: Colors.amber[700]),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'CAUTELADO: ${item.cautelaAtiva!.missaoNome} • Resp: ${item.cautelaAtiva!.militarPostoGraduacao} ${item.cautelaAtiva!.militarNomeGuerra}${item.cautelaAtiva!.militarCelular != null && item.cautelaAtiva!.militarCelular!.isNotEmpty ? " (Tel: ${item.cautelaAtiva!.militarCelular})" : ""}',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.amber[300] : Colors.amber[900],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

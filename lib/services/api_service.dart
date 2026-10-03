@@ -3,17 +3,26 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item.dart';
 import '../models/user.dart';
+import '../models/cautela.dart';
 
 class ApiService {
   static const String defaultBaseUrl = 'https://systeminformaticabinfae.onrender.com';
   static const String _keyBaseUrl = 'binfae_desktop_api_url';
   static const String _keyToken = 'binfae_desktop_token';
+  static const String _keyRefreshToken = 'binfae_desktop_refresh_token';
+  static const String _keyLoginTimestamp = 'binfae_desktop_login_timestamp';
 
   String _baseUrl = defaultBaseUrl;
   String? _token;
+  String? _refreshToken;
+  DateTime? _loginTimestamp;
+
+  Function()? onSessionExpired;
 
   String get baseUrl => _baseUrl;
   String? get token => _token;
+  String? get refreshTokenStr => _refreshToken;
+  DateTime? get loginTimestamp => _loginTimestamp;
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -22,6 +31,18 @@ class ApiService {
       _baseUrl = savedUrl.trim().replaceAll(RegExp(r'/+$'), '');
     }
     _token = prefs.getString(_keyToken);
+    _refreshToken = prefs.getString(_keyRefreshToken);
+
+    final rawTimestamp = prefs.getString(_keyLoginTimestamp);
+    if (rawTimestamp != null) {
+      _loginTimestamp = DateTime.tryParse(rawTimestamp);
+      // Se tiver passado mais de 24 horas desde o login, encerra a sessão
+      if (_loginTimestamp != null &&
+          DateTime.now().difference(_loginTimestamp!).inHours >= 24) {
+        await clearAuthSession();
+        return;
+      }
+    }
   }
 
   Future<void> setBaseUrl(String url) async {
@@ -36,9 +57,76 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     if (token != null) {
       await prefs.setString(_keyToken, token);
+      if (_loginTimestamp == null) {
+        _loginTimestamp = DateTime.now();
+        await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
+      }
     } else {
       await prefs.remove(_keyToken);
     }
+  }
+
+  Future<void> setRefreshToken(String? refreshToken) async {
+    _refreshToken = refreshToken;
+    final prefs = await SharedPreferences.getInstance();
+    if (refreshToken != null) {
+      await prefs.setString(_keyRefreshToken, refreshToken);
+    } else {
+      await prefs.remove(_keyRefreshToken);
+    }
+  }
+
+  Future<void> clearAuthSession() async {
+    _token = null;
+    _refreshToken = null;
+    _loginTimestamp = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyToken);
+    await prefs.remove(_keyRefreshToken);
+    await prefs.remove(_keyLoginTimestamp);
+    await prefs.remove('binfae_desktop_user');
+  }
+
+  Future<bool> refreshToken() async {
+    if (_refreshToken == null) return false;
+
+    // Se o login tiver mais de 24 horas, recusa o refresh e encerra a sessão
+    if (_loginTimestamp != null &&
+        DateTime.now().difference(_loginTimestamp!).inHours >= 24) {
+      await clearAuthSession();
+      onSessionExpired?.call();
+      return false;
+    }
+
+    try {
+      final uri = Uri.parse('$_baseUrl/auth/refresh');
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'refresh_token': _refreshToken}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+        final newAccess = data['access_token'] as String?;
+        final newRefresh = data['refresh_token'] as String?;
+        if (newAccess != null) {
+          await setToken(newAccess);
+        }
+        if (newRefresh != null) {
+          await setRefreshToken(newRefresh);
+        }
+        return true;
+      }
+    } catch (_) {}
+
+    // Refresh falhou
+    await clearAuthSession();
+    onSessionExpired?.call();
+    return false;
   }
 
   Map<String, String> _headers([bool isJson = true]) {
@@ -90,6 +178,12 @@ class ApiService {
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     await setToken(data['access_token']);
+    if (data['refresh_token'] != null) {
+      await setRefreshToken(data['refresh_token'] as String);
+    }
+    _loginTimestamp = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
     return data;
   }
 
@@ -449,5 +543,180 @@ class ApiService {
       }
     } catch (_) {}
     return null;
+  }
+
+  // ============================================================================
+  // CAUTELAS & MISSÕES
+  // ============================================================================
+
+  Future<List<CautelaModel>> listCautelas({String? tipo, String? status, String? search}) async {
+    final queryParams = <String, String>{};
+    if (tipo != null && tipo.isNotEmpty) queryParams['tipo'] = tipo;
+    if (status != null && status.isNotEmpty) queryParams['status'] = status;
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+
+    final uri = Uri.parse('$_baseUrl/cautelas').replace(queryParameters: queryParams.isNotEmpty ? queryParams : null);
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 401) {
+      final refreshed = await refreshToken();
+      if (refreshed) {
+        return listCautelas(tipo: tipo, status: status, search: search);
+      }
+      throw Exception('Sessão expirada. Faça login novamente.');
+    }
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao listar cautelas'));
+    }
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => CautelaModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<CautelaModel> getCautela(int id) async {
+    final uri = Uri.parse('$_baseUrl/cautelas/$id');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 401) {
+      final refreshed = await refreshToken();
+      if (refreshed) return getCautela(id);
+      throw Exception('Sessão expirada. Faça login novamente.');
+    }
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao obter detalhes da cautela'));
+    }
+    return CautelaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<CautelaModel> createCautela(String nome, {String tipo = 'MISSAO', String? observacoes}) async {
+    final uri = Uri.parse('$_baseUrl/cautelas');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'nome': nome.trim(),
+        'tipo': tipo,
+        if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 401) {
+      final refreshed = await refreshToken();
+      if (refreshed) return createCautela(nome, tipo: tipo, observacoes: observacoes);
+      throw Exception('Sessão expirada. Faça login novamente.');
+    }
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar missão/cautela'));
+    }
+    return CautelaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<CautelaItemModel> addItemToCautela(
+    int cautelaId, {
+    int? itemId,
+    String? itemCode,
+    required int militarSaram,
+    String? telefoneContato,
+    String? condicaoSaida,
+    String? observacoes,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/cautelas/$cautelaId/itens');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (itemId != null) 'item_id': itemId,
+        if (itemCode != null && itemCode.isNotEmpty) 'item_code': itemCode.trim(),
+        'militar_saram': militarSaram,
+        if (telefoneContato != null && telefoneContato.isNotEmpty) 'telefone_contato': telefoneContato.trim(),
+        'condicao_saida': condicaoSaida ?? 'BOM',
+        if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 401) {
+      final refreshed = await refreshToken();
+      if (refreshed) {
+        return addItemToCautela(
+          cautelaId,
+          itemId: itemId,
+          itemCode: itemCode,
+          militarSaram: militarSaram,
+          telefoneContato: telefoneContato,
+          condicaoSaida: condicaoSaida,
+          observacoes: observacoes,
+        );
+      }
+      throw Exception('Sessão expirada. Faça login novamente.');
+    }
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao adicionar material à missão'));
+    }
+    return CautelaItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<List<CautelaItemModel>> addBatchItemsToCautela(
+    int cautelaId, {
+    required int militarSaram,
+    String? telefoneContato,
+    List<int>? itensIds,
+    List<String>? itensCodes,
+    String? condicaoSaida,
+    String? observacoes,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/cautelas/$cautelaId/itens/lote');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'militar_saram': militarSaram,
+        if (telefoneContato != null && telefoneContato.isNotEmpty) 'telefone_contato': telefoneContato.trim(),
+        if (itensIds != null && itensIds.isNotEmpty) 'itens_ids': itensIds,
+        if (itensCodes != null && itensCodes.isNotEmpty) 'itens_codes': itensCodes,
+        'condicao_saida': condicaoSaida ?? 'BOM',
+        if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao adicionar materiais em lote'));
+    }
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => CautelaItemModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<CautelaItemModel> devolverItemCautela(
+    int cautelaId,
+    int itemId, {
+    String? condicaoRetorno,
+    String? observacoes,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/cautelas/$cautelaId/itens/$itemId/devolver');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (condicaoRetorno != null && condicaoRetorno.isNotEmpty) 'condicao_retorno': condicaoRetorno.trim(),
+        if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao devolver material'));
+    }
+    return CautelaItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<CautelaItemModel> scanDevolverItem(String code) async {
+    final cleanCode = Uri.encodeComponent(code.trim());
+    final uri = Uri.parse('$_baseUrl/cautelas/devolver/scan/$cleanCode');
+    final response = await http.post(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao descautelar material via leitor'));
+    }
+    return CautelaItemModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<Map<String, dynamic>> checkItemCautelaStatus(String code) async {
+    final cleanCode = Uri.encodeComponent(code.trim());
+    final uri = Uri.parse('$_baseUrl/cautelas/item/$cleanCode/status');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 10));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao checar status do item'));
+    }
+    return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
   }
 }

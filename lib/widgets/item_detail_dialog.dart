@@ -286,6 +286,39 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                 ),
               ],
             ),
+            if (_currentItem.cautelaAtiva != null) ...[
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.amber.withOpacity(0.4)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.assignment_ind_outlined, color: Colors.amber[800], size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'MATERIAL EM CAUTELA ATIVA (${_currentItem.cautelaAtiva!.tipo == 'MISSAO' ? 'Missão Operacional' : 'Cautela Fixa'}: ${_currentItem.cautelaAtiva!.missaoNome})',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.amber[300] : Colors.amber[900]),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Responsável: ${_currentItem.cautelaAtiva!.militarPostoGraduacao} ${_currentItem.cautelaAtiva!.militarNomeGuerra} (SARAM ${_currentItem.cautelaAtiva!.militarResponsavelSaram}) • Contato: ${_currentItem.cautelaAtiva!.militarCelular ?? "Não informado"}',
+                            style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
 
             // Abas de Navegação Estilizadas
