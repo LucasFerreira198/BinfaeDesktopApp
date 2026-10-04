@@ -84,6 +84,8 @@ jobs:
             - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
             
             ### 🚀 Novidades da Versão ${{ steps.version.outputs.val }}:
+            - 🔐 **Nova Tela de Login & Opção Lembrar por 24 Horas**: Interface reformulada com estética militar moderna, badge de ping em tempo real para a nuvem Vercel SP e botão "Lembrar por 24 horas". Se desmarcado, ao fechar o app o login é solicitado novamente; se marcado, a sessão dura exatamente 24 horas com expiração estrita.
+            - ⚙️ **Configuração de Servidor e Proxy na Tela de Login**: Acesso facilitado para testar e configurar o endereço da API sem precisar entrar no sistema.
             - ⚡ **Servidor em Nuvem no Brasil (Vercel SP)**: Conexão ultrarrápida com latência reduzida a milissegundos e suporte nativo a proxy corporativo autenticado.
             - 🔄 **Correção do Verificador de Atualizações**: Resolução definitiva do ciclo de aviso de atualização (versão interna compilada dinamicamente).
             - 🎯 **Correção e Aprimoramento do Módulo de Cautelas**: Exibição precisa do status "Em Uso" para itens ativos, sem marcar falsamente como devolvido.

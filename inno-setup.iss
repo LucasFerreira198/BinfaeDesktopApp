@@ -1,6 +1,6 @@
 ; Script Inno Setup para Informatica - BINFAE-GL (Flutter Windows Nativo)
 #ifndef MyAppVersion
-#define MyAppVersion "2.0.8"
+#define MyAppVersion "2.0.9"
 #endif
 
 [Setup]

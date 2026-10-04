@@ -11,11 +11,14 @@ class ApiService {
   static const String _keyToken = 'binfae_desktop_token';
   static const String _keyRefreshToken = 'binfae_desktop_refresh_token';
   static const String _keyLoginTimestamp = 'binfae_desktop_login_timestamp';
+  static const String _keyRememberMe = 'binfae_desktop_remember_me';
+  static const String _keySavedUsername = 'binfae_desktop_saved_username';
 
   String _baseUrl = defaultBaseUrl;
   String? _token;
   String? _refreshToken;
   DateTime? _loginTimestamp;
+  bool _rememberMe = true;
 
   Function()? onSessionExpired;
 
@@ -23,6 +26,7 @@ class ApiService {
   String? get token => _token;
   String? get refreshTokenStr => _refreshToken;
   DateTime? get loginTimestamp => _loginTimestamp;
+  bool get rememberMe => _rememberMe;
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -35,6 +39,16 @@ class ApiService {
         await prefs.setString(_keyBaseUrl, defaultBaseUrl);
       }
     }
+
+    final savedRememberMe = prefs.getBool(_keyRememberMe) ?? false;
+    _rememberMe = savedRememberMe;
+
+    // Se a opção "Lembrar" NÃO estiver marcada, ao reabrir o app o login é exigido imediatamente
+    if (!_rememberMe) {
+      await clearAuthSession(preserveSavedUsername: true);
+      return;
+    }
+
     _token = prefs.getString(_keyToken);
     _refreshToken = prefs.getString(_keyRefreshToken);
 
@@ -44,9 +58,12 @@ class ApiService {
       // Se tiver passado mais de 24 horas desde o login, encerra a sessão
       if (_loginTimestamp != null &&
           DateTime.now().difference(_loginTimestamp!).inHours >= 24) {
-        await clearAuthSession();
+        await clearAuthSession(preserveSavedUsername: true);
         return;
       }
+    } else {
+      await clearAuthSession(preserveSavedUsername: true);
+      return;
     }
   }
 
@@ -61,10 +78,12 @@ class ApiService {
     _token = token;
     final prefs = await SharedPreferences.getInstance();
     if (token != null) {
-      await prefs.setString(_keyToken, token);
-      if (_loginTimestamp == null) {
-        _loginTimestamp = DateTime.now();
-        await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
+      if (_rememberMe) {
+        await prefs.setString(_keyToken, token);
+        if (_loginTimestamp == null) {
+          _loginTimestamp = DateTime.now();
+          await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
+        }
       }
     } else {
       await prefs.remove(_keyToken);
@@ -75,21 +94,38 @@ class ApiService {
     _refreshToken = refreshToken;
     final prefs = await SharedPreferences.getInstance();
     if (refreshToken != null) {
-      await prefs.setString(_keyRefreshToken, refreshToken);
+      if (_rememberMe) {
+        await prefs.setString(_keyRefreshToken, refreshToken);
+      }
     } else {
       await prefs.remove(_keyRefreshToken);
     }
   }
 
-  Future<void> clearAuthSession() async {
+  Future<void> clearAuthSession({bool preserveSavedUsername = true}) async {
     _token = null;
     _refreshToken = null;
     _loginTimestamp = null;
+    _rememberMe = false;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyToken);
     await prefs.remove(_keyRefreshToken);
     await prefs.remove(_keyLoginTimestamp);
+    await prefs.remove(_keyRememberMe);
     await prefs.remove('binfae_desktop_user');
+    if (!preserveSavedUsername) {
+      await prefs.remove(_keySavedUsername);
+    }
+  }
+
+  Future<String?> getSavedUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySavedUsername);
+  }
+
+  Future<bool> getSavedRememberMePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyRememberMe) ?? true;
   }
 
   Future<bool> refreshToken() async {
@@ -142,7 +178,15 @@ class ApiService {
       headers['Content-Type'] = 'application/json';
     }
     if (_token != null) {
-      headers['Authorization'] = 'Bearer $_token';
+      // Se houver timestamp de login e ultrapassar 24h, expira a sessão
+      if (_loginTimestamp != null &&
+          DateTime.now().difference(_loginTimestamp!).inHours >= 24) {
+        _token = null;
+        clearAuthSession();
+        onSessionExpired?.call();
+      } else {
+        headers['Authorization'] = 'Bearer $_token';
+      }
     }
     return headers;
   }
@@ -158,7 +202,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> login(String username, String password) async {
+  Future<Map<String, dynamic>> login(String username, String password, {bool rememberMe = true}) async {
     final uri = Uri.parse('$_baseUrl/auth/login');
     final response = await http.post(
       uri,
@@ -182,13 +226,29 @@ class ApiService {
     }
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
-    await setToken(data['access_token']);
-    if (data['refresh_token'] != null) {
-      await setRefreshToken(data['refresh_token'] as String);
-    }
+    _rememberMe = rememberMe;
+    _token = data['access_token'] as String?;
+    _refreshToken = data['refresh_token'] as String?;
     _loginTimestamp = DateTime.now();
+
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
+    await prefs.setBool(_keyRememberMe, rememberMe);
+    await prefs.setString(_keySavedUsername, username.trim());
+
+    if (rememberMe) {
+      if (_token != null) {
+        await prefs.setString(_keyToken, _token!);
+      }
+      if (_refreshToken != null) {
+        await prefs.setString(_keyRefreshToken, _refreshToken!);
+      }
+      await prefs.setString(_keyLoginTimestamp, _loginTimestamp!.toIso8601String());
+    } else {
+      // Sessão temporária em memória: limpa dados do disco para exigir login ao fechar o app
+      await prefs.remove(_keyToken);
+      await prefs.remove(_keyRefreshToken);
+      await prefs.remove(_keyLoginTimestamp);
+    }
     return data;
   }
 

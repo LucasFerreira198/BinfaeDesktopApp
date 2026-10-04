@@ -48,7 +48,9 @@ class AuthProvider extends ChangeNotifier {
         try {
           final freshUser = await _apiService.getMe();
           _user = freshUser;
-          await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+          if (_apiService.rememberMe) {
+            await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+          }
         } catch (e) {
           final errStr = e.toString().toLowerCase();
           if (errStr.contains('401') || errStr.contains('expirada')) {
@@ -58,7 +60,9 @@ class AuthProvider extends ChangeNotifier {
               try {
                 final freshUser = await _apiService.getMe();
                 _user = freshUser;
-                await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+                if (_apiService.rememberMe) {
+                  await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+                }
               } catch (_) {}
             } else {
               // Refresh falhou ou sessão expirou (> 24h)
@@ -78,18 +82,22 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String username, String password, {bool rememberMe = true}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _apiService.login(username, password);
+      await _apiService.login(username, password, rememberMe: rememberMe);
       final freshUser = await _apiService.getMe();
       _user = freshUser;
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+      if (rememberMe) {
+        await prefs.setString(_keyCachedUser, jsonEncode(freshUser.toJson()));
+      } else {
+        await prefs.remove(_keyCachedUser);
+      }
 
       _isLoading = false;
       notifyListeners();
