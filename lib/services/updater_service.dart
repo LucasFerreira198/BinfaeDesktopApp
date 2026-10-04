@@ -23,7 +23,7 @@ class ReleaseInfo {
 }
 
 class UpdaterService {
-  static const String currentVersion = 'v2.0.6';
+  static const String currentVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v2.0.8');
   static const String repoOwner = 'LucasFerreira198';
   static const String repoName = 'BinfaeDesktopApp';
 
@@ -85,7 +85,7 @@ class UpdaterService {
     if (release.version.isEmpty) return false;
 
     final latestParts = release.version.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final cleanCurrent = currentVersion.replaceAll(RegExp(r'[^0-9.]'), '');
+    final cleanCurrent = currentVersion.split('+').first.replaceAll(RegExp(r'[^0-9.]'), '');
     final currentParts = cleanCurrent.split('.').map((e) => int.tryParse(e) ?? 0).toList();
 
     while (latestParts.length < 3) {
@@ -119,7 +119,8 @@ class UpdaterService {
 
       final totalBytes = response.contentLength ?? 0;
       final tempDir = Directory.systemTemp.path;
-      final installerPath = '$tempDir\\BinfaeDesktop-Setup.exe';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final installerPath = '$tempDir\\BinfaeDesktop-Setup-$timestamp.exe';
       final file = File(installerPath);
       final sink = file.openWrite();
 
@@ -150,7 +151,7 @@ class UpdaterService {
       // Executa instalador e encerra processo atual
       await Process.start(
         installerPath,
-        ['/CLOSEAPPLICATIONS', '/RESTARTAPPLICATIONS'],
+        ['/CLOSEAPPLICATIONS'],
         runInShell: true,
       );
 

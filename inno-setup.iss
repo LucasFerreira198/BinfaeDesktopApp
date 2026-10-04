@@ -1,7 +1,11 @@
 ; Script Inno Setup para Informatica - BINFAE-GL (Flutter Windows Nativo)
+#ifndef MyAppVersion
+#define MyAppVersion "2.0.8"
+#endif
+
 [Setup]
 AppName=Informatica - BINFAE-GL
-AppVersion=2.0.6
+AppVersion={#MyAppVersion}
 DefaultDirName={autopf}\Informatica - BINFAE-GL
 DefaultGroupName=Informatica - BINFAE-GL
 OutputDir=dist
@@ -11,6 +15,7 @@ SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
 WizardStyle=modern
 UninstallDisplayIcon={app}\binfae_desktop.exe
+CloseApplications=yes
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
@@ -23,4 +28,4 @@ Name: "{group}\Informatica - BINFAE-GL"; Filename: "{app}\binfae_desktop.exe"
 Name: "{autodesktop}\Informatica - BINFAE-GL"; Filename: "{app}\binfae_desktop.exe"
 
 [Run]
-Filename: "{app}\binfae_desktop.exe"; Description: "{cm:LaunchProgram,Informatica - BINFAE-GL}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\binfae_desktop.exe"; Description: "{cm:LaunchProgram,Informatica - BINFAE-GL}"; Flags: nowait postinstall

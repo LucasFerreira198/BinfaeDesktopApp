@@ -25,6 +25,18 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Obter Versao do Projeto
+        id: version
+        shell: powershell
+        run: |
+          $content = Get-Content pubspec.yaml -Raw
+          if ($content -match 'version:\s*([0-9.]+)') {
+            $ver = $matches[1]
+          } else {
+            $ver = "2.0.8"
+          }
+          Write-Output "val=$ver" >> $env:GITHUB_OUTPUT
+
       - name: Configurar Plataforma Windows
         run: |
           flutter config --enable-windows-desktop
@@ -32,7 +44,7 @@ jobs:
           flutter pub get
 
       - name: Compilar Release Nativo Windows
-        run: flutter build windows --release
+        run: flutter build windows --release --dart-define=APP_VERSION=v${{ steps.version.outputs.val }}
 
       - name: Criar Pacote Portátil ZIP
         shell: powershell
@@ -46,7 +58,7 @@ jobs:
           if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
             choco install innosetup -y
           }
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" inno-setup.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion="${{ steps.version.outputs.val }}" inno-setup.iss
 
       - name: Enviar Artefatos de Build
         uses: actions/upload-artifact@v4
@@ -55,18 +67,6 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 30
-
-      - name: Obter Versao do Projeto
-        id: version
-        shell: powershell
-        run: |
-          $content = Get-Content pubspec.yaml -Raw
-          if ($content -match 'version:\s*([0-9.]+)') {
-            $ver = $matches[1]
-          } else {
-            $ver = "2.0.6"
-          }
-          Write-Output "val=$ver" >> $env:GITHUB_OUTPUT
 
       - name: Publicar Release no GitHub com Download do .exe
         uses: softprops/action-gh-release@v2
@@ -84,6 +84,8 @@ jobs:
             - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
             
             ### 🚀 Novidades da Versão ${{ steps.version.outputs.val }}:
+            - ⚡ **Servidor em Nuvem no Brasil (Vercel SP)**: Conexão ultrarrápida com latência reduzida a milissegundos e suporte nativo a proxy corporativo autenticado.
+            - 🔄 **Correção do Verificador de Atualizações**: Resolução definitiva do ciclo de aviso de atualização (versão interna compilada dinamicamente).
             - 🎯 **Correção e Aprimoramento do Módulo de Cautelas**: Exibição precisa do status "Em Uso" para itens ativos, sem marcar falsamente como devolvido.
             - 🔄 **Menu de Opções de Devolução**: Descautelação manual ou por scanner/leitor USB direcionado exclusivamente para o material selecionado, com bloqueio estrito de códigos de outros itens.
             - 👤 **Identificação Completa do Militar Responsável**: SARAM, posto, nome de guerra e telefone de contato visíveis nos detalhes da missão.
@@ -100,4 +102,3 @@ jobs:
           make_latest: "true"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
