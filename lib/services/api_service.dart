@@ -6,7 +6,7 @@ import '../models/user.dart';
 import '../models/cautela.dart';
 
 class ApiService {
-  static const String defaultBaseUrl = 'https://systeminformaticabinfae.onrender.com';
+  static const String defaultBaseUrl = 'https://backend-info-binfae.vercel.app';
   static const String _keyBaseUrl = 'binfae_desktop_api_url';
   static const String _keyToken = 'binfae_desktop_token';
   static const String _keyRefreshToken = 'binfae_desktop_refresh_token';
@@ -27,8 +27,13 @@ class ApiService {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUrl = prefs.getString(_keyBaseUrl);
-    if (savedUrl != null && savedUrl.trim().isNotEmpty) {
+    if (savedUrl != null && savedUrl.trim().isNotEmpty && !savedUrl.contains('onrender.com')) {
       _baseUrl = savedUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    } else {
+      _baseUrl = defaultBaseUrl;
+      if (savedUrl != null && savedUrl.contains('onrender.com')) {
+        await prefs.setString(_keyBaseUrl, defaultBaseUrl);
+      }
     }
     _token = prefs.getString(_keyToken);
     _refreshToken = prefs.getString(_keyRefreshToken);
