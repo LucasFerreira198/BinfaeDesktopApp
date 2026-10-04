@@ -56,14 +56,26 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Obter Versao do Projeto
+        id: version
+        shell: powershell
+        run: |
+          $content = Get-Content pubspec.yaml -Raw
+          if ($content -match 'version:\s*([0-9.]+)') {
+            $ver = $matches[1]
+          } else {
+            $ver = "2.0.6"
+          }
+          Write-Output "val=$ver" >> $env:GITHUB_OUTPUT
+
       - name: Publicar Release no GitHub com Download do .exe
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main' || github.event_name == 'release'
         with:
           tag_name: latest
-          name: "Informatica - BINFAE-GL v2.0.5 - Aplicativo Nativo Windows (.exe)"
+          name: "Informatica - BINFAE-GL v${{ steps.version.outputs.val }} - Aplicativo Nativo Windows (.exe)"
           body: |
-            ## Informatica - BINFAE-GL v2.0.5 - Versão Oficial Nativa Desktop 💻
+            ## Informatica - BINFAE-GL v${{ steps.version.outputs.val }} - Versão Oficial Nativa Desktop 💻
             
             Aplicativo oficial 100% nativo desenvolvido em **Flutter Desktop (C++/DirectX)** com nova interface moderna v2.0, tema escuro profundo e acentos vibrantes de roxo e verde.
             
@@ -71,12 +83,13 @@ jobs:
             - **[BinfaeDesktop-Setup.exe](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Setup.exe)**: Instalador automático que cria atalhos no Desktop e Menu Iniciar com suporte a atualização direta no app.
             - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
             
-            ### 🚀 Novidades da Versão 2.0.5:
-            - 🎯 **Módulo Completo de Cautela de Materiais & Missões Operacionais**: Abertura simplificada de missões e cautelas fixas, abas comutáveis "Ativas" e "Concluídas", barra de progresso visual de devolução e auto-conclusão da missão ao zerar itens pendentes.
-            - 👤 **Fluxo Operacional Blindado**: Seleção do militar recebedor primeiro, exibição obrigatória do telefone de contato no card e modos de cautela unitário e em lote com leitor USB consecutivo.
-            - 🔍 **Descautelação por Leitor USB**: Leitura de qualquer material cautelado identifica automaticamente a missão e o militar responsável, permitindo confirmação de devolução imediata.
+            ### 🚀 Novidades da Versão ${{ steps.version.outputs.val }}:
+            - 🎯 **Correção e Aprimoramento do Módulo de Cautelas**: Exibição precisa do status "Em Uso" para itens ativos, sem marcar falsamente como devolvido.
+            - 🔄 **Menu de Opções de Devolução**: Descautelação manual ou por scanner/leitor USB direcionado exclusivamente para o material selecionado, com bloqueio estrito de códigos de outros itens.
+            - 👤 **Identificação Completa do Militar Responsável**: SARAM, posto, nome de guerra e telefone de contato visíveis nos detalhes da missão.
+            - ⏱️ **Estabilidade de Conexão com Servidor**: Timeout de integridade expandido para 12 segundos, absorvendo a inicialização do backend.
             - 🔒 **Sessão Estrita de 24 Horas & Cache Seguro**: Prevenção de logout acidental ao fechar e reabrir a janela, com expiração rigorosa em 24h e suporte a refresh token silencioso.
-            - 🔍 **Seletor de Militares com Busca em Tempo Real**: Na criação de novos usuários, pesquisa ágil por nome de guerra, nome completo, SARAM ou seção, exibindo lista com rolagem suave e seleção rápida.
+            - 🔍 **Seletor de Militares com Busca em Tempo Real**: Na criação de novos usuários, pesquisa ágil por nome de guerra, nome completo, SARAM ou seção.
             - 🏢 **Gravação e Persistência de Seção do Militar**: Suporte integrado no cadastro e edição do efetivo militar, com persistência no banco de dados e backend.
             - 🎖️ **Padronização dos Postos S2 e S1**: Graduações normalizadas de Soldado de 2ª e 1ª Classe em todo o sistema.
           files: |

@@ -1,7 +1,7 @@
 name: binfae_desktop
 description: "Informatica - BINFAE-GL - Sistema Nativo de Gestão de Patrimônio e Informática para Windows"
 publish_to: "none"
-version: 2.0.5+7
+version: 2.0.6+8
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

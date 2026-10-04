@@ -64,9 +64,7 @@ class _DashboardViewState extends State<DashboardView> {
         final hasNewVersion = UpdaterService.isNewerVersion(release);
         if (hasNewVersion) {
           setState(() => _latestRelease = release);
-          if (manual) {
-            UpdaterService.showUpdateModal(context, release);
-          }
+          UpdaterService.showUpdateModal(context, release);
         } else {
           setState(() => _latestRelease = null);
           if (manual) {

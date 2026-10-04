@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/stock_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/api_service.dart';
+import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
 
 class SettingsView extends StatefulWidget {
@@ -232,7 +233,7 @@ class _SettingsViewState extends State<SettingsView> {
           // Informações de Versão
           Center(
             child: Text(
-              'Informatica - BINFAE-GL v2.0.4 • Nativo Windows (120 FPS)',
+              'Informatica - BINFAE-GL ${UpdaterService.currentVersion} • Nativo Windows (120 FPS)',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
