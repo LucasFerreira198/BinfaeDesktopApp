@@ -7,6 +7,7 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/date_utils.dart';
 import '../widgets/cautela_detail_dialog.dart';
+import '../widgets/user_avatar.dart';
 
 class CautelasView extends StatefulWidget {
   const CautelasView({super.key});
@@ -871,18 +872,11 @@ class _LoanHubTableRowState extends State<_LoanHubTableRow> {
                 flex: 3,
                 child: Row(
                   children: [
-                    Container(
-                      width: 26,
-                      height: 26,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF00D2B4), Color(0xFF6366F1)],
-                        ),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.shield, color: Colors.white, size: 13),
-                      ),
+                    UserAvatar(
+                      fotoUrl: c.criador?.fotoUrl,
+                      name: c.criador?.nomeGuerra,
+                      radius: 13,
+                      iconSize: 13,
                     ),
                     const SizedBox(width: 8),
                     Expanded(

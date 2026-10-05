@@ -11,6 +11,8 @@ import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/item_detail_dialog.dart';
 import '../widgets/item_form_dialog.dart';
+import '../widgets/user_avatar.dart';
+import '../widgets/user_profile_dialog.dart';
 import 'home_dashboard_view.dart';
 import 'stock_view.dart';
 import 'cautelas_view.dart';
@@ -630,10 +632,9 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ),
 
-                // Cartão de Perfil Militar no Rodapé da Sidebar (LogiFlow style)
+                // Cartão de Perfil Militar no Rodapé da Sidebar (LogiFlow style + Auto-Edição)
                 Container(
                   margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(12),
@@ -641,47 +642,61 @@ class _DashboardViewState extends State<DashboardView> {
                       color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF00D2B4), Color(0xFF6366F1)],
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.shield, color: Colors.white, size: 16),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => const UserProfileDialog(),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
                           children: [
-                            Text(
-                              user?.displayName ?? 'S2 D. PAULA',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                            UserAvatar(
+                              fotoUrl: user?.fotoUrl,
+                              name: user?.displayName,
+                              radius: 17,
+                              iconSize: 16,
                             ),
-                            Text(
-                              isAdmin ? 'Administrador TI' : 'Operador TI',
-                              style: const TextStyle(
-                                fontSize: 9.5,
-                                color: AppColors.cyan,
-                                fontWeight: FontWeight.w600,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user?.displayName ?? 'S2 D. PAULA',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        isAdmin ? 'Administrador TI' : 'Operador TI',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          color: AppColors.cyan,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.edit_outlined, size: 10, color: AppColors.cyan),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -799,7 +814,12 @@ class _DashboardViewState extends State<DashboardView> {
                               side: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                             ),
                             onSelected: (val) {
-                              if (val == 'settings') {
+                              if (val == 'profile') {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const UserProfileDialog(),
+                                );
+                              } else if (val == 'settings') {
                                 setState(() => _selectedIndex = isAdmin ? 7 : 6);
                               } else if (val == 'update') {
                                 _checkForUpdates(manual: true);
@@ -813,12 +833,35 @@ class _DashboardViewState extends State<DashboardView> {
                             },
                             itemBuilder: (ctx) => [
                               PopupMenuItem(
-                                value: 'settings',
+                                value: 'profile',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.person_outline, size: 18),
+                                    UserAvatar(
+                                      fotoUrl: user?.fotoUrl,
+                                      name: user?.displayName,
+                                      radius: 12,
+                                      iconSize: 12,
+                                    ),
                                     const SizedBox(width: 10),
-                                    Text(user?.displayName ?? 'S2 D. PAULA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(user?.displayName ?? 'S2 D. PAULA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                        const Text('Editar Meu Perfil & Foto', style: TextStyle(fontSize: 10, color: AppColors.cyan)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuDivider(),
+                              PopupMenuItem(
+                                value: 'settings',
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.settings_outlined, size: 18),
+                                    SizedBox(width: 10),
+                                    Text('Configurações do App', style: TextStyle(fontSize: 13)),
                                   ],
                                 ),
                               ),
@@ -878,19 +921,12 @@ class _DashboardViewState extends State<DashboardView> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // Avatar com anel de gradiente
-                                    Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          colors: [Color(0xFF7C3AED), Color(0xFF10B981)],
-                                        ),
-                                      ),
-                                      child: const Center(
-                                        child: Icon(Icons.shield, color: Colors.white, size: 15),
-                                      ),
+                                    // Avatar com anel de gradiente / Foto Real
+                                    UserAvatar(
+                                      fotoUrl: user?.fotoUrl,
+                                      name: user?.displayName,
+                                      radius: 14,
+                                      iconSize: 14,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(

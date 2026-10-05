@@ -110,6 +110,43 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<UserModel> updateProfile({
+    String? fotoUrl,
+    String? password,
+    String? celular,
+    String? email,
+    String? nomeGuerra,
+    String? secao,
+  }) async {
+    final updated = await _apiService.updateMe(
+      fotoUrl: fotoUrl,
+      password: password,
+      celular: celular,
+      email: email,
+      nomeGuerra: nomeGuerra,
+      secao: secao,
+    );
+    _user = updated;
+    final prefs = await SharedPreferences.getInstance();
+    if (_apiService.rememberMe) {
+      await prefs.setString(_keyCachedUser, jsonEncode(updated.toJson()));
+    }
+    notifyListeners();
+    return updated;
+  }
+
+  Future<void> refreshUser() async {
+    try {
+      final fresh = await _apiService.getMe();
+      _user = fresh;
+      final prefs = await SharedPreferences.getInstance();
+      if (_apiService.rememberMe) {
+        await prefs.setString(_keyCachedUser, jsonEncode(fresh.toJson()));
+      }
+      notifyListeners();
+    } catch (_) {}
+  }
+
   Future<void> logout() async {
     await _apiService.clearAuthSession();
     final prefs = await SharedPreferences.getInstance();

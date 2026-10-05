@@ -261,6 +261,34 @@ class ApiService {
     return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
+  Future<UserModel> updateMe({
+    String? fotoUrl,
+    String? password,
+    String? celular,
+    String? email,
+    String? nomeGuerra,
+    String? secao,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/auth/me');
+    final Map<String, dynamic> body = {};
+    if (fotoUrl != null) body['foto_url'] = fotoUrl;
+    if (password != null && password.isNotEmpty) body['password'] = password;
+    if (celular != null) body['celular'] = celular;
+    if (email != null) body['email'] = email;
+    if (nomeGuerra != null) body['nome_guerra'] = nomeGuerra;
+    if (secao != null) body['secao'] = secao;
+
+    final response = await http.patch(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar dados de perfil (${response.statusCode})'));
+    }
+    return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
   Future<Map<String, dynamic>?> getSyncStatus() async {
     try {
       final uri = Uri.parse('$_baseUrl/system/sync-status');
@@ -508,6 +536,7 @@ class ApiService {
     required String password,
     bool admin = false,
     bool ativo = true,
+    String? fotoUrl,
   }) async {
     final uri = Uri.parse('$_baseUrl/users/createUser');
     final body = <String, dynamic>{
@@ -517,6 +546,7 @@ class ApiService {
     };
     if (saram != null) body['saram'] = saram;
     if (username != null && username.isNotEmpty) body['username'] = username;
+    if (fotoUrl != null && fotoUrl.isNotEmpty) body['foto_url'] = fotoUrl;
 
     final response = await http.post(
       uri,
@@ -535,6 +565,7 @@ class ApiService {
     bool? admin,
     bool? ativo,
     String? password,
+    String? fotoUrl,
   }) async {
     final uri = Uri.parse('$_baseUrl/users/update/$identifier');
     final body = <String, dynamic>{};
@@ -542,6 +573,7 @@ class ApiService {
     if (admin != null) body['admin'] = admin;
     if (ativo != null) body['ativo'] = ativo;
     if (password != null && password.isNotEmpty) body['password'] = password;
+    if (fotoUrl != null) body['foto_url'] = fotoUrl;
 
     final response = await http.patch(
       uri,

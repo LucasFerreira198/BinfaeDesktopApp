@@ -7,6 +7,7 @@ class MilitaryModel {
   final String? secao;
   final String? email;
   final String? celular;
+  final String? fotoUrl;
 
   MilitaryModel({
     required this.saram,
@@ -17,6 +18,7 @@ class MilitaryModel {
     this.secao,
     this.email,
     this.celular,
+    this.fotoUrl,
   });
 
   factory MilitaryModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class MilitaryModel {
       secao: json['secao'] as String?,
       email: json['email'] as String?,
       celular: json['celular'] as String?,
+      fotoUrl: json['foto_url'] as String?,
     );
   }
 
@@ -41,6 +44,7 @@ class MilitaryModel {
     'secao': secao,
     'email': email,
     'celular': celular,
+    'foto_url': fotoUrl,
   };
 
   String? get telefone => celular;
@@ -52,6 +56,7 @@ class UserModel {
   final bool admin;
   final bool ativo;
   final int? militarId;
+  final String? _fotoUrl;
   final MilitaryModel? militar;
 
   UserModel({
@@ -60,8 +65,9 @@ class UserModel {
     required this.admin,
     required this.ativo,
     this.militarId,
+    String? fotoUrl,
     this.militar,
-  });
+  }) : _fotoUrl = fotoUrl;
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -70,6 +76,7 @@ class UserModel {
       admin: json['admin'] as bool? ?? false,
       ativo: json['ativo'] as bool? ?? true,
       militarId: json['militar_id'] as int?,
+      fotoUrl: json['foto_url'] as String?,
       militar: json['militar'] != null ? MilitaryModel.fromJson(json['militar']) : null,
     );
   }
@@ -80,8 +87,11 @@ class UserModel {
     'admin': admin,
     'ativo': ativo,
     'militar_id': militarId,
+    'foto_url': fotoUrl,
     'militar': militar?.toJson(),
   };
+
+  String? get fotoUrl => _fotoUrl ?? militar?.fotoUrl;
 
   String get displayName {
     if (militar != null) {

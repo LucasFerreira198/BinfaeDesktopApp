@@ -130,6 +130,81 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     }
   }
 
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+    bool isDark = true,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101622) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1E2838) : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.cyan.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 16, color: AppColors.cyan),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: AppColors.cyan,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _inputDeco(String label, {String? hint, IconData? icon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: icon != null ? Icon(icon, size: 18, color: const Color(0xFF94A3B8)) : null,
+      filled: true,
+      fillColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.cyan, width: 1.5),
+      ),
+      labelStyle: const TextStyle(fontSize: 12.5),
+      hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -142,233 +217,290 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
         : stock.subgroups;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: isDark ? const Color(0xFF0B0F17) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isDark ? const Color(0xFF1E2838) : const Color(0xFFE2E8F0),
+          width: 1.2,
+        ),
+      ),
       child: Container(
-        width: 720,
-        constraints: const BoxConstraints(maxHeight: 650),
-        padding: const EdgeInsets.all(26),
+        width: 760,
+        constraints: const BoxConstraints(maxHeight: 740),
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Header Modal com Badge e Subtítulo
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.item == null ? 'Cadastrar Novo Material' : 'Editar Material',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.cyan.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+                        ),
+                        child: Icon(
+                          widget.item == null ? Icons.add_box_rounded : Icons.edit_note_rounded,
+                          color: AppColors.cyan,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.item == null ? 'Cadastrar Novo Material' : 'Editar Material',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                          Text(
+                            widget.item == null
+                                ? 'Informe os dados patrimoniais e de estoque do item'
+                                : 'Atualize os parâmetros e a localização do item patrimonial',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close, size: 20),
+                    style: IconButton.styleFrom(
+                      backgroundColor: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
+              // Conteúdo Rolável Dividido em Seções Visuais
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Nome
-                      TextFormField(
-                        controller: _nomeController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nome do Material *',
-                          hintText: 'Ex: Teclado USB Dell KB216',
-                          prefixIcon: Icon(Icons.inventory_2_outlined, size: 20),
-                        ),
-                        validator: (v) => v == null || v.trim().isEmpty ? 'Informe o nome do material' : null,
-                      ),
-                      const SizedBox(height: 14),
-
-                      // Identificadores (BMP, Código Interno, Número de Série)
-                      Row(
+                      // Seção 1: Identificação do Material
+                      _buildSectionCard(
+                        title: '1. Identificação Patrimonial',
+                        icon: Icons.qr_code_2_rounded,
+                        isDark: isDark,
                         children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _bmpController,
-                              decoration: const InputDecoration(
-                                labelText: 'BMP (Patrimônio)',
-                                hintText: 'Ex: 123456',
-                                prefixIcon: Icon(Icons.qr_code, size: 18),
-                              ),
+                          TextFormField(
+                            controller: _nomeController,
+                            decoration: _inputDeco(
+                              'Nome do Material *',
+                              hint: 'Ex: Teclado USB Dell KB216, Rádio APX2000',
+                              icon: Icons.inventory_2_outlined,
                             ),
+                            validator: (v) => v == null || v.trim().isEmpty ? 'Informe o nome do material' : null,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _codigoInternoController,
-                              decoration: const InputDecoration(
-                                labelText: 'Código Interno',
-                                hintText: 'Ex: TEC-001',
-                                prefixIcon: Icon(Icons.tag, size: 18),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _bmpController,
+                                  decoration: _inputDeco('BMP (Patrimônio)', hint: 'Ex: 5540', icon: Icons.qr_code),
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _numeroSerieController,
-                              decoration: const InputDecoration(
-                                labelText: 'Número de Série',
-                                hintText: 'Ex: CN-012345',
-                                prefixIcon: Icon(Icons.fingerprint, size: 18),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _codigoInternoController,
+                                  decoration: _inputDeco('Código Interno', hint: 'Ex: TEC-001', icon: Icons.tag),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _numeroSerieController,
+                                  decoration: _inputDeco('Número de Série', hint: 'Ex: CN-012345', icon: Icons.fingerprint),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
 
-                      // Categorias: Grupo e Subgrupo em cascata
-                      Row(
+                      // Seção 2: Classificação & Localização
+                      _buildSectionCard(
+                        title: '2. Classificação & Localização Física',
+                        icon: Icons.category_rounded,
+                        isDark: isDark,
                         children: [
-                          Expanded(
-                            child: DropdownButtonFormField<int>(
-                              value: _selectedGrupoId,
-                              decoration: const InputDecoration(
-                                labelText: 'Grupo',
-                                prefixIcon: Icon(Icons.category_outlined, size: 18),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<int>(
+                                  value: _selectedGrupoId,
+                                  decoration: _inputDeco('Grupo', icon: Icons.category_outlined),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: groups.map((g) {
+                                    return DropdownMenuItem<int>(
+                                      value: g.id,
+                                      child: Text(g.nome),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _selectedGrupoId = val;
+                                      _selectedSubgrupoId = null;
+                                    });
+                                  },
+                                ),
                               ),
-                              items: groups.map((g) {
-                                return DropdownMenuItem<int>(
-                                  value: g.id,
-                                  child: Text(g.nome),
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedGrupoId = val;
-                                  _selectedSubgrupoId = null;
-                                });
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<int>(
-                              value: _selectedSubgrupoId,
-                              decoration: const InputDecoration(
-                                labelText: 'Subgrupo',
-                                prefixIcon: Icon(Icons.subdirectory_arrow_right, size: 18),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButtonFormField<int>(
+                                  value: _selectedSubgrupoId,
+                                  decoration: _inputDeco('Subgrupo', icon: Icons.subdirectory_arrow_right),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: filteredSubgroups.map((s) {
+                                    return DropdownMenuItem<int>(
+                                      value: s.id,
+                                      child: Text(s.nome),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) => setState(() => _selectedSubgrupoId = val),
+                                ),
                               ),
-                              items: filteredSubgroups.map((s) {
-                                return DropdownMenuItem<int>(
-                                  value: s.id,
-                                  child: Text(s.nome),
-                                );
-                              }).toList(),
-                              onChanged: (val) => setState(() => _selectedSubgrupoId = val),
-                            ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<int>(
+                            value: _selectedLocalId,
+                            decoration: _inputDeco('Local Físico de Armazenamento', icon: Icons.place_outlined),
+                            dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                            items: stock.locations.map((loc) {
+                              return DropdownMenuItem<int>(
+                                value: loc.id,
+                                child: Text(loc.caminhoCompleto ?? loc.nome),
+                              );
+                            }).toList(),
+                            onChanged: (val) => setState(() => _selectedLocalId = val),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
 
-                      // Local Físico de Armazenamento
-                      DropdownButtonFormField<int>(
-                        value: _selectedLocalId,
-                        decoration: const InputDecoration(
-                          labelText: 'Local Físico de Armazenamento',
-                          prefixIcon: Icon(Icons.place_outlined, size: 18),
-                        ),
-                        items: stock.locations.map((loc) {
-                          return DropdownMenuItem<int>(
-                            value: loc.id,
-                            child: Text(loc.caminhoCompleto ?? loc.nome),
-                          );
-                        }).toList(),
-                        onChanged: (val) => setState(() => _selectedLocalId = val),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // Estoque e Quantidades
-                      Row(
+                      // Seção 3: Controle de Estoque & Parâmetros
+                      _buildSectionCard(
+                        title: '3. Controle de Estoque & Medidas',
+                        icon: Icons.insights_rounded,
+                        isDark: isDark,
                         children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _tipoControle,
-                              decoration: const InputDecoration(labelText: 'Tipo de Controle'),
-                              items: _tiposControle.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                              onChanged: (val) => setState(() => _tipoControle = val ?? 'UNITARIO'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _quantidadeController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(labelText: 'Saldo em Estoque *'),
-                              validator: (v) => v == null || double.tryParse(v.replaceAll(',', '.')) == null
-                                  ? 'Quantidade inválida'
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _quantidadeMinimaController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(labelText: 'Estoque Mínimo'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _unidadeMedida,
-                              decoration: const InputDecoration(labelText: 'Unidade'),
-                              items: _unidades.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                              onChanged: (val) => setState(() => _unidadeMedida = val ?? 'UNIDADE'),
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: _tipoControle,
+                                  decoration: _inputDeco('Tipo de Controle', icon: Icons.tune),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: _tiposControle.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                                  onChanged: (val) => setState(() => _tipoControle = val ?? 'UNITARIO'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _quantidadeController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: _inputDeco('Saldo em Estoque *', hint: 'Ex: 1.0', icon: Icons.numbers),
+                                  validator: (v) => v == null || double.tryParse(v.replaceAll(',', '.')) == null
+                                      ? 'Quantidade inválida'
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _quantidadeMinimaController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: _inputDeco('Estoque Mínimo', hint: 'Ex: 0.0', icon: Icons.warning_amber),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: _unidadeMedida,
+                                  decoration: _inputDeco('Unidade', icon: Icons.straighten),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: _unidades.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
+                                  onChanged: (val) => setState(() => _unidadeMedida = val ?? 'UNIDADE'),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
 
-                      // Estado de Conservação e Status
-                      Row(
+                      // Seção 4: Condição & Status Operacional
+                      _buildSectionCard(
+                        title: '4. Condição Operacional & Status',
+                        icon: Icons.health_and_safety_outlined,
+                        isDark: isDark,
                         children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _estadoConservacao,
-                              decoration: const InputDecoration(labelText: 'Estado de Conservação'),
-                              items: _estadosConservacao
-                                  .map((e) => DropdownMenuItem(value: e, child: Text(e.replaceAll('_', ' '))))
-                                  .toList(),
-                              onChanged: (val) => setState(() => _estadoConservacao = val ?? 'BOM'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _status,
-                              decoration: const InputDecoration(labelText: 'Status Atual'),
-                              items: _statusList
-                                  .map((s) => DropdownMenuItem(value: s, child: Text(s.replaceAll('_', ' '))))
-                                  .toList(),
-                              onChanged: (val) => setState(() => _status = val ?? 'DISPONIVEL'),
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: _estadoConservacao,
+                                  decoration: _inputDeco('Estado de Conservação', icon: Icons.verified_outlined),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: _estadosConservacao
+                                      .map((e) => DropdownMenuItem(value: e, child: Text(e.replaceAll('_', ' '))))
+                                      .toList(),
+                                  onChanged: (val) => setState(() => _estadoConservacao = val ?? 'BOM'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: _status,
+                                  decoration: _inputDeco('Status Atual no Sistema', icon: Icons.radio_button_checked),
+                                  dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
+                                  items: _statusList
+                                      .map((s) => DropdownMenuItem(value: s, child: Text(s.replaceAll('_', ' '))))
+                                      .toList(),
+                                  onChanged: (val) => setState(() => _status = val ?? 'DISPONIVEL'),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
 
-                      // Observações
-                      TextFormField(
-                        controller: _observacoesController,
-                        maxLines: 2,
-                        decoration: const InputDecoration(
-                          labelText: 'Observações / Especificações Técnicas',
-                          hintText: 'Anotações adicionais sobre o material, licenças, etc.',
-                        ),
+                      // Seção 5: Observações / Especificações Técnicas
+                      _buildSectionCard(
+                        title: '5. Observações & Especificações Técnicas',
+                        icon: Icons.notes_rounded,
+                        isDark: isDark,
+                        children: [
+                          TextFormField(
+                            controller: _observacoesController,
+                            maxLines: 3,
+                            decoration: _inputDeco(
+                              'Observações Técnicas / Garantia',
+                              hint: 'Anotações adicionais, endereço MAC, licenças, número de série adicional, etc.',
+                              icon: Icons.description_outlined,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -376,27 +508,42 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
               ),
 
               const SizedBox(height: 16),
-              // Ações
+
+              // Rodapé do Modal com Ações
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancelar'),
+                    onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      foregroundColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                    child: const Text('Cancelar', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton.icon(
                     onPressed: _isSubmitting ? null : _save,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.cyan,
+                      foregroundColor: const Color(0xFF0A0E17),
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 0,
                     ),
                     icon: _isSubmitting
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Icon(Icons.check, size: 18),
-                    label: Text(widget.item == null ? 'Cadastrar Material' : 'Salvar Alterações'),
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0A0E17)),
+                          )
+                        : const Icon(Icons.check_circle_rounded, size: 18),
+                    label: Text(
+                      _isSubmitting
+                          ? 'Salvando...'
+                          : (widget.item == null ? 'Cadastrar Material' : 'Salvar Alterações'),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
                   ),
                 ],
               ),

@@ -7,6 +7,8 @@ import '../providers/theme_provider.dart';
 import '../services/api_service.dart';
 import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/user_avatar.dart';
+import '../widgets/user_profile_dialog.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -64,14 +66,11 @@ class _SettingsViewState extends State<SettingsView> {
             ),
             child: Row(
               children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(Icons.shield, color: AppColors.primary, size: 28),
+                UserAvatar(
+                  fotoUrl: user?.fotoUrl,
+                  name: user?.displayName,
+                  radius: 26,
+                  iconSize: 26,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -99,11 +98,27 @@ class _SettingsViewState extends State<SettingsView> {
                     ],
                   ),
                 ),
+                ElevatedButton.icon(
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (_) => const UserProfileDialog(),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.cyan,
+                    foregroundColor: const Color(0xFF0A0E17),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: const Text('Editar Perfil', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 10),
                 OutlinedButton.icon(
                   onPressed: () => auth.logout(),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.danger,
                     side: const BorderSide(color: AppColors.danger),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   icon: const Icon(Icons.logout, size: 16),

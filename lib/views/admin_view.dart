@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/user_avatar.dart';
 
 class AdminView extends StatefulWidget {
   const AdminView({super.key});
@@ -122,6 +123,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     int? selectedSaram;
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
+    final fotoUrlController = TextEditingController();
     final militarySearchController = TextEditingController();
     String militarySearchQuery = '';
     bool isAdmin = false;
@@ -365,6 +367,16 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                       ),
                       const SizedBox(height: 14),
 
+                      TextField(
+                        controller: fotoUrlController,
+                        decoration: const InputDecoration(
+                          labelText: 'URL da Foto / Avatar (opcional)',
+                          hintText: 'https://.../foto.jpg',
+                          prefixIcon: Icon(Icons.link, size: 18),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
                       // Toggles
                       SwitchListTile(
                         title: const Text('Administrador do Sistema', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -415,6 +427,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                               password: pass,
                               admin: isAdmin,
                               ativo: isAtivo,
+                              fotoUrl: fotoUrlController.text.trim().isNotEmpty ? fotoUrlController.text.trim() : null,
                             );
                             if (mounted) {
                               Navigator.pop(ctx);
@@ -449,6 +462,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     bool isAtivo = user.ativo;
     final usernameController = TextEditingController(text: user.username);
     final passwordController = TextEditingController();
+    final fotoUrlController = TextEditingController(text: user.fotoUrl ?? '');
 
     showDialog(
       context: context,
@@ -472,6 +486,15 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                         labelText: 'Nome de Usuário (Username)',
                         hintText: 'Ex: admin.ti, lucas.silva...',
                         prefixIcon: Icon(Icons.alternate_email, size: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: fotoUrlController,
+                      decoration: const InputDecoration(
+                        labelText: 'URL da Foto / Avatar',
+                        hintText: 'https://.../foto.jpg',
+                        prefixIcon: Icon(Icons.link, size: 18),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -537,6 +560,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                       admin: isAdmin,
                                       ativo: isAtivo,
                                       password: passwordController.text.trim().isNotEmpty ? passwordController.text.trim() : null,
+                                      fotoUrl: fotoUrlController.text.trim(),
                                     );
                                     if (mounted) {
                                       Navigator.pop(ctx);
@@ -660,6 +684,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     final secaoController = TextEditingController(text: military?.secao ?? '');
     final emailController = TextEditingController(text: military?.email ?? '');
     final celularController = TextEditingController(text: military?.celular ?? '');
+    final fotoUrlController = TextEditingController(text: military?.fotoUrl ?? '');
     String posto = military?.postoGraduacao ?? 'S2';
 
     showDialog(
@@ -764,6 +789,16 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+
+                      TextField(
+                        controller: fotoUrlController,
+                        decoration: const InputDecoration(
+                          labelText: 'URL da Foto / Avatar',
+                          hintText: 'https://.../foto.jpg',
+                          prefixIcon: Icon(Icons.link, size: 18),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -793,6 +828,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             'secao': secaoController.text.trim().isEmpty ? null : secaoController.text.trim(),
                             'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
                             'celular': celularController.text.trim().isEmpty ? null : celularController.text.trim(),
+                            'foto_url': fotoUrlController.text.trim().isEmpty ? null : fotoUrlController.text.trim(),
                           };
 
                           try {
@@ -952,14 +988,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                               child: Row(
                                 children: [
-                                  CircleAvatar(
+                                  UserAvatar(
+                                    fotoUrl: u.fotoUrl,
+                                    name: u.displayName,
                                     radius: 18,
-                                    backgroundColor: u.admin ? AppColors.primary.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
-                                    child: Icon(
-                                      u.admin ? Icons.admin_panel_settings : Icons.person_outline,
-                                      size: 18,
-                                      color: u.admin ? AppColors.primary : Colors.grey,
-                                    ),
+                                    iconSize: 18,
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
@@ -1098,7 +1131,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 14),
+                                  UserAvatar(
+                                    fotoUrl: m.fotoUrl,
+                                    name: m.nomeGuerra,
+                                    radius: 16,
+                                    iconSize: 16,
+                                  ),
+                                  const SizedBox(width: 14),
                                   Expanded(
                                     flex: 3,
                                     child: Column(
