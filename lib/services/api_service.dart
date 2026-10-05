@@ -261,6 +261,17 @@ class ApiService {
     return UserModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
+  Future<Map<String, dynamic>?> getSyncStatus() async {
+    try {
+      final uri = Uri.parse('$_baseUrl/system/sync-status');
+      final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 4));
+      if (response.statusCode == 200) {
+        return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      }
+    } catch (_) {}
+    return null;
+  }
+
   Future<List<ItemModel>> fetchItems() async {
     final uri = Uri.parse('$_baseUrl/stock/items');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 20));

@@ -23,6 +23,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   // Sub-filtro de status: 'ATIVA' ou 'CONCLUIDA'
   String _selectedStatusFilter = 'ATIVA';
   final TextEditingController _searchCtrl = TextEditingController();
+  int? _observedCautelasVersion;
 
   @override
   void initState() {
@@ -37,10 +38,36 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final stock = Provider.of<StockProvider>(context);
+    if (stock.lastCautelasVersion != null) {
+      if (_observedCautelasVersion != null && stock.lastCautelasVersion != _observedCautelasVersion) {
+        _observedCautelasVersion = stock.lastCautelasVersion;
+        _loadCautelasSilently();
+      } else if (_observedCautelasVersion == null) {
+        _observedCautelasVersion = stock.lastCautelasVersion;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadCautelasSilently() async {
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final list = await api.listCautelas();
+      if (mounted) {
+        setState(() {
+          _cautelas = list;
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadCautelas() async {

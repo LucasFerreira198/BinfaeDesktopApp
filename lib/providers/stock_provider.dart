@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/api_service.dart';
@@ -9,6 +10,10 @@ class StockProvider extends ChangeNotifier {
 
   bool _isSyncing = false;
   String? _syncError;
+  Timer? _autoSyncTimer;
+  int? _lastStockVersion;
+  int? _lastCautelasVersion;
+  bool _isAutoSyncing = false;
 
   // Filtros ativos
   String _searchQuery = '';
@@ -23,6 +28,8 @@ class StockProvider extends ChangeNotifier {
   bool get isSyncing => _isSyncing;
   String? get syncError => _syncError;
   DateTime? get lastSync => _storageService.lastSync;
+  int? get lastStockVersion => _lastStockVersion;
+  int? get lastCautelasVersion => _lastCautelasVersion;
 
   String get searchQuery => _searchQuery;
   String? get selectedStatus => _selectedStatus;
@@ -55,6 +62,62 @@ class StockProvider extends ChangeNotifier {
   Future<void> init() async {
     await _storageService.loadLocalDatabase();
     notifyListeners();
+    startRealtimeSync();
+  }
+
+  void startRealtimeSync() {
+    _autoSyncTimer?.cancel();
+    _autoSyncTimer = Timer.periodic(const Duration(milliseconds: 2000), (_) {
+      checkAndSyncSilently();
+    });
+    // Trigger initial check immediately
+    checkAndSyncSilently();
+  }
+
+  void stopRealtimeSync() {
+    _autoSyncTimer?.cancel();
+    _autoSyncTimer = null;
+  }
+
+  Future<void> checkAndSyncSilently() async {
+    if (_apiService.token == null || _isSyncing || _isAutoSyncing) return;
+
+    _isAutoSyncing = true;
+    try {
+      final status = await _apiService.getSyncStatus();
+      if (status != null && status['status'] == 'success') {
+        final remoteStockVer = status['stock_version'] as int?;
+        final remoteCautelasVer = status['cautelas_version'] as int?;
+
+        bool shouldUpdateStock = false;
+        if (_lastStockVersion == null) {
+          _lastStockVersion = remoteStockVer;
+        } else if (remoteStockVer != null && remoteStockVer > _lastStockVersion!) {
+          _lastStockVersion = remoteStockVer;
+          shouldUpdateStock = true;
+        }
+
+        bool shouldUpdateCautelas = false;
+        if (_lastCautelasVersion == null) {
+          _lastCautelasVersion = remoteCautelasVer;
+        } else if (remoteCautelasVer != null && remoteCautelasVer > _lastCautelasVersion!) {
+          _lastCautelasVersion = remoteCautelasVer;
+          shouldUpdateCautelas = true;
+        }
+
+        if (shouldUpdateStock) {
+          final items = await _apiService.fetchItems();
+          await _storageService.persistDatabase(items: items);
+          notifyListeners();
+        } else if (shouldUpdateCautelas) {
+          notifyListeners();
+        }
+      }
+    } catch (_) {
+      // Ignora falhas de conexão de segundo plano
+    } finally {
+      _isAutoSyncing = false;
+    }
   }
 
   // Busca instantânea de item (para scanner ou lookup rápido)
@@ -160,6 +223,12 @@ class StockProvider extends ChangeNotifier {
         subgroups: subgroups,
         locations: locations,
       );
+
+      final status = await _apiService.getSyncStatus();
+      if (status != null && status['status'] == 'success') {
+        _lastStockVersion = status['stock_version'] as int?;
+        _lastCautelasVersion = status['cautelas_version'] as int?;
+      }
     } catch (e) {
       _syncError = e.toString().replaceAll('Exception: ', '');
     } finally {
@@ -313,5 +382,11 @@ class StockProvider extends ChangeNotifier {
 
     await _storageService.persistDatabase(items: currentItems);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _autoSyncTimer?.cancel();
+    super.dispose();
   }
 }
