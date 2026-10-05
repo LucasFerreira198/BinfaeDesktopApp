@@ -137,7 +137,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Base Aérea do Galeão (BINFAE-GL) • Operador: ${user != null ? "${user.postoGraduacao ?? ''} ${user.nomeGuerra ?? user.nomeCompleto}".trim() : "S2 D. PAULA"}',
+                      'Base Aérea do Galeão (BINFAE-GL) • Operador: ${user != null ? user.displayName : "S2 D. PAULA"}',
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
