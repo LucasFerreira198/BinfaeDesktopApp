@@ -44,6 +44,16 @@ class StockProvider extends ChangeNotifier {
   List<SubgroupModel> get subgroups => _storageService.subgroups;
   List<LocationModel> get locations => _storageService.locations;
 
+  // Itens em Manutenção (Aguardando Reparo e Consertados/Falta Devolver)
+  List<ItemModel> get maintenanceItems =>
+      _storageService.items.where((i) => i.estaEmManutencao).toList();
+
+  List<ItemModel> get repairWaitingItems =>
+      _storageService.items.where((i) => i.aguardandoReparo).toList();
+
+  List<ItemModel> get repairedItems =>
+      _storageService.items.where((i) => i.manutencaoConcluida).toList();
+
   // Itens filtrados em 0ms diretamente da memória RAM
   List<ItemModel> get filteredItems {
     return _storageService.filterLocalItems(

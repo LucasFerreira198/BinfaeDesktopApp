@@ -248,6 +248,40 @@ class ItemModel {
     }
     return true;
   }
+
+  // --- Ciclo de Manutenção & Reparos ---
+  bool get estaEmManutencao => status.toUpperCase() == 'EM_MANUTENCAO';
+
+  Map<String, dynamic>? get manutencaoInfo =>
+      caracteristicas?['manutencao'] is Map ? Map<String, dynamic>.from(caracteristicas!['manutencao'] as Map) : null;
+
+  bool get manutencaoConcluida =>
+      estaEmManutencao &&
+      (manutencaoInfo?['status_etapa'] == 'CONSERTADO' || manutencaoInfo?['status_etapa'] == 'FALTA_DEVOLVER');
+
+  bool get aguardandoReparo => estaEmManutencao && !manutencaoConcluida;
+
+  String? get defeitoManutencao {
+    final d = manutencaoInfo?['defeito'] as String?;
+    if (d != null && d.trim().isNotEmpty) return d;
+    if (observacoes != null && observacoes!.trim().isNotEmpty) return observacoes;
+    return 'Defeito técnico relatado no envio';
+  }
+
+  String? get laudoReparo => manutencaoInfo?['laudo_reparo'] as String?;
+
+  String get origemLocalNome {
+    final o = manutencaoInfo?['origem_local_nome'] as String?;
+    if (o != null && o.trim().isNotEmpty) return o;
+    if (local != null) return local!.caminhoCompleto ?? local!.nome;
+    return 'Local de Origem';
+  }
+
+  int? get origemLocalId => manutencaoInfo?['origem_local_id'] as int? ?? localId;
+
+  String? get dataEntradaManutencao => manutencaoInfo?['data_entrada'] as String?;
+
+  String? get dataConsertoManutencao => manutencaoInfo?['data_conserto'] as String?;
 }
 
 class ItemMovementModel {

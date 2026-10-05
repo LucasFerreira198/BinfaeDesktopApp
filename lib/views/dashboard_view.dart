@@ -16,6 +16,7 @@ import '../widgets/user_profile_dialog.dart';
 import 'home_dashboard_view.dart';
 import 'stock_view.dart';
 import 'cautelas_view.dart';
+import 'maintenance_view.dart';
 import 'locations_view.dart';
 import 'groups_view.dart';
 import 'history_view.dart';
@@ -360,8 +361,14 @@ class _DashboardViewState extends State<DashboardView> {
           setState(() => _selectedIndex = 2);
         },
       ),
-      StockView(searchFocusNode: _searchFocusNode),
+      StockView(
+        searchFocusNode: _searchFocusNode,
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
       const CautelasView(),
+      MaintenanceView(
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
       const LocationsView(),
       const GroupsView(),
       const HistoryView(),
@@ -369,7 +376,7 @@ class _DashboardViewState extends State<DashboardView> {
       const SettingsView(),
     ];
 
-    if (!isAdmin && _selectedIndex == 6) {
+    if (_selectedIndex >= views.length) {
       _selectedIndex = 0;
     }
 
@@ -377,6 +384,7 @@ class _DashboardViewState extends State<DashboardView> {
       'Dashboard Operacional',
       'Materiais e Gestão de Estoque',
       'Cautela de Materiais e Missões',
+      'Manutenção e Reparos',
       'Locais Físicos e Estrutura',
       'Grupos e Subgrupos',
       'Histórico Geral de Movimentações',
@@ -388,6 +396,7 @@ class _DashboardViewState extends State<DashboardView> {
       Icons.dashboard_outlined,
       Icons.inventory_2_outlined,
       Icons.assignment_turned_in_outlined,
+      Icons.handyman_outlined,
       Icons.place_outlined,
       Icons.category_outlined,
       Icons.history_outlined,
@@ -512,6 +521,35 @@ class _DashboardViewState extends State<DashboardView> {
                 _NavHoverItem(
                   index: 3,
                   currentIndex: _selectedIndex,
+                  label: 'Manutenção',
+                  icon: Icons.handyman_outlined,
+                  isDark: isDark,
+                  badgeWidget: stock.maintenanceItems.isNotEmpty
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppColors.warning.withOpacity(0.4),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            '${stock.maintenanceItems.length}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        )
+                      : null,
+                  onTap: () => setState(() => _selectedIndex = 3),
+                ),
+                _NavHoverItem(
+                  index: 4,
+                  currentIndex: _selectedIndex,
                   label: 'Locais Físicos',
                   icon: Icons.place_outlined,
                   isDark: isDark,
@@ -530,40 +568,40 @@ class _DashboardViewState extends State<DashboardView> {
                       ],
                     ),
                   ),
-                  onTap: () => setState(() => _selectedIndex = 3),
-                ),
-                _NavHoverItem(
-                  index: 4,
-                  currentIndex: _selectedIndex,
-                  label: 'Grupos e Subgrupos',
-                  icon: Icons.category_outlined,
-                  isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 4),
                 ),
                 _NavHoverItem(
                   index: 5,
                   currentIndex: _selectedIndex,
-                  label: 'Histórico Geral',
-                  icon: Icons.history_outlined,
+                  label: 'Grupos e Subgrupos',
+                  icon: Icons.category_outlined,
                   isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 5),
                 ),
+                _NavHoverItem(
+                  index: 6,
+                  currentIndex: _selectedIndex,
+                  label: 'Histórico Geral',
+                  icon: Icons.history_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 6),
+                ),
                 if (isAdmin)
                   _NavHoverItem(
-                    index: 6,
+                    index: 7,
                     currentIndex: _selectedIndex,
                     label: 'Painel Administrativo',
                     icon: Icons.admin_panel_settings_outlined,
                     isDark: isDark,
-                    onTap: () => setState(() => _selectedIndex = 6),
+                    onTap: () => setState(() => _selectedIndex = 7),
                   ),
                 _NavHoverItem(
-                  index: isAdmin ? 7 : 6,
+                  index: isAdmin ? 8 : 7,
                   currentIndex: _selectedIndex,
                   label: 'Configurações',
                   icon: Icons.settings_outlined,
                   isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = isAdmin ? 7 : 6),
+                  onTap: () => setState(() => _selectedIndex = isAdmin ? 8 : 7),
                 ),
 
                 const Spacer(),
@@ -820,7 +858,7 @@ class _DashboardViewState extends State<DashboardView> {
                                   builder: (_) => const UserProfileDialog(),
                                 );
                               } else if (val == 'settings') {
-                                setState(() => _selectedIndex = isAdmin ? 7 : 6);
+                                setState(() => _selectedIndex = isAdmin ? 8 : 7);
                               } else if (val == 'update') {
                                 _checkForUpdates(manual: true);
                               } else if (val == 'fullscreen') {

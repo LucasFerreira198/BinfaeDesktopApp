@@ -9,8 +9,9 @@ import '../widgets/item_form_dialog.dart';
 
 class StockView extends StatefulWidget {
   final FocusNode? searchFocusNode;
+  final void Function(int targetIndex)? onNavigate;
 
-  const StockView({super.key, this.searchFocusNode});
+  const StockView({super.key, this.searchFocusNode, this.onNavigate});
 
   @override
   State<StockView> createState() => _StockViewState();
@@ -312,6 +313,7 @@ class _StockViewState extends State<StockView> {
                               return _LogisticsProRow(
                                 item: item,
                                 isDark: isDark,
+                                onNavigate: widget.onNavigate,
                               );
                             },
                           ),
@@ -408,8 +410,13 @@ class _StockViewState extends State<StockView> {
 class _LogisticsProRow extends StatefulWidget {
   final ItemModel item;
   final bool isDark;
+  final void Function(int targetIndex)? onNavigate;
 
-  const _LogisticsProRow({required this.item, required this.isDark});
+  const _LogisticsProRow({
+    required this.item,
+    required this.isDark,
+    this.onNavigate,
+  });
 
   @override
   State<_LogisticsProRow> createState() => _LogisticsProRowState();
@@ -462,11 +469,17 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: () {
-          showDialog(
+        onTap: () async {
+          final res = await showDialog(
             context: context,
-            builder: (ctx) => ItemDetailDialog(item: item),
+            builder: (ctx) => ItemDetailDialog(
+              item: item,
+              onNavigateView: widget.onNavigate,
+            ),
           );
+          if (res == 'NAVIGATE_TO_MAINTENANCE') {
+            widget.onNavigate?.call(3);
+          }
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
@@ -685,11 +698,17 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                       tooltip: 'Detalhes & QR Code',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-                      onPressed: () {
-                        showDialog(
+                      onPressed: () async {
+                        final res = await showDialog(
                           context: context,
-                          builder: (ctx) => ItemDetailDialog(item: item),
+                          builder: (ctx) => ItemDetailDialog(
+                            item: item,
+                            onNavigateView: widget.onNavigate,
+                          ),
                         );
+                        if (res == 'NAVIGATE_TO_MAINTENANCE') {
+                          widget.onNavigate?.call(3);
+                        }
                       },
                     ),
                   ],

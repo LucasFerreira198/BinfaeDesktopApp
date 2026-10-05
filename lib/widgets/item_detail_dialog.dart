@@ -15,8 +15,9 @@ import '../utils/date_utils.dart';
 
 class ItemDetailDialog extends StatefulWidget {
   final ItemModel item;
+  final void Function(int targetViewIndex)? onNavigateView;
 
-  const ItemDetailDialog({super.key, required this.item});
+  const ItemDetailDialog({super.key, required this.item, this.onNavigateView});
 
   @override
   State<ItemDetailDialog> createState() => _ItemDetailDialogState();
@@ -155,6 +156,9 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.maintenance, foregroundColor: Colors.black),
             onPressed: () async {
+              final defect = noteController.text.trim().isNotEmpty
+                  ? noteController.text.trim()
+                  : 'Defeito informado pelo operador';
               Navigator.pop(ctx);
               final stock = Provider.of<StockProvider>(context, listen: false);
               try {
@@ -162,12 +166,16 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                   itemId: _currentItem.id,
                   tipoMovimentacao: 'MANUTENCAO',
                   quantidade: _currentItem.quantidade,
-                  motivo: noteController.text.trim().isNotEmpty ? noteController.text.trim() : 'Encaminhado para manutenção',
+                  motivo: defect,
                 );
                 if (mounted) {
-                  Navigator.pop(context);
+                  Navigator.pop(context, 'NAVIGATE_TO_MAINTENANCE');
+                  widget.onNavigateView?.call(3);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(backgroundColor: AppColors.success, content: Text('Material encaminhado para manutenção com sucesso!')),
+                    SnackBar(
+                      backgroundColor: AppColors.success,
+                      content: Text('Material encaminhado para manutenção! Defeito: "$defect"'),
+                    ),
                   );
                 }
               } catch (e) {

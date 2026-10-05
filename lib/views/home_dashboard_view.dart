@@ -269,7 +269,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ),
                       child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 18),
                     ),
-                    onTap: () => widget.onNavigate(1, statusFilter: 'EM_MANUTENCAO'),
+                    onTap: () => widget.onNavigate(3),
                   ),
                 ),
               ],
@@ -618,7 +618,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                             TextButton(
-                              onPressed: () => widget.onNavigate(5),
+                              onPressed: () => widget.onNavigate(6),
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(60, 24),
