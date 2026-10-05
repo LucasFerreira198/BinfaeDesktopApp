@@ -441,8 +441,8 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
         statusText = item.status;
     }
 
-    final double ratio = item.quantidadeEstoqueMinimo != null && item.quantidadeEstoqueMinimo! > 0
-        ? (item.quantidade / (item.quantidadeEstoqueMinimo! * 3)).clamp(0.05, 1.0)
+    final double ratio = item.quantidadeMinima > 0
+        ? (item.quantidade / (item.quantidadeMinima * 3)).clamp(0.05, 1.0)
         : (item.quantidade > 0 ? 0.95 : 0.0);
 
     return MouseRegion(
@@ -564,7 +564,7 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                         minHeight: 5,
                         backgroundColor: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          item.quantidade <= (item.quantidadeEstoqueMinimo ?? 0)
+                          item.quantidade <= item.quantidadeMinima
                               ? AppColors.warning
                               : AppColors.cyan,
                         ),

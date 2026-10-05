@@ -180,11 +180,11 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 
               try {
                 final api = Provider.of<ApiService>(context, listen: false);
-                await api.createCautela({
-                  'nome': nome,
-                  'tipo': tipo,
-                  'observacoes': obsCtrl.text.trim().isEmpty ? null : obsCtrl.text.trim(),
-                });
+                await api.createCautela(
+                  nome,
+                  tipo: tipo,
+                  observacoes: obsCtrl.text.trim().isEmpty ? null : obsCtrl.text.trim(),
+                );
                 if (ctx.mounted) Navigator.of(ctx).pop(true);
               } catch (e) {
                 if (ctx.mounted) {

@@ -197,6 +197,8 @@ class ItemModel {
     'atualizado_em': atualizadoEm,
     'cautela_ativa': cautelaAtiva,
   };
+
+  double get quantidadeEstoqueMinimo => quantidadeMinima;
 }
 
 class ItemMovementModel {

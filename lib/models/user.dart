@@ -93,6 +93,7 @@ class UserModel {
   String get postoGraduacao => militar?.postoGraduacao ?? '';
   String get nomeGuerra => militar?.nomeGuerra ?? username;
   String get nomeCompleto => militar?.nomeCompleto ?? username;
+  int? get saram => militar?.saram;
   String? get celular => militar?.celular;
   String? get telefone => militar?.celular;
 }
