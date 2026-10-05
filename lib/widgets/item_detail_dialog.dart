@@ -97,7 +97,7 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                       pw.Divider(thickness: 0.5),
                       pw.Text('BMP: ${_currentItem.bmp ?? "S/ BMP"}', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
                       pw.Text(_currentItem.nome, style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold), maxLines: 2),
-                      pw.Text('Local: ${_currentItem.local?.nome ?? "Depósito"}', style: const pw.TextStyle(fontSize: 7)),
+                      pw.Text('Local: ${_currentItem.localizacaoAtual}', style: const pw.TextStyle(fontSize: 7)),
                       pw.Text('ID #${_currentItem.id} • ${DateFormat("dd/MM/yyyy").format(DateTime.now())}', style: const pw.TextStyle(fontSize: 6, color: PdfColors.grey600)),
                     ],
                   ),
@@ -416,9 +416,16 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
 
   // Tab 1: Galeria de Imagens (2 Fotos) + Especificações
   Widget _buildDetailsAndGalleryTab(bool isDark) {
-    final locationPath = _currentItem.local != null
-        ? (_currentItem.local!.caminhoCompleto ?? _currentItem.local!.nome).replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ')
-        : 'Sem local físico cadastrado';
+    final String locationPath;
+    if (_currentItem.estaEmSetor) {
+      locationPath = '📍 ${_currentItem.localizacaoAtual}';
+    } else if (_currentItem.local != null) {
+      locationPath = '📦 ' + (_currentItem.local!.caminhoCompleto ?? _currentItem.local!.nome).replaceAll(' > ', ' ➔ ').replaceAll(' / ', ' ➔ ').replaceAll('/', ' ➔ ');
+    } else if (_currentItem.cautelaAtiva != null) {
+      locationPath = '🛡️ ${_currentItem.localizacaoAtual}';
+    } else {
+      locationPath = 'Sem local físico cadastrado';
+    }
 
     return SingleChildScrollView(
       child: Column(
@@ -872,7 +879,7 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                         style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                       const SizedBox(height: 4),
-                      Text('Local: ${_currentItem.local?.nome ?? "Depósito"}', style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                      Text('Local: ${_currentItem.localizacaoAtual}', style: const TextStyle(fontSize: 9, color: Colors.black54)),
                       Text('ID #${_currentItem.id}', style: const TextStyle(fontSize: 8, color: Colors.black38)),
                     ],
                   ),

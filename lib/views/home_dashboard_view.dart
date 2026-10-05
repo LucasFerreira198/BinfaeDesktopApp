@@ -193,36 +193,55 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
 
             const SizedBox(height: 20),
 
-            // 2. LINHA DE 4 KPIS MODERNOS (Estilo LogiFlow / LoanHub)
+            // 2. LINHA DE 5 KPIS MODERNOS (Estilo LogiFlow / LoanHub)
             Row(
               children: [
                 Expanded(
                   child: _ModernKpiCard(
-                    title: 'Total de Materiais',
+                    title: 'Total Materiais',
                     value: '${metrics.total}',
-                    badgeText: '+8.2%',
+                    badgeText: 'Total',
                     badgeColor: AppColors.cyan,
                     isDark: isDark,
                     trailingWidget: _MiniBarSparkline(color: AppColors.cyan),
                     onTap: () => widget.onNavigate(1),
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ModernKpiCard(
-                    title: 'Disponíveis no Depósito',
+                    title: 'No Depósito',
                     value: '${metrics.disponivel}',
-                    badgeText: metrics.total > 0 ? '${((metrics.disponivel / metrics.total) * 100).toStringAsFixed(1)}%' : '0%',
+                    badgeText: metrics.total > 0 ? '${((metrics.disponivel / metrics.total) * 100).toStringAsFixed(0)}%' : '0%',
                     badgeColor: AppColors.success,
                     isDark: isDark,
                     trailingWidget: _GaugeArc(
                       ratio: metrics.total > 0 ? (metrics.disponivel / metrics.total) : 0.8,
-                      color: AppColors.cyan,
+                      color: AppColors.success,
                     ),
-                    onTap: () => widget.onNavigate(1, statusFilter: 'DISPONIVEL'),
+                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_DEPOSITO'),
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ModernKpiCard(
+                    title: 'Alocados em Setor',
+                    value: '${metrics.noSetor}',
+                    badgeText: 'Setores',
+                    badgeColor: const Color(0xFF8B5CF6),
+                    isDark: isDark,
+                    trailingWidget: Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.domain_outlined, color: Color(0xFF8B5CF6), size: 18),
+                    ),
+                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_SETOR'),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ModernKpiCard(
                     title: 'Cautelados em Missão',
@@ -234,7 +253,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     onTap: () => widget.onNavigate(2),
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _ModernKpiCard(
                     title: 'Em Manutenção',
@@ -243,12 +262,12 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     badgeColor: AppColors.danger,
                     isDark: isDark,
                     trailingWidget: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
                         color: AppColors.danger.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 22),
+                      child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 18),
                     ),
                     onTap: () => widget.onNavigate(1, statusFilter: 'EM_MANUTENCAO'),
                   ),

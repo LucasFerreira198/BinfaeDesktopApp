@@ -1634,7 +1634,7 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                                     ),
                                     const SizedBox(height: 6),
                                     Text('BMP: ${_selectedItem!.bmp ?? "Sem BMP"} • Código: ${_selectedItem!.codigoInterno ?? "ID #${_selectedItem!.id}"}', style: const TextStyle(fontSize: 11.5, color: Colors.grey)),
-                                    Text('Local Atual: ${_selectedItem!.local?.nome ?? "Depósito"}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                    Text('Local Atual: ${_selectedItem!.localizacaoAtual}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
                                   ],
                                 ),
                               ),

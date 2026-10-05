@@ -199,6 +199,55 @@ class ItemModel {
   };
 
   double get quantidadeEstoqueMinimo => quantidadeMinima;
+
+  /// Retorna a localização descritiva exata do material (Setor, Missão, Almoxarifado ou Sem local)
+  String get localizacaoAtual {
+    if (cautelaAtiva != null) {
+      final tipo = cautelaAtiva!['tipo'] ?? cautelaAtiva!['cautela_tipo'] ?? 'MISSAO';
+      final nome = cautelaAtiva!['missao_nome'] ?? cautelaAtiva!['cautela_nome'] ?? '';
+      final mil = cautelaAtiva!['militar_nome_guerra'] ?? '';
+      if (tipo == 'FIXA') {
+        return nome.isNotEmpty ? 'Setor: $nome' : 'Setor Alocado';
+      } else {
+        return mil.isNotEmpty ? 'Missão: $nome ($mil)' : 'Cautela: $nome';
+      }
+    }
+    if (status == 'CAUTELADO') {
+      return 'Cautelado (Em Missão)';
+    }
+    if (local != null) {
+      if (local!.tipo?.toUpperCase() == 'SETOR') {
+        return 'Setor: ${local!.nome}';
+      }
+      return local!.caminhoCompleto ?? local!.nome;
+    }
+    return 'Sem local definido';
+  }
+
+  /// Identifica se o item está fisicamente ou administrativamente em um setor
+  bool get estaEmSetor {
+    if (cautelaAtiva != null && ((cautelaAtiva!['tipo'] ?? '') == 'FIXA' || (cautelaAtiva!['cautela_tipo'] ?? '') == 'FIXA')) {
+      return true;
+    }
+    if (local != null && local!.tipo?.toUpperCase() == 'SETOR') {
+      return true;
+    }
+    if (status == 'EM_USO') {
+      return true;
+    }
+    return false;
+  }
+
+  /// Identifica se o item está disponível no almoxarifado/depósito central
+  bool get estaNoDeposito {
+    if (status == 'CAUTELADO' || status == 'EM_MANUTENCAO' || status == 'BAIXADO') {
+      return false;
+    }
+    if (estaEmSetor) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class ItemMovementModel {
@@ -253,14 +302,16 @@ class ItemMovementModel {
 
 class StockMetricsModel {
   final int total;
-  final int disponivel;
-  final int cautelado;
+  final int disponivel; // No Depósito
+  final int noSetor;    // Alocados em Setor / Cautela Fixa
+  final int cautelado;  // Em Missão
   final int manutencao;
   final int baixoEstoque;
 
   StockMetricsModel({
     this.total = 0,
     this.disponivel = 0,
+    this.noSetor = 0,
     this.cautelado = 0,
     this.manutencao = 0,
     this.baixoEstoque = 0,

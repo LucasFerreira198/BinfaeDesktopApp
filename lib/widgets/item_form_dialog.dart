@@ -383,16 +383,41 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          DropdownButtonFormField<int>(
+                          DropdownButtonFormField<int?>(
                             value: _selectedLocalId,
-                            decoration: _inputDeco('Local Físico de Armazenamento', icon: Icons.place_outlined),
+                            decoration: _inputDeco('Local Físico / Setor de Destino', icon: Icons.place_outlined),
                             dropdownColor: isDark ? const Color(0xFF151D2A) : Colors.white,
-                            items: stock.locations.map((loc) {
-                              return DropdownMenuItem<int>(
-                                value: loc.id,
-                                child: Text(loc.caminhoCompleto ?? loc.nome),
-                              );
-                            }).toList(),
+                            items: [
+                              const DropdownMenuItem<int?>(
+                                value: null,
+                                child: Text('Nenhum (Sem local definido)', style: TextStyle(color: Colors.grey)),
+                              ),
+                              ...stock.locations.map((loc) {
+                                final isSetor = loc.tipo?.toUpperCase() == 'SETOR';
+                                return DropdownMenuItem<int?>(
+                                  value: loc.id,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isSetor ? Icons.domain_outlined : Icons.warehouse_outlined,
+                                        size: 14,
+                                        color: isSetor ? const Color(0xFF8B5CF6) : AppColors.cyan,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        isSetor ? 'Setor: ${loc.nome}' : (loc.caminhoCompleto ?? loc.nome),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: isSetor ? FontWeight.bold : FontWeight.normal,
+                                          color: isSetor ? (isDark ? const Color(0xFFA78BFA) : const Color(0xFF6D28D9)) : null,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
                             onChanged: (val) => setState(() => _selectedLocalId = val),
                           ),
                         ],

@@ -159,11 +159,15 @@ class _MovementDialogState extends State<MovementDialog> {
                         children: [
                           _buildTypePickerChip('TODOS', 'Todos', filterTipo, (t) => setPickerState(() => filterTipo = t)),
                           const SizedBox(width: 6),
+                          _buildTypePickerChip('SETOR', 'Setores', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
                           _buildTypePickerChip('DEPOSITO', 'Depósitos', filterTipo, (t) => setPickerState(() => filterTipo = t)),
                           const SizedBox(width: 6),
                           _buildTypePickerChip('ARMARIO', 'Armários', filterTipo, (t) => setPickerState(() => filterTipo = t)),
                           const SizedBox(width: 6),
                           _buildTypePickerChip('PRATELEIRA', 'Prateleiras', filterTipo, (t) => setPickerState(() => filterTipo = t)),
+                          const SizedBox(width: 6),
+                          _buildTypePickerChip('SALA', 'Salas', filterTipo, (t) => setPickerState(() => filterTipo = t)),
                           const SizedBox(width: 6),
                           _buildTypePickerChip('BANCADA', 'Bancadas', filterTipo, (t) => setPickerState(() => filterTipo = t)),
                         ],
@@ -283,6 +287,10 @@ class _MovementDialogState extends State<MovementDialog> {
 
   IconData _getLocationIcon(String? tipo) {
     switch (tipo?.toUpperCase()) {
+      case 'SETOR':
+        return Icons.domain_outlined;
+      case 'SALA':
+        return Icons.meeting_room_outlined;
       case 'DEPOSITO':
         return Icons.warehouse_outlined;
       case 'ARMARIO':

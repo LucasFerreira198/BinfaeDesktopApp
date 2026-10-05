@@ -178,7 +178,9 @@ class _StockViewState extends State<StockView> {
                 children: [
                   _buildPillChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, () => stock.clearFilters(), isDark),
                   const SizedBox(width: 8),
-                  _buildPillChip('Disponíveis', stock.selectedStatus == 'DISPONIVEL', () => stock.setStatus('DISPONIVEL'), isDark),
+                  _buildPillChip('No Depósito', stock.selectedStatus == 'NO_DEPOSITO', () => stock.setStatus('NO_DEPOSITO'), isDark),
+                  const SizedBox(width: 8),
+                  _buildPillChip('Em Setores', stock.selectedStatus == 'NO_SETOR', () => stock.setStatus('NO_SETOR'), isDark),
                   const SizedBox(width: 8),
                   _buildPillChip('Cautelados', stock.selectedStatus == 'CAUTELADO', () => stock.setStatus('CAUTELADO'), isDark),
                   const SizedBox(width: 8),
@@ -423,22 +425,32 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
 
     Color statusColor;
     String statusText;
-    switch (item.status.toUpperCase()) {
-      case 'DISPONIVEL':
+    final upperStatus = item.status.toUpperCase();
+    if (upperStatus == 'DISPONIVEL') {
+      if (item.estaEmSetor) {
+        statusColor = const Color(0xFF8B5CF6);
+        statusText = 'No Setor';
+      } else {
         statusColor = AppColors.success;
         statusText = 'Disponível';
-        break;
-      case 'CAUTELADO':
-        statusColor = AppColors.cyan;
-        statusText = 'Cautelado';
-        break;
-      case 'EM_MANUTENCAO':
-        statusColor = AppColors.warning;
-        statusText = 'Manutenção';
-        break;
-      default:
-        statusColor = AppColors.danger;
-        statusText = item.status;
+      }
+    } else if (upperStatus == 'EM_USO') {
+      statusColor = const Color(0xFF8B5CF6);
+      statusText = 'Em Uso';
+    } else if (upperStatus == 'CAUTELADO') {
+      statusColor = AppColors.cyan;
+      statusText = (item.cautelaAtiva != null && (item.cautelaAtiva!['tipo'] == 'FIXA' || item.cautelaAtiva!['cautela_tipo'] == 'FIXA'))
+          ? 'Setor (Fixa)'
+          : 'Cautelado';
+    } else if (upperStatus == 'EM_MANUTENCAO') {
+      statusColor = AppColors.warning;
+      statusText = 'Manutenção';
+    } else if (upperStatus == 'BAIXADO') {
+      statusColor = Colors.grey;
+      statusText = 'Baixado';
+    } else {
+      statusColor = AppColors.danger;
+      statusText = item.status;
     }
 
     final double ratio = item.quantidadeMinima > 0
@@ -574,17 +586,41 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                 ),
               ),
 
-              // Localização Física
+              // Localização Física / Setor / Missão
               Expanded(
                 flex: 3,
-                child: Text(
-                  item.local?.nome ?? 'Depósito Geral',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      item.estaEmSetor
+                          ? Icons.domain_outlined
+                          : (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO'
+                              ? Icons.shield_outlined
+                              : (item.local != null ? Icons.warehouse_outlined : Icons.help_outline)),
+                      size: 14,
+                      color: item.estaEmSetor
+                          ? const Color(0xFF8B5CF6)
+                          : (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO'
+                              ? AppColors.warning
+                              : (item.local != null ? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)) : Colors.grey)),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        item.localizacaoAtual,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: item.estaEmSetor ? FontWeight.w600 : FontWeight.normal,
+                          color: item.estaEmSetor
+                              ? (isDark ? const Color(0xFFA78BFA) : const Color(0xFF6D28D9))
+                              : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 

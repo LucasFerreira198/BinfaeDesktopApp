@@ -96,7 +96,15 @@ class StorageService {
     final query = search.trim().toLowerCase();
 
     return _memoryItems.where((item) {
-      if (status != null && item.status != status) return false;
+      if (status != null) {
+        if (status == 'NO_SETOR') {
+          if (!item.estaEmSetor) return false;
+        } else if (status == 'NO_DEPOSITO') {
+          if (!item.estaNoDeposito) return false;
+        } else if (item.status != status) {
+          return false;
+        }
+      }
       if (groupId != null && item.subgrupo?.grupoId != groupId) return false;
       if (subgroupId != null && item.subgrupoId != subgroupId) return false;
       if (locationId != null && item.localId != locationId) return false;
@@ -112,7 +120,8 @@ class StorageService {
         final matchCode = item.codigoInterno?.toLowerCase().contains(query) ?? false;
         final matchSerial = item.numeroSerie?.toLowerCase().contains(query) ?? false;
         final matchObs = item.observacoes?.toLowerCase().contains(query) ?? false;
-        final matchLoc = item.local?.nome.toLowerCase().contains(query) ?? false;
+        final matchLoc = (item.local?.nome.toLowerCase().contains(query) ?? false) ||
+                         item.localizacaoAtual.toLowerCase().contains(query);
 
         if (!matchName && !matchBmp && !matchCode && !matchSerial && !matchObs && !matchLoc) {
           return false;
@@ -126,17 +135,20 @@ class StorageService {
   StockMetricsModel calculateMetrics() {
     int total = _memoryItems.length;
     int disponivel = 0;
+    int noSetor = 0;
     int cautelado = 0;
     int manutencao = 0;
     int baixoEstoque = 0;
 
     for (final item in _memoryItems) {
-      if (item.status == 'DISPONIVEL') {
-        disponivel++;
-      } else if (item.status == 'CAUTELADO') {
-        cautelado++;
-      } else if (item.status == 'EM_MANUTENCAO') {
+      if (item.status == 'EM_MANUTENCAO') {
         manutencao++;
+      } else if (item.status == 'CAUTELADO' || (item.cautelaAtiva != null && (item.cautelaAtiva!['tipo'] ?? '') == 'MISSAO')) {
+        cautelado++;
+      } else if (item.estaEmSetor) {
+        noSetor++;
+      } else {
+        disponivel++;
       }
 
       if (item.tipoControle == 'GRANEL' && item.quantidade <= item.quantidadeMinima) {
@@ -147,6 +159,7 @@ class StorageService {
     return StockMetricsModel(
       total: total,
       disponivel: disponivel,
+      noSetor: noSetor,
       cautelado: cautelado,
       manutencao: manutencao,
       baixoEstoque: baixoEstoque,
