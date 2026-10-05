@@ -629,6 +629,61 @@ class _DashboardViewState extends State<DashboardView> {
                     ],
                   ),
                 ),
+
+                // Cartão de Perfil Militar no Rodapé da Sidebar (LogiFlow style)
+                Container(
+                  margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF00D2B4), Color(0xFF6366F1)],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.shield, color: Colors.white, size: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user?.displayName ?? 'S2 D. PAULA',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              isAdmin ? 'Administrador TI' : 'Operador TI',
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                color: AppColors.cyan,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -926,19 +981,28 @@ class _NavHoverItemState extends State<_NavHoverItem> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: active
-                  ? (widget.isDark ? const Color(0xFF1E293B) : const Color(0xFFEEF2FF))
+                  ? (widget.isDark ? AppColors.cyan.withOpacity(0.12) : const Color(0xFFE6FFFA))
                   : (_isHovered
-                      ? (widget.isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC))
+                      ? (widget.isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC))
                       : Colors.transparent),
-              borderRadius: BorderRadius.circular(10),
-              border: Border(
-                left: BorderSide(
-                  color: active
-                      ? AppColors.primary
-                      : (_isHovered ? AppColors.primaryLight.withOpacity(0.6) : Colors.transparent),
-                  width: 3,
-                ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: active
+                    ? (widget.isDark ? AppColors.cyan.withOpacity(0.7) : AppColors.cyan)
+                    : (_isHovered
+                        ? (widget.isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0))
+                        : Colors.transparent),
+                width: 1.2,
               ),
+              boxShadow: active && widget.isDark
+                  ? [
+                      BoxShadow(
+                        color: AppColors.cyan.withOpacity(0.18),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: Row(
               children: [
@@ -946,9 +1010,9 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                   widget.icon,
                   size: 19,
                   color: active
-                      ? AppColors.primary
+                      ? AppColors.cyan
                       : (_isHovered
-                          ? AppColors.primaryLight
+                          ? (widget.isDark ? Colors.white : AppColors.cyan)
                           : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                 ),
                 const SizedBox(width: 12),
@@ -959,7 +1023,7 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                       fontSize: 13,
                       fontWeight: active ? FontWeight.bold : (_isHovered ? FontWeight.w600 : FontWeight.w500),
                       color: active
-                          ? (widget.isDark ? Colors.white : AppColors.primary)
+                          ? (widget.isDark ? Colors.white : AppColors.cyanDark)
                           : (_isHovered
                               ? (widget.isDark ? Colors.white : const Color(0xFF0F172A))
                               : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569))),

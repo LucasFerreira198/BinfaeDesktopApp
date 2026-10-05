@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Brand / Acentos Vibrantes de Roxo
-  static const Color primary = Color(0xFF7C3AED);
-  static const Color primaryLight = Color(0xFF8B5CF6);
-  static const Color primaryDark = Color(0xFF5B21B6);
-  static const Color accent = Color(0xFF6366F1);
+  // Brand & Acentos Neon (Teal/Cyan & Indigo Militar)
+  static const Color cyan = Color(0xFF00D2B4);       // Neon Cyan principal
+  static const Color cyanLight = Color(0xFF2DD4BF);
+  static const Color cyanDark = Color(0xFF0D9488);
+  static const Color primary = Color(0xFF00D2B4);    // Ciano Neon como cor primária
+  static const Color primaryLight = Color(0xFF2DD4BF);
+  static const Color primaryDark = Color(0xFF0D9488);
+  static const Color accent = Color(0xFF6366F1);     // Indigo elétrico
+  static const Color purple = Color(0xFF7C3AED);
 
   // Status & Disponibilidade
-  static const Color success = Color(0xFF10B981); // Verde-disponibilidade
-  static const Color warning = Color(0xFFF59E0B); // Cautelado
-  static const Color maintenance = Color(0xFFEAB308); // Manutenção (Amarelo)
-  static const Color danger = Color(0xFFEF4444); // Baixo estoque / Erro
-  static const Color info = Color(0xFF3B82F6);
+  static const Color success = Color(0xFF10B981);    // Verde-disponibilidade
+  static const Color warning = Color(0xFFF59E0B);    // Âmbar / Cautelado
+  static const Color maintenance = Color(0xFFEAB308);// Manutenção
+  static const Color danger = Color(0xFFEF4444);     // Atrasada / Baixo estoque
+  static const Color info = Color(0xFF38BDF8);       // Azul Céu
 
-  // Deep Dark Theme (Carvão e Azul-Noite)
-  static const Color darkBackground = Color(0xFF080C14); // Carvão profundo
-  static const Color darkSurface = Color(0xFF0E1422);    // Azul-noite escuro
-  static const Color darkSurfaceVariant = Color(0xFF151D2F);
-  static const Color darkCard = Color(0xFF151D2F);
-  static const Color darkCardHover = Color(0xFF1B243B);
-  static const Color darkBorder = Color(0xFF243049);
-  static const Color darkBorderHover = Color(0xFF7C3AED);
+  // Obsidian Dark Theme (Estética Militar Escura de Alto Contraste)
+  static const Color darkBackground = Color(0xFF0B0F17); // Obsidian base profundo
+  static const Color darkSurface = Color(0xFF101520);    // Superfície escura
+  static const Color darkSurfaceVariant = Color(0xFF151D2A);
+  static const Color darkCard = Color(0xFF151D2A);       // Superfície de cards e tabelas
+  static const Color darkCardHover = Color(0xFF1C2638);  // Hover suave
+  static const Color darkBorder = Color(0xFF232B3E);     // Bordas finas de 1px
+  static const Color darkBorderHover = Color(0xFF00D2B4);
   static const Color darkText = Color(0xFFF9FAFB);
   static const Color darkTextSecondary = Color(0xFF94A3B8);
 
@@ -31,11 +35,12 @@ class AppColors {
   static const Color lightSurfaceVariant = Color(0xFFF1F5F9);
   static const Color lightCard = Color(0xFFFFFFFF);
   static const Color lightBorder = Color(0xFFE2E8F0);
-  static const Color lightBorderHover = Color(0xFF8B5CF6);
+  static const Color lightBorderHover = Color(0xFF00D2B4);
   static const Color lightText = Color(0xFF0F172A);
-  // Aliases de conveniência para componentes administrativos e modais
+
+  // Aliases de conveniência
   static const Color cardBorder = darkBorder;
-  static const Color sidebarBackground = darkSurfaceVariant;
+  static const Color sidebarBackground = darkBackground;
   static const Color textPrimary = darkText;
 }
 
