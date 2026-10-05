@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/item.dart';
 import '../providers/stock_provider.dart';
 import '../services/api_service.dart';
+import '../utils/date_utils.dart';
 import '../theme/app_theme.dart';
 
 class HistoryView extends StatefulWidget {
@@ -253,16 +254,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildMovementRow(BuildContext context, ItemMovementModel m, String itemName, bool isDark) {
     final typeColor = _getTypeColor(m.tipoMovimentacao);
-
-    String formattedDate = '';
-    if (m.criadoEm != null) {
-      try {
-        final parsed = DateTime.parse(m.criadoEm!);
-        formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(parsed.toLocal());
-      } catch (_) {
-        formattedDate = m.criadoEm!;
-      }
-    }
+    final formattedDate = AppDateUtils.formatDateTime(m.criadoEm);
 
     String localInfo = '';
     if (m.origem != null && m.destino != null) {

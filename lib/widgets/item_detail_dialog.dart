@@ -11,6 +11,7 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import 'movement_dialog.dart';
 import 'item_form_dialog.dart';
+import '../utils/date_utils.dart';
 
 class ItemDetailDialog extends StatefulWidget {
   final ItemModel item;
@@ -626,10 +627,7 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
         final m = _itemMovements[index];
         final typeColor = _getStatusColor(m.tipoMovimentacao);
 
-        String dateStr = m.criadoEm ?? '';
-        try {
-          dateStr = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(m.criadoEm!).toLocal());
-        } catch (_) {}
+        final dateStr = AppDateUtils.formatDateTime(m.criadoEm);
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),

@@ -1,7 +1,7 @@
 name: binfae_desktop
 description: "Informatica - BINFAE-GL - Sistema Nativo de Gestão de Patrimônio e Informática para Windows"
 publish_to: "none"
-version: 2.1.0+12
+version: 2.1.1+13
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -16,6 +16,7 @@ dependencies:
   qr_flutter: ^4.1.0
   pdf: ^3.10.8
   printing: ^5.13.2
+  window_manager: ^0.3.9
 
 dev_dependencies:
   flutter_test:

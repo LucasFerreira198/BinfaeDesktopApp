@@ -749,7 +749,7 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                           Text('•', style: TextStyle(color: isDark ? Colors.white30 : Colors.black26)),
                           const SizedBox(width: 12),
                           Text(
-                            'Início: ${DateFormat('dd/MM/yyyy HH:mm').format(_cautela.dataInicio)}',
+                            'Início: ${DateFormat('dd/MM/yyyy HH:mm').format(_cautela.dataInicio.toLocal())}',
                             style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54),
                           ),
                           if (_cautela.dataFim != null) ...[
@@ -757,7 +757,7 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                             Text('•', style: TextStyle(color: isDark ? Colors.white30 : Colors.black26)),
                             const SizedBox(width: 12),
                             Text(
-                              'Conclusão: ${DateFormat('dd/MM/yyyy HH:mm').format(_cautela.dataFim!)}',
+                              'Conclusão: ${DateFormat('dd/MM/yyyy HH:mm').format(_cautela.dataFim!.toLocal())}',
                               style: const TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -1015,13 +1015,13 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                                         const Icon(Icons.access_time, size: 13, color: Colors.grey),
                                         const SizedBox(width: 4),
                                         Text(
-                                          'Saída: ${DateFormat('dd/MM HH:mm').format(item.dataCautela)}',
+                                          'Saída: ${DateFormat('dd/MM HH:mm').format(item.dataCautela.toLocal())}',
                                           style: const TextStyle(fontSize: 11, color: Colors.grey),
                                         ),
                                         if (item.dataDevolucao != null) ...[
                                           const SizedBox(width: 10),
                                           Text(
-                                            '• Retorno: ${DateFormat('dd/MM HH:mm').format(item.dataDevolucao!)}',
+                                            '• Retorno: ${DateFormat('dd/MM HH:mm').format(item.dataDevolucao!.toLocal())}',
                                             style: const TextStyle(fontSize: 11, color: AppColors.success),
                                           ),
                                         ],

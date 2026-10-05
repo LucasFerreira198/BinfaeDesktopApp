@@ -686,12 +686,12 @@ class _CautelaCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Início: ${DateFormat('dd/MM/yyyy HH:mm').format(cautela.dataInicio)}',
+                  'Início: ${DateFormat('dd/MM/yyyy HH:mm').format(cautela.dataInicio.toLocal())}',
                   style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
                 if (cautela.dataFim != null)
                   Text(
-                    'Fim: ${DateFormat('dd/MM/yyyy HH:mm').format(cautela.dataFim!)}',
+                    'Fim: ${DateFormat('dd/MM/yyyy HH:mm').format(cautela.dataFim!.toLocal())}',
                     style: const TextStyle(fontSize: 11, color: AppColors.success, fontWeight: FontWeight.w600),
                   ),
               ],

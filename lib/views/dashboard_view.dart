@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 import '../providers/auth_provider.dart';
 import '../providers/stock_provider.dart';
 import '../providers/theme_provider.dart';
@@ -9,6 +11,7 @@ import '../services/updater_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/item_detail_dialog.dart';
 import '../widgets/item_form_dialog.dart';
+import 'home_dashboard_view.dart';
 import 'stock_view.dart';
 import 'cautelas_view.dart';
 import 'locations_view.dart';
@@ -36,6 +39,9 @@ class _DashboardViewState extends State<DashboardView> {
   // Auto-updater state
   ReleaseInfo? _latestRelease;
 
+  // Fullscreen state
+  bool _isFullScreen = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,8 +52,28 @@ class _DashboardViewState extends State<DashboardView> {
       _checkForUpdates();
     });
 
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.isFullScreen().then((fs) {
+        if (mounted) setState(() => _isFullScreen = fs);
+      }).catchError((_) {});
+    }
+
     // Registra listener de teclado global para atalhos e scanner USB Wedge
     HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+  }
+
+  Future<void> _toggleFullScreen() async {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      try {
+        final isFs = await windowManager.isFullScreen();
+        await windowManager.setFullScreen(!isFs);
+        if (mounted) {
+          setState(() {
+            _isFullScreen = !isFs;
+          });
+        }
+      } catch (_) {}
+    }
   }
 
   @override
@@ -83,12 +109,18 @@ class _DashboardViewState extends State<DashboardView> {
   bool _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
 
+    // Atalho: F11 (Alternar Tela Cheia)
+    if (event.logicalKey == LogicalKeyboardKey.f11) {
+      _toggleFullScreen();
+      return true;
+    }
+
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
     // Atalho: Ctrl + F (Focar busca no estoque)
     if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyF) {
-      if (_selectedIndex != 0) {
-        setState(() => _selectedIndex = 0);
+      if (_selectedIndex != 1) {
+        setState(() => _selectedIndex = 1);
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _searchFocusNode.requestFocus();
@@ -309,6 +341,23 @@ class _DashboardViewState extends State<DashboardView> {
 
     // Lista de telas disponíveis
     final views = [
+      HomeDashboardView(
+        onNavigate: (index, {statusFilter}) {
+          if (statusFilter != null) {
+            stock.setStatus(statusFilter);
+          }
+          setState(() => _selectedIndex = index);
+        },
+        onNewItem: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => const ItemFormDialog(),
+          );
+        },
+        onNewCautela: () {
+          setState(() => _selectedIndex = 2);
+        },
+      ),
       StockView(searchFocusNode: _searchFocusNode),
       const CautelasView(),
       const LocationsView(),
@@ -318,11 +367,12 @@ class _DashboardViewState extends State<DashboardView> {
       const SettingsView(),
     ];
 
-    if (!isAdmin && _selectedIndex == 5) {
+    if (!isAdmin && _selectedIndex == 6) {
       _selectedIndex = 0;
     }
 
     final titles = [
+      'Dashboard Operacional',
       'Materiais e Gestão de Estoque',
       'Cautela de Materiais e Missões',
       'Locais Físicos e Estrutura',
@@ -333,6 +383,7 @@ class _DashboardViewState extends State<DashboardView> {
     ];
 
     final icons = [
+      Icons.dashboard_outlined,
       Icons.inventory_2_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.place_outlined,
@@ -435,21 +486,29 @@ class _DashboardViewState extends State<DashboardView> {
                 _NavHoverItem(
                   index: 0,
                   currentIndex: _selectedIndex,
-                  label: 'Materiais e Estoque',
-                  icon: Icons.inventory_2_outlined,
+                  label: 'Dashboard',
+                  icon: Icons.dashboard_outlined,
                   isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 0),
                 ),
                 _NavHoverItem(
                   index: 1,
                   currentIndex: _selectedIndex,
-                  label: 'Cautelas e Missões',
-                  icon: Icons.assignment_turned_in_outlined,
+                  label: 'Materiais e Estoque',
+                  icon: Icons.inventory_2_outlined,
                   isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 1),
                 ),
                 _NavHoverItem(
                   index: 2,
+                  currentIndex: _selectedIndex,
+                  label: 'Cautelas e Missões',
+                  icon: Icons.assignment_turned_in_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 2),
+                ),
+                _NavHoverItem(
+                  index: 3,
                   currentIndex: _selectedIndex,
                   label: 'Locais Físicos',
                   icon: Icons.place_outlined,
@@ -469,40 +528,40 @@ class _DashboardViewState extends State<DashboardView> {
                       ],
                     ),
                   ),
-                  onTap: () => setState(() => _selectedIndex = 2),
-                ),
-                _NavHoverItem(
-                  index: 3,
-                  currentIndex: _selectedIndex,
-                  label: 'Grupos e Subgrupos',
-                  icon: Icons.category_outlined,
-                  isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 3),
                 ),
                 _NavHoverItem(
                   index: 4,
                   currentIndex: _selectedIndex,
-                  label: 'Histórico Geral',
-                  icon: Icons.history_outlined,
+                  label: 'Grupos e Subgrupos',
+                  icon: Icons.category_outlined,
                   isDark: isDark,
                   onTap: () => setState(() => _selectedIndex = 4),
                 ),
+                _NavHoverItem(
+                  index: 5,
+                  currentIndex: _selectedIndex,
+                  label: 'Histórico Geral',
+                  icon: Icons.history_outlined,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 5),
+                ),
                 if (isAdmin)
                   _NavHoverItem(
-                    index: 5,
+                    index: 6,
                     currentIndex: _selectedIndex,
                     label: 'Painel Administrativo',
                     icon: Icons.admin_panel_settings_outlined,
                     isDark: isDark,
-                    onTap: () => setState(() => _selectedIndex = 5),
+                    onTap: () => setState(() => _selectedIndex = 6),
                   ),
                 _NavHoverItem(
-                  index: isAdmin ? 6 : 5,
+                  index: isAdmin ? 7 : 6,
                   currentIndex: _selectedIndex,
                   label: 'Configurações',
                   icon: Icons.settings_outlined,
                   isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = isAdmin ? 6 : 5),
+                  onTap: () => setState(() => _selectedIndex = isAdmin ? 7 : 6),
                 ),
 
                 const Spacer(),
@@ -659,6 +718,14 @@ class _DashboardViewState extends State<DashboardView> {
                             const SizedBox(width: 12),
                           ],
 
+                          // Botão de Tela Cheia (F11)
+                          IconButton(
+                            icon: Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 22),
+                            tooltip: _isFullScreen ? 'Sair da Tela Cheia (F11)' : 'Tela Cheia (F11)',
+                            onPressed: _toggleFullScreen,
+                          ),
+                          const SizedBox(width: 8),
+
                           // Botão de Tema
                           IconButton(
                             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
@@ -678,9 +745,11 @@ class _DashboardViewState extends State<DashboardView> {
                             ),
                             onSelected: (val) {
                               if (val == 'settings') {
-                                setState(() => _selectedIndex = isAdmin ? 5 : 4);
+                                setState(() => _selectedIndex = isAdmin ? 7 : 6);
                               } else if (val == 'update') {
                                 _checkForUpdates(manual: true);
+                              } else if (val == 'fullscreen') {
+                                _toggleFullScreen();
                               } else if (val == 'theme') {
                                 themeProv.toggleTheme();
                               } else if (val == 'logout') {
@@ -699,6 +768,16 @@ class _DashboardViewState extends State<DashboardView> {
                                 ),
                               ),
                               const PopupMenuDivider(),
+                              PopupMenuItem(
+                                value: 'fullscreen',
+                                child: Row(
+                                  children: [
+                                    Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 18, color: AppColors.primaryLight),
+                                    const SizedBox(width: 10),
+                                    Text(_isFullScreen ? 'Sair da Tela Cheia (F11)' : 'Tela Cheia (F11)', style: const TextStyle(fontSize: 13)),
+                                  ],
+                                ),
+                              ),
                               const PopupMenuItem(
                                 value: 'update',
                                 child: Row(

@@ -1,5 +1,6 @@
 import 'item.dart';
 import 'user.dart';
+import '../utils/date_utils.dart';
 
 class CautelaItemModel {
   final int id;
@@ -57,11 +58,9 @@ class CautelaItemModel {
       usuarioDevolucao: json['usuario_devolucao'] != null
           ? UserModel.fromJson(json['usuario_devolucao'])
           : null,
-      dataSaida: json['data_saida'] != null
-          ? DateTime.parse(json['data_saida'])
-          : (json['data_cautela'] != null ? DateTime.parse(json['data_cautela']) : DateTime.now()),
+      dataSaida: AppDateUtils.parseToLocal(json['data_saida'] ?? json['data_cautela']),
       dataDevolucao: json['data_devolucao'] != null
-          ? DateTime.tryParse(json['data_devolucao'])
+          ? AppDateUtils.parseToLocal(json['data_devolucao'])
           : null,
       status: json['status'] as String? ?? 'CAUTELADO',
       condicaoSaida: json['condicao_saida'] as String?,
@@ -136,10 +135,8 @@ class CautelaModel {
       nome: json['nome'] as String? ?? 'Sem nome',
       tipo: json['tipo'] as String? ?? 'MISSAO',
       status: json['status'] as String? ?? 'ATIVA',
-      dataInicio: json['data_inicio'] != null
-          ? DateTime.parse(json['data_inicio'])
-          : DateTime.now(),
-      dataFim: json['data_fim'] != null ? DateTime.tryParse(json['data_fim']) : null,
+      dataInicio: AppDateUtils.parseToLocal(json['data_inicio']),
+      dataFim: json['data_fim'] != null ? AppDateUtils.parseToLocal(json['data_fim']) : null,
       criadoPorUsuarioId: json['criado_por_usuario_id'] as int?,
       criadoPor: json['criado_por'] != null ? UserModel.fromJson(json['criado_por']) : null,
       observacoes: json['observacoes'] as String?,
