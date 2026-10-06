@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
+import '../utils/image_picker_helper.dart';
+import 'avatar_editor_dialog.dart';
 import 'user_avatar.dart';
 
 class UserProfileDialog extends StatefulWidget {
@@ -25,6 +30,8 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
 
   bool _obscurePassword = true;
   bool _isSaving = false;
+  bool _showUrlInput = false;
+  bool _isLoadingImage = false;
   String _previewFotoUrl = '';
 
   @override
@@ -62,6 +69,85 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndEditPhoto() async {
+    final bytes = await ImagePickerHelper.pickImageBytes();
+    if (bytes != null && mounted) {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final user = auth.user;
+      final militar = user?.militar;
+
+      final croppedDataUrl = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AvatarEditorDialog(
+          imageBytes: bytes,
+          userName: user?.displayName,
+          postoGraduacao: militar?.postoGraduacao,
+        ),
+      );
+
+      if (croppedDataUrl != null && mounted) {
+        setState(() {
+          _fotoUrlController.text = croppedDataUrl;
+          _previewFotoUrl = croppedDataUrl;
+        });
+      }
+    }
+  }
+
+  Future<void> _editCurrentPhoto() async {
+    if (_previewFotoUrl.isEmpty) return;
+    setState(() => _isLoadingImage = true);
+    Uint8List? bytes;
+
+    try {
+      if (_previewFotoUrl.startsWith('data:image')) {
+        final commaIdx = _previewFotoUrl.indexOf(',');
+        final b64 = commaIdx != -1 ? _previewFotoUrl.substring(commaIdx + 1) : _previewFotoUrl;
+        bytes = base64Decode(b64);
+      } else if (_previewFotoUrl.startsWith('http://') || _previewFotoUrl.startsWith('https://')) {
+        final response = await http.get(Uri.parse(_previewFotoUrl)).timeout(const Duration(seconds: 10));
+        if (response.statusCode == 200) {
+          bytes = response.bodyBytes;
+        }
+      }
+    } catch (e) {
+      debugPrint('[UserProfileDialog] Erro ao carregar foto atual: $e');
+    } finally {
+      if (mounted) setState(() => _isLoadingImage = false);
+    }
+
+    if (bytes != null && mounted) {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final user = auth.user;
+      final militar = user?.militar;
+
+      final croppedDataUrl = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AvatarEditorDialog(
+          imageBytes: bytes,
+          userName: user?.displayName,
+          postoGraduacao: militar?.postoGraduacao,
+        ),
+      );
+
+      if (croppedDataUrl != null && mounted) {
+        setState(() {
+          _fotoUrlController.text = croppedDataUrl;
+          _previewFotoUrl = croppedDataUrl;
+        });
+      }
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.danger,
+          content: Text('Não foi possível carregar a imagem para ajuste.'),
+        ),
+      );
+    }
   }
 
   Future<void> _handleSave() async {
@@ -290,25 +376,62 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Avatar Preview Grande com anel de neon ciano
-                              Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.cyan, width: 2),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.cyan.withOpacity(0.25),
-                                      blurRadius: 10,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                                child: UserAvatar(
-                                  fotoUrl: _previewFotoUrl.isNotEmpty ? _previewFotoUrl : null,
-                                  name: user?.displayName,
-                                  radius: 36,
-                                  iconSize: 32,
+                              // Avatar Preview Grande com anel de neon ciano e Badge de Edição
+                              Tooltip(
+                                message: 'Clique para carregar ou ajustar foto',
+                                child: InkWell(
+                                  onTap: _previewFotoUrl.isNotEmpty ? _editCurrentPhoto : _pickAndEditPhoto,
+                                  borderRadius: BorderRadius.circular(44),
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: AppColors.cyan, width: 2),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.cyan.withOpacity(0.25),
+                                              blurRadius: 10,
+                                              spreadRadius: 1,
+                                            ),
+                                          ],
+                                        ),
+                                        child: UserAvatar(
+                                          fotoUrl: _previewFotoUrl.isNotEmpty ? _previewFotoUrl : null,
+                                          name: user?.displayName,
+                                          radius: 38,
+                                          iconSize: 34,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.cyan,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: isDark ? const Color(0xFF0B0F17) : Colors.white,
+                                              width: 2,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.3),
+                                                blurRadius: 4,
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.camera_alt_rounded,
+                                            size: 13,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 18),
@@ -316,24 +439,112 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    TextFormField(
-                                      controller: _fotoUrlController,
-                                      decoration: _inputDeco(
-                                        'URL da Foto ou Avatar',
-                                        hint: 'Cole o link direto da imagem (ex: https://.../foto.jpg)',
-                                        icon: Icons.link,
-                                        suffix: _previewFotoUrl.isNotEmpty
-                                            ? IconButton(
-                                                icon: const Icon(Icons.clear, size: 16),
-                                                tooltip: 'Remover foto',
-                                                onPressed: () => _fotoUrlController.clear(),
-                                              )
-                                            : null,
+                                    // Linha de Botões de Ação
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                      children: [
+                                        // Botão Principal: Carregar do Computador
+                                        ElevatedButton.icon(
+                                          onPressed: _pickAndEditPhoto,
+                                          icon: const Icon(Icons.upload_file_rounded, size: 16),
+                                          label: const Text('Carregar Foto do Computador'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: AppColors.cyan,
+                                            foregroundColor: Colors.black,
+                                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                            elevation: 0,
+                                          ),
+                                        ),
+
+                                        // Botão Secundário: Ajustar/Centralizar Atual (se houver foto)
+                                        if (_previewFotoUrl.isNotEmpty)
+                                          OutlinedButton.icon(
+                                            onPressed: _isLoadingImage ? null : _editCurrentPhoto,
+                                            icon: _isLoadingImage
+                                                ? const SizedBox(
+                                                    width: 12,
+                                                    height: 12,
+                                                    child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.cyan),
+                                                  )
+                                                : const Icon(Icons.crop_rotate_rounded, size: 16),
+                                            label: const Text('Ajustar / Centralizar'),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: AppColors.cyan,
+                                              side: const BorderSide(color: AppColors.cyan),
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                            ),
+                                          ),
+
+                                        // Botão Remover Foto
+                                        if (_previewFotoUrl.isNotEmpty)
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              _fotoUrlController.clear();
+                                              setState(() => _previewFotoUrl = '');
+                                            },
+                                            icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.danger),
+                                            label: const Text('Remover', style: TextStyle(color: AppColors.danger, fontSize: 12)),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+
+                                    // Toggle para inserir URL direta da Web
+                                    InkWell(
+                                      onTap: () => setState(() => _showUrlInput = !_showUrlInput),
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 2),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              _showUrlInput ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                              size: 16,
+                                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              _showUrlInput ? 'Ocultar campo de link URL' : 'Ou colar link direto da web...',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+
+                                    if (_showUrlInput) ...[
+                                      const SizedBox(height: 8),
+                                      TextFormField(
+                                        controller: _fotoUrlController,
+                                        decoration: _inputDeco(
+                                          'URL da Foto ou Avatar',
+                                          hint: 'Cole o link direto da imagem (ex: https://.../foto.jpg)',
+                                          icon: Icons.link,
+                                          suffix: _previewFotoUrl.isNotEmpty
+                                              ? IconButton(
+                                                  icon: const Icon(Icons.clear, size: 16),
+                                                  tooltip: 'Remover foto',
+                                                  onPressed: () => _fotoUrlController.clear(),
+                                                )
+                                              : null,
+                                        ),
+                                      ),
+                                    ],
+
+                                    const SizedBox(height: 4),
                                     Text(
-                                      'A foto será exibida na barra lateral, no cabeçalho e nas cautelas em todo o sistema.',
+                                      'A foto será recortada, centralizada e exibida em todo o sistema (cautelas, barra lateral e perfil).',
                                       style: TextStyle(
                                         fontSize: 10.5,
                                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),

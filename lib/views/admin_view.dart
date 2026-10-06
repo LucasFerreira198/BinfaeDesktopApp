@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/image_picker_helper.dart';
+import '../widgets/avatar_editor_dialog.dart';
 import '../widgets/user_avatar.dart';
 
 class AdminView extends StatefulWidget {
@@ -369,10 +371,28 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
                       TextField(
                         controller: fotoUrlController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'URL da Foto / Avatar (opcional)',
-                          hintText: 'https://.../foto.jpg',
-                          prefixIcon: Icon(Icons.link, size: 18),
+                          hintText: 'https://.../foto.jpg ou use o botão ao lado',
+                          prefixIcon: const Icon(Icons.link, size: 18),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.add_a_photo_outlined, size: 18, color: AppColors.cyan),
+                            tooltip: 'Carregar e ajustar foto do computador',
+                            onPressed: () async {
+                              final bytes = await ImagePickerHelper.pickImageBytes();
+                              if (bytes != null && setModalState != null) {
+                                final cropped = await showDialog<String>(
+                                  context: context,
+                                  builder: (_) => AvatarEditorDialog(imageBytes: bytes),
+                                );
+                                if (cropped != null) {
+                                  setModalState(() {
+                                    fotoUrlController.text = cropped;
+                                  });
+                                }
+                              }
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -491,10 +511,31 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     const SizedBox(height: 12),
                     TextField(
                       controller: fotoUrlController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'URL da Foto / Avatar',
-                        hintText: 'https://.../foto.jpg',
-                        prefixIcon: Icon(Icons.link, size: 18),
+                        hintText: 'https://.../foto.jpg ou use o botão ao lado',
+                        prefixIcon: const Icon(Icons.link, size: 18),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.add_a_photo_outlined, size: 18, color: AppColors.cyan),
+                          tooltip: 'Carregar e ajustar foto do computador',
+                          onPressed: () async {
+                            final bytes = await ImagePickerHelper.pickImageBytes();
+                            if (bytes != null && setModalState != null) {
+                              final cropped = await showDialog<String>(
+                                context: context,
+                                builder: (_) => AvatarEditorDialog(
+                                  imageBytes: bytes,
+                                  userName: user.displayName,
+                                ),
+                              );
+                              if (cropped != null) {
+                                setModalState(() {
+                                  fotoUrlController.text = cropped;
+                                });
+                              }
+                            }
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -793,10 +834,32 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
                       TextField(
                         controller: fotoUrlController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'URL da Foto / Avatar',
-                          hintText: 'https://.../foto.jpg',
-                          prefixIcon: Icon(Icons.link, size: 18),
+                          hintText: 'https://.../foto.jpg ou use o botão ao lado',
+                          prefixIcon: const Icon(Icons.link, size: 18),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.add_a_photo_outlined, size: 18, color: AppColors.cyan),
+                            tooltip: 'Carregar e ajustar foto do computador',
+                            onPressed: () async {
+                              final bytes = await ImagePickerHelper.pickImageBytes();
+                              if (bytes != null && setModalState != null) {
+                                final cropped = await showDialog<String>(
+                                  context: context,
+                                  builder: (_) => AvatarEditorDialog(
+                                    imageBytes: bytes,
+                                    userName: military?.nomeGuerra,
+                                    postoGraduacao: military?.postoGraduacao,
+                                  ),
+                                );
+                                if (cropped != null) {
+                                  setModalState(() {
+                                    fotoUrlController.text = cropped;
+                                  });
+                                }
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ],

@@ -23,7 +23,7 @@ class ReleaseInfo {
 }
 
 class UpdaterService {
-  static const String currentVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v2.3.4');
+  static const String currentVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v2.3.5');
   static const String repoOwner = 'LucasFerreira198';
   static const String repoName = 'BinfaeDesktopApp';
 
