@@ -34,7 +34,7 @@ class AppHttpOverrides extends HttpOverrides {
       if (username != null && username!.trim().isNotEmpty) {
         final cleanUser = username!.trim();
         final cleanPass = password ?? '';
-        client.authenticateProxy = (String h, int p, String scheme, String? realm) {
+        client.authenticateProxy = (String h, int p, String scheme, String? realm) async {
           client.addProxyCredentials(
             h,
             p,
@@ -210,7 +210,7 @@ class ApiService {
     if (enabled && host.trim().isNotEmpty) {
       client.findProxy = (uri) => "PROXY ${host.trim()}:$port";
       if (username != null && username.trim().isNotEmpty) {
-        client.authenticateProxy = (h, p, scheme, realm) {
+        client.authenticateProxy = (h, p, scheme, realm) async {
           client.addProxyCredentials(
             h,
             p,
