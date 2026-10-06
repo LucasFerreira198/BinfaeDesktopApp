@@ -190,10 +190,10 @@ class _GroupsViewState extends State<GroupsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header com Título e Botões
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 800;
+              final titleSection = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -213,33 +213,60 @@ class _GroupsViewState extends State<GroupsView> {
                     ),
                   ),
                 ],
-              ),
-              Row(
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => _openSubgroupDialog(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Novo Subgrupo'),
+              );
+
+              final actionButtons = [
+                OutlinedButton.icon(
+                  onPressed: () => _openSubgroupDialog(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => _openGroupDialog(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Novo Subgrupo'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _openGroupDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.category_outlined, size: 18),
+                  label: const Text('Novo Grupo', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ];
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleSection,
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 10,
+                      children: actionButtons,
                     ),
-                    icon: const Icon(Icons.category_outlined, size: 18),
-                    label: const Text('Novo Grupo', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  titleSection,
+                  Row(
+                    children: [
+                      actionButtons[0],
+                      const SizedBox(width: 12),
+                      actionButtons[1],
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 

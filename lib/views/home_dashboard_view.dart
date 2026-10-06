@@ -109,10 +109,10 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. HEADER OPERACIONAL: BREADCRUMB & RELÓGIO OFICIAL DE BRASÍLIA
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 720;
+                final breadcrumbWidget = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -125,12 +125,15 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                         ),
-                        Text(
-                          ' | Centro de Operações de TI',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        Flexible(
+                          child: Text(
+                            ' | Centro de Operações de TI',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
                           ),
                         ),
                       ],
@@ -138,16 +141,16 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     const SizedBox(height: 4),
                     Text(
                       'Base Aérea do Galeão (BINFAE-GL) • Operador: ${user != null ? user.displayName : "S2 D. PAULA"}',
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                       ),
                     ),
                   ],
-                ),
+                );
 
-                // Relógio e Status da Nuvem Vercel SP
-                Container(
+                final clockWidget = Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF151D2A) : Colors.white,
@@ -157,6 +160,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     ),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: 8,
@@ -187,17 +191,37 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ),
                     ],
                   ),
-                ),
-              ],
+                );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      breadcrumbWidget,
+                      const SizedBox(height: 12),
+                      clockWidget,
+                    ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: breadcrumbWidget),
+                    const SizedBox(width: 16),
+                    clockWidget,
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 20),
 
             // 2. LINHA DE 5 KPIS MODERNOS (Estilo LogiFlow / LoanHub)
-            Row(
-              children: [
-                Expanded(
-                  child: _ModernKpiCard(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final kpiCards = [
+                  _ModernKpiCard(
                     title: 'Total Materiais',
                     value: '${metrics.total}',
                     badgeText: 'Total',
@@ -206,10 +230,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     trailingWidget: _MiniBarSparkline(color: AppColors.cyan),
                     onTap: () => widget.onNavigate(1),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ModernKpiCard(
+                  _ModernKpiCard(
                     title: 'No Depósito',
                     value: '${metrics.disponivel}',
                     badgeText: metrics.total > 0 ? '${((metrics.disponivel / metrics.total) * 100).toStringAsFixed(0)}%' : '0%',
@@ -221,10 +242,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     ),
                     onTap: () => widget.onNavigate(1, statusFilter: 'NO_DEPOSITO'),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ModernKpiCard(
+                  _ModernKpiCard(
                     title: 'Alocados em Setor',
                     value: '${metrics.noSetor}',
                     badgeText: 'Setores',
@@ -240,10 +258,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     ),
                     onTap: () => widget.onNavigate(1, statusFilter: 'NO_SETOR'),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ModernKpiCard(
+                  _ModernKpiCard(
                     title: 'Cautelados em Missão',
                     value: '${metrics.cautelado}',
                     badgeText: 'Em Campo',
@@ -252,10 +267,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     trailingWidget: const _PulseSparkline(color: AppColors.warning),
                     onTap: () => widget.onNavigate(2),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ModernKpiCard(
+                  _ModernKpiCard(
                     title: 'Em Manutenção',
                     value: '${metrics.manutencao}',
                     badgeText: 'Atenção',
@@ -271,20 +283,39 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                     ),
                     onTap: () => widget.onNavigate(3),
                   ),
-                ),
-              ],
+                ];
+
+                if (constraints.maxWidth >= 980) {
+                  return Row(
+                    children: [
+                      for (int i = 0; i < kpiCards.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 12),
+                        Expanded(child: kpiCards[i]),
+                      ],
+                    ],
+                  );
+                }
+
+                final columns = constraints.maxWidth >= 600 ? 3 : 2;
+                final spacing = 12.0;
+                final totalSpacing = spacing * (columns - 1);
+                final itemWidth = (constraints.maxWidth - totalSpacing) / columns;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: kpiCards.map((card) => SizedBox(width: itemWidth, child: card)).toList(),
+                );
+              },
             ),
 
             const SizedBox(height: 20),
 
             // 3. SEÇÃO CENTRAL: FLUXO DE MOVIMENTAÇÕES + RADAR DE MISSÕES ATIVAS
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Coluna Esquerda: Gráfico de Curva Suave (Delivery/Movement Performance)
-                Expanded(
-                  flex: 6,
-                  child: Container(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 920;
+                final flowWidget = Container(
                     height: 280,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -364,14 +395,8 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ],
                     ),
                   ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // Coluna Direita: Missões e Cautelas Ativas (Radar + Lista)
-                Expanded(
-                  flex: 5,
-                  child: Container(
+                );
+                final missionsWidget = Container(
                     height: 280,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -528,20 +553,36 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                );
+
+                if (isNarrow) {
+                  return Column(
+                    children: [
+                      flowWidget,
+                      const SizedBox(height: 16),
+                      missionsWidget,
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 6, child: flowWidget),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 5, child: missionsWidget),
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 20),
 
             // 4. SEÇÃO INFERIOR: DISTRIBUIÇÃO POR CATEGORIA + MOVIMENTAÇÕES RECENTES
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Gráfico Donut de Categorias
-                Expanded(
-                  flex: 4,
-                  child: Container(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 920;
+                final donutWidget = Container(
                     height: 260,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -590,14 +631,8 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ],
                     ),
                   ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // Tabela de Movimentações Recentes em Tempo Real
-                Expanded(
-                  flex: 7,
-                  child: Container(
+                );
+                final recentWidget = Container(
                     height: 260,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -728,8 +763,27 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                );
+
+                if (isNarrow) {
+                  return Column(
+                    children: [
+                      donutWidget,
+                      const SizedBox(height: 16),
+                      recentWidget,
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 4, child: donutWidget),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 7, child: recentWidget),
+                  ],
+                );
+              },
             ),
           ],
         ),

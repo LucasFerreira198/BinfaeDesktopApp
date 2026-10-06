@@ -70,10 +70,10 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. HEADER DO MÓDULO DE MANUTENÇÃO
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 850;
+                final titleColumn = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -98,13 +98,16 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                           child: const Icon(Icons.handyman_rounded, color: Colors.black, size: 20),
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          'Manutenção e Reparos de TI',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        Flexible(
+                          child: Text(
+                            'Manutenção e Reparos de TI',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
                           ),
                         ),
                       ],
@@ -118,10 +121,10 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                       ),
                     ),
                   ],
-                ),
+                );
 
-                // Resumo rápido em badges
-                Row(
+                final badgesRow = Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildSummaryBadge(
                       label: 'Na Bancada',
@@ -137,19 +140,36 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                       isDark: isDark,
                     ),
                   ],
-                ),
-              ],
+                );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      titleColumn,
+                      const SizedBox(height: 12),
+                      badgesRow,
+                    ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    titleColumn,
+                    badgesRow,
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 20),
 
             // 2. BARRA DE CONTROLE: BUSCA E TAB BAR MODERNA
-            Row(
-              children: [
-                // Campo de Busca Rápida
-                Expanded(
-                  flex: 4,
-                  child: Container(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 850;
+                final searchWidget = Container(
                     height: 42,
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF131B2B) : Colors.white,
@@ -186,15 +206,8 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                       ),
                       onChanged: (v) => setState(() => _searchQuery = v.trim()),
                     ),
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                // Tab Switcher com Badges de Contagem
-                Expanded(
-                  flex: 5,
-                  child: Container(
+                  );
+                final tabWidget = Container(
                     height: 42,
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
@@ -249,9 +262,27 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
+                  );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      searchWidget,
+                      const SizedBox(height: 10),
+                      tabWidget,
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(flex: 4, child: searchWidget),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 5, child: tabWidget),
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 18),
@@ -590,8 +621,11 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
           const SizedBox(height: 12),
 
           // Linha 3: Local de Origem + Data + Botões de Ação
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            runSpacing: 8,
             children: [
               // Metadados de Origem
               Row(

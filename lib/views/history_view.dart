@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/item.dart';
@@ -97,10 +98,10 @@ class _HistoryViewState extends State<HistoryView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header com Título e Botão de Atualizar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 750;
+              final titleSection = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -120,8 +121,9 @@ class _HistoryViewState extends State<HistoryView> {
                     ),
                   ),
                 ],
-              ),
-              ElevatedButton.icon(
+              );
+
+              final refreshBtn = ElevatedButton.icon(
                 onPressed: _isLoading ? null : _loadMovements,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -133,43 +135,60 @@ class _HistoryViewState extends State<HistoryView> {
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                     : const Icon(Icons.refresh, size: 18),
                 label: const Text('Atualizar Histórico'),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleSection,
+                    const SizedBox(height: 12),
+                    refreshBtn,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  titleSection,
+                  refreshBtn,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 
           // Filtros
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (v) => setState(() => _search = v.trim()),
-                  decoration: InputDecoration(
-                    hintText: 'Filtrar por material, motivo, militar ou ID...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _search = '');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: isDark ? const Color(0xFF151D2F) : Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 650;
+              final searchWidget = TextField(
+                controller: _searchController,
+                onChanged: (v) => setState(() => _search = v.trim()),
+                decoration: InputDecoration(
+                  hintText: 'Filtrar por material, motivo, militar ou ID...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _search = '');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Dropdown tipo
-              Container(
+              );
+
+              final typeWidget = Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF151D2F) : Colors.white,
@@ -187,8 +206,27 @@ class _HistoryViewState extends State<HistoryView> {
                     onChanged: (v) => setState(() => _selectedType = v),
                   ),
                 ),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    searchWidget,
+                    const SizedBox(height: 10),
+                    typeWidget,
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: searchWidget),
+                  const SizedBox(width: 12),
+                  typeWidget,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 16),
 
@@ -222,29 +260,44 @@ class _HistoryViewState extends State<HistoryView> {
                               ],
                             ),
                           )
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF151D2F) : Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: ListView.separated(
-                                itemCount: filtered.length,
-                                separatorBuilder: (_, __) => Divider(
-                                  height: 1,
-                                  color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9),
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              const minHistoryWidth = 780.0;
+                              final contentWidth = math.max(minHistoryWidth, constraints.maxWidth);
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF151D2F) : Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
                                 ),
-                                itemBuilder: (context, index) {
-                                  final m = filtered[index];
-                                  final item = stock.allItems.where((i) => i.id == m.itemId).firstOrNull;
-                                  final itemName = m.itemNome ?? item?.nome ?? 'Material #${m.itemId}';
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Scrollbar(
+                                    thumbVisibility: constraints.maxWidth < minHistoryWidth,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: SizedBox(
+                                        width: contentWidth,
+                                        child: ListView.separated(
+                                          itemCount: filtered.length,
+                                          separatorBuilder: (_, __) => Divider(
+                                            height: 1,
+                                            color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9),
+                                          ),
+                                          itemBuilder: (context, index) {
+                                            final m = filtered[index];
+                                            final item = stock.allItems.where((i) => i.id == m.itemId).firstOrNull;
+                                            final itemName = m.itemNome ?? item?.nome ?? 'Material #${m.itemId}';
 
-                                  return _buildMovementRow(context, m, itemName, isDark);
-                                },
-                              ),
-                            ),
+                                            return _buildMovementRow(context, m, itemName, isDark);
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
           ),
         ],

@@ -45,6 +45,10 @@ class _DashboardViewState extends State<DashboardView> {
   // Fullscreen state
   bool _isFullScreen = false;
 
+  // Responsive sidebar collapse state
+  bool _isSidebarCollapsed = false;
+  bool _userToggledSidebar = false;
+
   @override
   void initState() {
     super.initState();
@@ -405,12 +409,18 @@ class _DashboardViewState extends State<DashboardView> {
     ];
 
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isCompact = screenWidth < 1100;
+    final isCollapsed = _userToggledSidebar ? _isSidebarCollapsed : isCompact;
+
     return Scaffold(
       body: Row(
         children: [
-          // Sidebar Esquerda Refinada
-          Container(
-            width: 250,
+          // Sidebar Esquerda Responsiva / Retrátil (Largura 240px ou 72px)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            width: isCollapsed ? 72 : 240,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF0B0F19) : Colors.white,
               border: Border(
@@ -424,319 +434,398 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 // Top Header Brand (Escudo Estilizado com Micro-servidor)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 12 : 18, vertical: 16),
                   child: Row(
+                    mainAxisAlignment: isCollapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.4),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                      Tooltip(
+                        message: 'Informatica - BINFAE-GL',
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ],
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(Icons.shield_outlined, color: Colors.white, size: 24),
-                            Positioned(
-                              bottom: 11,
-                              child: Container(
-                                padding: const EdgeInsets.all(1.5),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                                child: const Icon(Icons.dns, color: Colors.white, size: 9),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.4),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Icon(Icons.shield_outlined, color: Colors.white, size: 22),
+                              Positioned(
+                                bottom: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(1.5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  child: const Icon(Icons.dns, color: Colors.white, size: 8),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Informatica',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.3,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
+                      if (!isCollapsed) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Informatica',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.3,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                'BINFAE-GL',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryLight,
+                                  letterSpacing: 0.5,
+                                ),
+                                maxLines: 1,
+                              ),
+                            ],
                           ),
-                          Text(
-                            'BINFAE-GL',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryLight,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
                 const Divider(height: 1, thickness: 1),
                 const SizedBox(height: 10),
 
-                // Itens de Navegação com Indicador de Mouse Hover e Badges
-                _NavHoverItem(
-                  index: 0,
-                  currentIndex: _selectedIndex,
-                  label: 'Dashboard',
-                  icon: Icons.dashboard_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 0),
-                ),
-                _NavHoverItem(
-                  index: 1,
-                  currentIndex: _selectedIndex,
-                  label: 'Materiais e Estoque',
-                  icon: Icons.inventory_2_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 1),
-                ),
-                _NavHoverItem(
-                  index: 2,
-                  currentIndex: _selectedIndex,
-                  label: 'Cautelas e Missões',
-                  icon: Icons.assignment_turned_in_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 2),
-                ),
-                _NavHoverItem(
-                  index: 3,
-                  currentIndex: _selectedIndex,
-                  label: 'Manutenção',
-                  icon: Icons.handyman_outlined,
-                  isDark: isDark,
-                  badgeWidget: stock.maintenanceItems.isNotEmpty
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: AppColors.warning.withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: AppColors.warning.withOpacity(0.4),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            '${stock.maintenanceItems.length}',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.warning,
-                            ),
-                          ),
-                        )
-                      : null,
-                  onTap: () => setState(() => _selectedIndex = 3),
-                ),
-                _NavHoverItem(
-                  index: 4,
-                  currentIndex: _selectedIndex,
-                  label: 'Locais Físicos',
-                  icon: Icons.place_outlined,
-                  isDark: isDark,
-                  badgeWidget: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
+                // Lista de Itens de Navegação com suporte a modo compacto
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
                       children: [
-                        Icon(Icons.insights, size: 10, color: AppColors.primaryLight),
-                        SizedBox(width: 2),
-                        Text('Árvore', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
+                        _NavHoverItem(
+                          index: 0,
+                          currentIndex: _selectedIndex,
+                          label: 'Dashboard',
+                          icon: Icons.dashboard_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 0),
+                        ),
+                        _NavHoverItem(
+                          index: 1,
+                          currentIndex: _selectedIndex,
+                          label: 'Materiais e Estoque',
+                          icon: Icons.inventory_2_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 1),
+                        ),
+                        _NavHoverItem(
+                          index: 2,
+                          currentIndex: _selectedIndex,
+                          label: 'Cautelas e Missões',
+                          icon: Icons.assignment_turned_in_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 2),
+                        ),
+                        _NavHoverItem(
+                          index: 3,
+                          currentIndex: _selectedIndex,
+                          label: 'Manutenção',
+                          icon: Icons.handyman_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          badgeWidget: stock.maintenanceItems.isNotEmpty
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.warning.withOpacity(0.18),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.warning.withOpacity(0.4),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${stock.maintenanceItems.length}',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.warning,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                          onTap: () => setState(() => _selectedIndex = 3),
+                        ),
+                        _NavHoverItem(
+                          index: 4,
+                          currentIndex: _selectedIndex,
+                          label: 'Locais Físicos',
+                          icon: Icons.place_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          badgeWidget: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.16),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.insights, size: 10, color: AppColors.primaryLight),
+                                SizedBox(width: 2),
+                                Text('Árvore', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
+                              ],
+                            ),
+                          ),
+                          onTap: () => setState(() => _selectedIndex = 4),
+                        ),
+                        _NavHoverItem(
+                          index: 5,
+                          currentIndex: _selectedIndex,
+                          label: 'Grupos e Subgrupos',
+                          icon: Icons.category_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 5),
+                        ),
+                        _NavHoverItem(
+                          index: 6,
+                          currentIndex: _selectedIndex,
+                          label: 'Histórico Geral',
+                          icon: Icons.history_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 6),
+                        ),
+                        if (isAdmin)
+                          _NavHoverItem(
+                            index: 7,
+                            currentIndex: _selectedIndex,
+                            label: 'Painel Administrativo',
+                            icon: Icons.admin_panel_settings_outlined,
+                            isDark: isDark,
+                            isCollapsed: isCollapsed,
+                            onTap: () => setState(() => _selectedIndex = 7),
+                          ),
+                        _NavHoverItem(
+                          index: isAdmin ? 8 : 7,
+                          currentIndex: _selectedIndex,
+                          label: 'Configurações',
+                          icon: Icons.settings_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = isAdmin ? 8 : 7),
+                        ),
                       ],
                     ),
                   ),
-                  onTap: () => setState(() => _selectedIndex = 4),
                 ),
-                _NavHoverItem(
-                  index: 5,
-                  currentIndex: _selectedIndex,
-                  label: 'Grupos e Subgrupos',
-                  icon: Icons.category_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 5),
-                ),
-                _NavHoverItem(
-                  index: 6,
-                  currentIndex: _selectedIndex,
-                  label: 'Histórico Geral',
-                  icon: Icons.history_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 6),
-                ),
-                if (isAdmin)
-                  _NavHoverItem(
-                    index: 7,
-                    currentIndex: _selectedIndex,
-                    label: 'Painel Administrativo',
-                    icon: Icons.admin_panel_settings_outlined,
-                    isDark: isDark,
-                    onTap: () => setState(() => _selectedIndex = 7),
-                  ),
-                _NavHoverItem(
-                  index: isAdmin ? 8 : 7,
-                  currentIndex: _selectedIndex,
-                  label: 'Configurações',
-                  icon: Icons.settings_outlined,
-                  isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = isAdmin ? 8 : 7),
-                ),
-
-                const Spacer(),
 
                 // Indicador de Leitor USB Wedge
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.qr_code_scanner, size: 14, color: AppColors.primaryLight),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Leitor USB Wedge Ativo',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                isCollapsed
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Tooltip(
+                          message: 'Leitor USB Wedge Ativo',
+                          child: const Icon(Icons.qr_code_scanner, size: 18, color: AppColors.primaryLight),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Status de Sincronização em RAM no Rodapé da Barra
-                Container(
-                  margin: const EdgeInsets.all(14),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: stock.syncError != null
-                              ? AppColors.danger
-                              : (stock.isSyncing ? AppColors.warning : AppColors.success),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          stock.isSyncing
-                              ? 'Sincronizando...'
-                              : (stock.syncError != null ? 'Erro de conexão' : 'Banco em 0ms (RAM)'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : const Color(0xFF475569),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.refresh, size: 16),
-                        tooltip: 'Sincronizar (F5)',
-                        onPressed: stock.isSyncing ? null : () => stock.syncData(),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Cartão de Perfil Militar no Rodapé da Sidebar (LogiFlow style + Auto-Edição)
-                Container(
-                  margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => const UserProfileDialog(),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         child: Row(
                           children: [
-                            UserAvatar(
-                              fotoUrl: user?.fotoUrl,
-                              name: user?.displayName,
-                              radius: 17,
-                              iconSize: 16,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user?.displayName ?? 'S2 D. PAULA',
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        isAdmin ? 'Administrador TI' : 'Operador TI',
-                                        style: const TextStyle(
-                                          fontSize: 9.5,
-                                          color: AppColors.cyan,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Icon(Icons.edit_outlined, size: 10, color: AppColors.cyan),
-                                    ],
-                                  ),
-                                ],
+                            const Icon(Icons.qr_code_scanner, size: 14, color: AppColors.primaryLight),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Leitor USB Wedge Ativo',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                ),
+
+                // Status de Sincronização em RAM no Rodapé
+                isCollapsed
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Tooltip(
+                          message: stock.isSyncing
+                              ? 'Sincronizando...'
+                              : (stock.syncError != null ? 'Erro de conexão' : 'Banco em 0ms (RAM) - Clique para sincronizar'),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.refresh,
+                              size: 18,
+                              color: stock.syncError != null
+                                  ? AppColors.danger
+                                  : (stock.isSyncing ? AppColors.warning : AppColors.success),
+                            ),
+                            onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        margin: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: stock.syncError != null
+                                    ? AppColors.danger
+                                    : (stock.isSyncing ? AppColors.warning : AppColors.success),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                stock.isSyncing
+                                    ? 'Sincronizando...'
+                                    : (stock.syncError != null ? 'Erro de conexão' : 'Banco em 0ms (RAM)'),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white70 : const Color(0xFF475569),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.refresh, size: 16),
+                              tooltip: 'Sincronizar (F5)',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                // Cartão de Perfil Militar
+                isCollapsed
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Tooltip(
+                          message: 'Meu Perfil: ${user?.displayName ?? "Operador"}',
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => const UserProfileDialog(),
+                              );
+                            },
+                            child: UserAvatar(
+                              fotoUrl: user?.fotoUrl,
+                              name: user?.displayName,
+                              radius: 18,
+                              iconSize: 18,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => const UserProfileDialog(),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                children: [
+                                  UserAvatar(
+                                    fotoUrl: user?.fotoUrl,
+                                    name: user?.displayName,
+                                    radius: 17,
+                                    iconSize: 16,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user?.displayName ?? 'S2 D. PAULA',
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              isAdmin ? 'Administrador TI' : 'Operador TI',
+                                              style: const TextStyle(
+                                                fontSize: 9.5,
+                                                color: AppColors.cyan,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(Icons.edit_outlined, size: 10, color: AppColors.cyan),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -745,10 +834,10 @@ class _DashboardViewState extends State<DashboardView> {
           Expanded(
             child: Column(
               children: [
-                // Header Superior Evoluído
+                // Header Superior Responsivo
                 Container(
                   height: 64,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF0E1422) : Colors.white,
                     border: Border(
@@ -761,37 +850,58 @@ class _DashboardViewState extends State<DashboardView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Título da View Atual com Ícone
-                      Row(
-                        children: [
-                          Icon(
-                            _selectedIndex < icons.length ? icons[_selectedIndex] : Icons.inventory_2_outlined,
-                            size: 20,
-                            color: AppColors.primaryLight,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            _selectedIndex < titles.length ? titles[_selectedIndex] : 'Informatica - BINFAE-GL',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      // Botão Toggle Sidebar + Título da View Atual
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(isCollapsed ? Icons.menu : Icons.menu_open, size: 22),
+                              tooltip: isCollapsed ? 'Expandir Menu Lateral' : 'Recolher Menu Lateral',
+                              onPressed: () {
+                                setState(() {
+                                  _userToggledSidebar = true;
+                                  _isSidebarCollapsed = !isCollapsed;
+                                });
+                              },
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Icon(
+                              _selectedIndex < icons.length ? icons[_selectedIndex] : Icons.inventory_2_outlined,
+                              size: 20,
+                              color: AppColors.primaryLight,
+                            ),
+                            const SizedBox(width: 10),
+                            Flexible(
+                              child: Text(
+                                _selectedIndex < titles.length ? titles[_selectedIndex] : 'Informatica - BINFAE-GL',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
-                      // Ações do Header (Notificação Discreta de Download + Tema + Perfil Dropdown)
+                      // Ações do Header (Notificação Discreta de Download + Tela Cheia + Tema + Perfil Dropdown)
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Notificação discreta de Atualização [v... disponível]
                           if (_latestRelease != null) ...[
                             MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () => UpdaterService.showUpdateModal(context, _latestRelease!),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth < 950 ? 8 : 12,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
@@ -809,21 +919,23 @@ class _DashboardViewState extends State<DashboardView> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const Icon(Icons.download_rounded, size: 14, color: Colors.white),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '[${_latestRelease!.version.isNotEmpty ? "v${_latestRelease!.version}" : _latestRelease!.tag} disponível]',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                      if (screenWidth >= 950) ...[
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '[${_latestRelease!.version.isNotEmpty ? "v${_latestRelease!.version}" : _latestRelease!.tag} disponível]',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 8),
                           ],
 
                           // Botão de Tela Cheia (F11)
@@ -832,7 +944,7 @@ class _DashboardViewState extends State<DashboardView> {
                             tooltip: _isFullScreen ? 'Sair da Tela Cheia (F11)' : 'Tela Cheia (F11)',
                             onPressed: _toggleFullScreen,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 4),
 
                           // Botão de Tema
                           IconButton(
@@ -840,7 +952,7 @@ class _DashboardViewState extends State<DashboardView> {
                             tooltip: 'Alternar Tema Claro/Escuro',
                             onPressed: () => themeProv.toggleTheme(),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
 
                           // Dropdown de Perfil Militar (S2 D. PAULA / Usuário)
                           PopupMenuButton<String>(
@@ -949,7 +1061,10 @@ class _DashboardViewState extends State<DashboardView> {
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth < 950 ? 6 : 10,
+                                  vertical: 5,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(20),
@@ -958,33 +1073,35 @@ class _DashboardViewState extends State<DashboardView> {
                                   ),
                                 ),
                                 child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Avatar com anel de gradiente / Foto Real
                                     UserAvatar(
                                       fotoUrl: user?.fotoUrl,
                                       name: user?.displayName,
                                       radius: 14,
                                       iconSize: 14,
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      user?.displayName ?? 'S2 D. PAULA',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                      ),
-                                    ),
-                                    if (isAdmin) ...[
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary,
-                                          borderRadius: BorderRadius.circular(8),
+                                    if (screenWidth >= 950) ...[
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        user?.displayName ?? 'S2 D. PAULA',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                                         ),
-                                        child: const Text('ADMIN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
                                       ),
+                                      if (isAdmin) ...[
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Text('ADMIN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
+                                        ),
+                                      ],
                                     ],
                                     const SizedBox(width: 4),
                                     const Icon(Icons.arrow_drop_down, size: 18),
@@ -1019,6 +1136,7 @@ class _NavHoverItem extends StatefulWidget {
   final IconData icon;
   final bool isDark;
   final Widget? badgeWidget;
+  final bool isCollapsed;
   final VoidCallback onTap;
 
   const _NavHoverItem({
@@ -1028,6 +1146,7 @@ class _NavHoverItem extends StatefulWidget {
     required this.icon,
     required this.isDark,
     this.badgeWidget,
+    this.isCollapsed = false,
     required this.onTap,
   });
 
@@ -1041,44 +1160,70 @@ class _NavHoverItemState extends State<_NavHoverItem> {
   @override
   Widget build(BuildContext context) {
     final active = widget.currentIndex == widget.index;
+    final isCollapsed = widget.isCollapsed;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: GestureDetector(
-          onTap: widget.onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: active
-                  ? (widget.isDark ? AppColors.cyan.withOpacity(0.12) : const Color(0xFFE6FFFA))
-                  : (_isHovered
-                      ? (widget.isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC))
-                      : Colors.transparent),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: active
-                    ? (widget.isDark ? AppColors.cyan.withOpacity(0.7) : AppColors.cyan)
-                    : (_isHovered
-                        ? (widget.isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0))
-                        : Colors.transparent),
-                width: 1.2,
-              ),
-              boxShadow: active && widget.isDark
-                  ? [
-                      BoxShadow(
-                        color: AppColors.cyan.withOpacity(0.18),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+    final content = AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      padding: EdgeInsets.symmetric(
+        horizontal: isCollapsed ? 8 : 14,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: active
+            ? (widget.isDark ? AppColors.cyan.withOpacity(0.12) : const Color(0xFFE6FFFA))
+            : (_isHovered
+                ? (widget.isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC))
+                : Colors.transparent),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: active
+              ? (widget.isDark ? AppColors.cyan.withOpacity(0.7) : AppColors.cyan)
+              : (_isHovered
+                  ? (widget.isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0))
+                  : Colors.transparent),
+          width: 1.2,
+        ),
+        boxShadow: active && widget.isDark
+            ? [
+                BoxShadow(
+                  color: AppColors.cyan.withOpacity(0.18),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      child: isCollapsed
+          ? Center(
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    widget.icon,
+                    size: 20,
+                    color: active
+                        ? AppColors.cyan
+                        : (_isHovered
+                            ? (widget.isDark ? Colors.white : AppColors.cyan)
+                            : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+                  ),
+                  if (widget.badgeWidget != null)
+                    Positioned(
+                      top: -4,
+                      right: -4,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.warning,
+                        ),
                       ),
-                    ]
-                  : null,
-            ),
-            child: Row(
+                    ),
+                ],
+              ),
+            )
+          : Row(
               children: [
                 Icon(
                   widget.icon,
@@ -1102,12 +1247,31 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                               ? (widget.isDark ? Colors.white : const Color(0xFF0F172A))
                               : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569))),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (widget.badgeWidget != null) widget.badgeWidget!,
               ],
             ),
-          ),
+    );
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 6 : 10, vertical: 2),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: isCollapsed
+              ? Tooltip(
+                  message: widget.label,
+                  preferBelow: false,
+                  verticalOffset: 16,
+                  child: content,
+                )
+              : content,
         ),
       ),
     );

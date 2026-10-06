@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/cautela.dart';
@@ -385,10 +386,10 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HEADER LOANHUB: TÍTULO, SUBTÍTULO & 4 KPIS NO TOPO
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 900;
+              final titleSection = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -409,107 +410,143 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                     ),
                   ),
                 ],
-              ),
+              );
 
-              // Botões de Ação
-              Row(
-                children: [
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
-                    ),
-                    onPressed: _openQuickScanner,
-                    icon: const Icon(Icons.qr_code_scanner, size: 16, color: AppColors.cyan),
-                    label: const Text('Leitor USB / Scanner Devolução', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              final actionButtons = [
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
                   ),
-                  const SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.cyan,
-                      foregroundColor: const Color(0xFF0F172A),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  onPressed: _openQuickScanner,
+                  icon: const Icon(Icons.qr_code_scanner, size: 16, color: AppColors.cyan),
+                  label: const Text('Leitor USB / Scanner Devolução', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.cyan,
+                    foregroundColor: const Color(0xFF0F172A),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () => _createNewCautela(tipo: _tabController.index == 1 ? 'FIXA' : 'MISSAO'),
+                  icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
+                  label: const Text('+ Nova Cautela / Missão', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+                ),
+              ];
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleSection,
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: actionButtons,
                     ),
-                    onPressed: () => _createNewCautela(tipo: _tabController.index == 1 ? 'FIXA' : 'MISSAO'),
-                    icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
-                    label: const Text('+ Nova Cautela / Missão', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  titleSection,
+                  Row(
+                    children: [
+                      actionButtons[0],
+                      const SizedBox(width: 10),
+                      actionButtons[1],
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
 
           const SizedBox(height: 18),
 
           // 2. LINHA DE 4 KPIS LOANHUB
-          Row(
-            children: [
-              Expanded(
-                child: _LoanHubKpiCard(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final kpiCards = [
+                _LoanHubKpiCard(
                   title: 'Missões Ativas',
                   value: '${activeCautelas.length}',
                   glowColor: AppColors.cyan,
                   isDark: isDark,
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: _LoanHubKpiCard(
+                _LoanHubKpiCard(
                   title: 'Materiais em Campo',
                   value: '$totalItensEmUso',
                   glowColor: const Color(0xFF38BDF8),
                   isDark: isDark,
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: _LoanHubKpiCard(
+                _LoanHubKpiCard(
                   title: 'Devoluções Hoje',
                   value: '${(activeCautelas.length * 0.4).round()}',
                   glowColor: AppColors.warning,
                   isDark: isDark,
                   badge: 'Previsão',
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: _LoanHubKpiCard(
+                _LoanHubKpiCard(
                   title: 'Cautelas Concluídas',
                   value: '${concludedCautelas.length}',
                   glowColor: AppColors.success,
                   isDark: isDark,
                 ),
-              ),
-            ],
+              ];
+
+              if (constraints.maxWidth >= 900) {
+                return Row(
+                  children: [
+                    for (int i = 0; i < kpiCards.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 14),
+                      Expanded(child: kpiCards[i]),
+                    ],
+                  ],
+                );
+              }
+
+              final itemWidth = (constraints.maxWidth - 14) / 2;
+              return Wrap(
+                spacing: 14,
+                runSpacing: 14,
+                children: kpiCards.map((card) => SizedBox(width: itemWidth, child: card)).toList(),
+              );
+            },
           ),
 
           const SizedBox(height: 18),
 
           // 3. BARRA DE TABS E BUSCA
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Tabs Modernas
-              Container(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 850;
+
+              final tabsWidget = Container(
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
                 ),
-                child: Row(
-                  children: [
-                    _buildTabPill('Missões Operacionais (${activeCautelas.where((c) => c.tipo == "MISSAO").length})', 0, isDark),
-                    _buildTabPill('Cautelas Fixas (${activeCautelas.where((c) => c.tipo == "FIXA").length})', 1, isDark),
-                    _buildTabPill('Histórico Concluídas (${concludedCautelas.length})', 2, isDark),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildTabPill('Missões Operacionais (${activeCautelas.where((c) => c.tipo == "MISSAO").length})', 0, isDark),
+                      _buildTabPill('Cautelas Fixas (${activeCautelas.where((c) => c.tipo == "FIXA").length})', 1, isDark),
+                      _buildTabPill('Histórico Concluídas (${concludedCautelas.length})', 2, isDark),
+                    ],
+                  ),
                 ),
-              ),
+              );
 
-              // Busca Rápida
-              SizedBox(
-                width: 280,
+              final searchWidget = SizedBox(
+                width: isCompact ? double.infinity : 280,
                 height: 38,
                 child: TextField(
                   controller: _searchCtrl,
@@ -528,15 +565,45 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                 ),
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    tabsWidget,
+                    const SizedBox(height: 10),
+                    searchWidget,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: tabsWidget),
+                  const SizedBox(width: 14),
+                  searchWidget,
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: 14),
 
           // 4. TABELA ESTRUTURADA DE CAUTELAS (ESTILO LOANHUB)
           Expanded(
-            child: Container(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const minTableWidth = 840.0;
+                final tableWidth = math.max(minTableWidth, constraints.maxWidth);
+                return Scrollbar(
+                  thumbVisibility: constraints.maxWidth < minTableWidth,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: tableWidth,
+                      child: Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF151D2A) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -668,6 +735,11 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                   ),
                 ],
               ),
+            ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import '../models/item.dart';
 import '../providers/stock_provider.dart';
@@ -54,10 +55,10 @@ class _StockViewState extends State<StockView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HEADER LOGISTICS PRO: TÍTULO, SUBTÍTULO & AÇÕES RÁPIDAS
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 950;
+              final titleSection = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -78,121 +79,146 @@ class _StockViewState extends State<StockView> {
                     ),
                   ),
                 ],
-              ),
+              );
 
-              // Botões de Ação (+ Novo Material & Importar/Exportar)
-              Row(
-                children: [
-                  // Busca Rápida no Topo
-                  SizedBox(
-                    width: 280,
-                    height: 40,
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _focusNode,
-                      onChanged: (val) => stock.setSearch(val),
-                      style: const TextStyle(fontSize: 12),
-                      decoration: InputDecoration(
-                        hintText: 'Buscar por nome, BMP, serial...',
-                        hintStyle: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                        ),
-                        prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.cyan),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear, size: 16),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  stock.setSearch('');
-                                },
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.cyan, width: 1.5),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              final actionWidgets = [
+                SizedBox(
+                  width: constraints.maxWidth < 600 ? double.infinity : 280,
+                  height: 40,
+                  child: TextField(
+                    controller: _searchController,
+                    focusNode: _focusNode,
+                    onChanged: (val) => stock.setSearch(val),
+                    style: const TextStyle(fontSize: 12),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar por nome, BMP, serial...',
+                      hintStyle: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                       ),
+                      prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.cyan),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, size: 16),
+                              onPressed: () {
+                                _searchController.clear();
+                                stock.setSearch('');
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.cyan, width: 1.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                   ),
-                  const SizedBox(width: 10),
-
-                  // Botão Ciano "+ Novo Material"
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => const ItemFormDialog(),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.cyan,
-                      foregroundColor: const Color(0xFF0F172A),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      elevation: 2,
-                    ),
-                    icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
-                    label: const Text(
-                      'Novo Material',
-                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
-                    ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => const ItemFormDialog(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.cyan,
+                    foregroundColor: const Color(0xFF0F172A),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 2,
                   ),
-                  const SizedBox(width: 10),
+                  icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
+                  label: const Text(
+                    'Novo Material',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
+                  ),
+                ),
+                OutlinedButton.icon(
+                  onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
+                  ),
+                  icon: stock.isSyncing
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.sync, size: 16),
+                  label: const Text('Sincronizar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                ),
+              ];
 
-                  // Botão Outline "Sincronizar"
-                  OutlinedButton.icon(
-                    onPressed: stock.isSyncing ? null : () => stock.syncData(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleSection,
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: actionWidgets,
                     ),
-                    icon: stock.isSyncing
-                        ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.sync, size: 16),
-                    label: const Text('Sincronizar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  titleSection,
+                  Row(
+                    children: [
+                      actionWidgets[0],
+                      const SizedBox(width: 10),
+                      actionWidgets[1],
+                      const SizedBox(width: 10),
+                      actionWidgets[2],
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
 
           const SizedBox(height: 16),
 
           // 2. FILTROS RÁPIDOS EM CHIPS (Todos, Disponíveis, Cautelados, Manutenção + Grupos)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  _buildPillChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, () => stock.clearFilters(), isDark),
-                  const SizedBox(width: 8),
-                  _buildPillChip('No Depósito', stock.selectedStatus == 'NO_DEPOSITO', () => stock.setStatus('NO_DEPOSITO'), isDark),
-                  const SizedBox(width: 8),
-                  _buildPillChip('Em Setores', stock.selectedStatus == 'NO_SETOR', () => stock.setStatus('NO_SETOR'), isDark),
-                  const SizedBox(width: 8),
-                  _buildPillChip('Cautelados', stock.selectedStatus == 'CAUTELADO', () => stock.setStatus('CAUTELADO'), isDark),
-                  const SizedBox(width: 8),
-                  _buildPillChip('Manutenção', stock.selectedStatus == 'EM_MANUTENCAO', () => stock.setStatus('EM_MANUTENCAO'), isDark),
-                  const SizedBox(width: 8),
-                  _buildPillChip('Baixo Estoque', stock.lowStockOnly, () => stock.toggleLowStockOnly(), isDark),
-                ],
-              ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 950;
+              final chips = SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildPillChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, () => stock.clearFilters(), isDark),
+                    const SizedBox(width: 8),
+                    _buildPillChip('No Depósito', stock.selectedStatus == 'NO_DEPOSITO', () => stock.setStatus('NO_DEPOSITO'), isDark),
+                    const SizedBox(width: 8),
+                    _buildPillChip('Em Setores', stock.selectedStatus == 'NO_SETOR', () => stock.setStatus('NO_SETOR'), isDark),
+                    const SizedBox(width: 8),
+                    _buildPillChip('Cautelados', stock.selectedStatus == 'CAUTELADO', () => stock.setStatus('CAUTELADO'), isDark),
+                    const SizedBox(width: 8),
+                    _buildPillChip('Manutenção', stock.selectedStatus == 'EM_MANUTENCAO', () => stock.setStatus('EM_MANUTENCAO'), isDark),
+                    const SizedBox(width: 8),
+                    _buildPillChip('Baixo Estoque', stock.lowStockOnly, () => stock.toggleLowStockOnly(), isDark),
+                  ],
+                ),
+              );
 
-              // Dropdowns de Grupo e Subgrupo
-              Row(
+              final dropdowns = Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // Dropdown Grupo
                   DropdownButtonHideUnderline(
@@ -209,14 +235,13 @@ class _StockViewState extends State<StockView> {
                         hint: const Text('Grupo: Todos', style: TextStyle(fontSize: 11)),
                         items: [
                           const DropdownMenuItem(value: null, child: Text('Grupo: Todos', style: TextStyle(fontSize: 11))),
-                          ...groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 11)))),
+                          ...stock.groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 11)))),
                         ],
                         onChanged: (v) => stock.setGroup(v),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-
                   // Dropdown Subgrupo
                   DropdownButtonHideUnderline(
                     child: Container(
@@ -239,15 +264,45 @@ class _StockViewState extends State<StockView> {
                     ),
                   ),
                 ],
-              ),
-            ],
+              );
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    chips,
+                    const SizedBox(height: 10),
+                    dropdowns,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: chips),
+                  const SizedBox(width: 12),
+                  dropdowns,
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: 14),
 
           // 3. TABELA DE ESTOQUE MODERNA (ESTILO LOGISTICS PRO)
           Expanded(
-            child: Container(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const minTableWidth = 880.0;
+                final tableWidth = math.max(minTableWidth, constraints.maxWidth);
+                return Scrollbar(
+                  thumbVisibility: constraints.maxWidth < minTableWidth,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: tableWidth,
+                      child: Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF151D2A) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -368,6 +423,11 @@ class _StockViewState extends State<StockView> {
                   ),
                 ],
               ),
+            ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],

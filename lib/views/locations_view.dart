@@ -247,10 +247,10 @@ class _LocationsViewState extends State<LocationsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header com Título, Estatísticas e Botão de Ação
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 900;
+              final titleSection = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -290,10 +290,9 @@ class _LocationsViewState extends State<LocationsView> {
                     ),
                   ),
                 ],
-              ),
-              Row(
-                children: [
-                  OutlinedButton.icon(
+              );
+              final actionButtons = [
+                OutlinedButton.icon(
                     onPressed: () => _expandAll(allLocations),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: isDark ? Colors.white70 : const Color(0xFF475569),
@@ -304,8 +303,7 @@ class _LocationsViewState extends State<LocationsView> {
                     icon: const Icon(Icons.unfold_more, size: 16),
                     label: const Text('Expandir Tudo', style: TextStyle(fontSize: 12)),
                   ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
+                OutlinedButton.icon(
                     onPressed: _collapseAll,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: isDark ? Colors.white70 : const Color(0xFF475569),
@@ -316,8 +314,7 @@ class _LocationsViewState extends State<LocationsView> {
                     icon: const Icon(Icons.unfold_less, size: 16),
                     label: const Text('Recolher Tudo', style: TextStyle(fontSize: 12)),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
+                ElevatedButton.icon(
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -333,9 +330,39 @@ class _LocationsViewState extends State<LocationsView> {
                     icon: const Icon(Icons.add_location_alt_outlined, size: 18),
                     label: const Text('Nova Área / Local Raiz', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
+              ];
+
+              if (isCompact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleSection,
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: actionButtons,
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  titleSection,
+                  Row(
+                    children: [
+                      actionButtons[0],
+                      const SizedBox(width: 8),
+                      actionButtons[1],
+                      const SizedBox(width: 12),
+                      actionButtons[2],
+                    ],
+                  ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
           const SizedBox(height: 18),
 
