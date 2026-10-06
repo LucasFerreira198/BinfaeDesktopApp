@@ -127,93 +127,6 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
-  void _showConnectionSettingsDialog() {
-    final apiService = Provider.of<ApiService>(context, listen: false);
-    final urlController = TextEditingController(text: apiService.baseUrl);
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.settings_ethernet_rounded, color: AppColors.primaryLight, size: 22),
-              ),
-              const SizedBox(width: 12),
-              const Text('Configurações de Conexão', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: SizedBox(
-            width: 440,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Endereço da API do Sistema (Servidor Backend)',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: urlController,
-                  decoration: InputDecoration(
-                    hintText: 'https://backend-info-binfae.vercel.app',
-                    prefixIcon: const Icon(Icons.link_rounded, size: 20),
-                    filled: true,
-                    fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Servidor Padrão no Brasil: Vercel SP (gru1) com latência de ~20-30ms e compatibilidade com proxy corporativo autenticado.',
-                  style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.black54),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                urlController.text = ApiService.defaultBaseUrl;
-              },
-              child: const Text('Restaurar Padrão'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final newUrl = urlController.text.trim();
-                if (newUrl.isNotEmpty) {
-                  await apiService.setBaseUrl(newUrl);
-                  Navigator.of(ctx).pop();
-                  await _checkServer(showFeedback: true);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: const Text('Salvar e Testar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -711,24 +624,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
-
-                    // Botão de Ajustes de Conexão / Proxy
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton.icon(
-                          onPressed: _showConnectionSettingsDialog,
-                          icon: const Icon(Icons.settings_ethernet_rounded, size: 15),
-                          label: const Text('Configurações do Servidor / Proxy', style: TextStyle(fontSize: 11.5)),
-                          style: TextButton.styleFrom(
-                            foregroundColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 14),
 
                     // Rodapé de Segurança e Versão
                     Text(
