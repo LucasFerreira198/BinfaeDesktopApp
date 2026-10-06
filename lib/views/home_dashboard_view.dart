@@ -220,7 +220,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
             // 2. LINHA DE 5 KPIS MODERNOS (Estilo LogiFlow / LoanHub)
             LayoutBuilder(
               builder: (context, constraints) {
-                final kpiCards = [
+                final List<Widget> kpiCards = <Widget>[
                   _ModernKpiCard(
                     title: 'Total Materiais',
                     value: '${metrics.total}',
@@ -304,7 +304,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                 return Wrap(
                   spacing: spacing,
                   runSpacing: spacing,
-                  children: kpiCards.map((card) => SizedBox(width: itemWidth, child: card)).toList(),
+                  children: kpiCards.map<Widget>((card) => SizedBox(width: itemWidth, child: card)).toList(),
                 );
               },
             ),
@@ -394,8 +394,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                         ),
                       ],
                     ),
-                  ),
-                );
+                  );
                 final missionsWidget = Container(
                     height: 280,
                     padding: const EdgeInsets.all(18),
@@ -552,8 +551,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                         ),
                       ],
                     ),
-                  ),
-                );
+                  );
 
                 if (isNarrow) {
                   return Column(
@@ -630,8 +628,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                         ),
                       ],
                     ),
-                  ),
-                );
+                  );
                 final recentWidget = Container(
                     height: 260,
                     padding: const EdgeInsets.all(18),
@@ -762,8 +759,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                         ),
                       ],
                     ),
-                  ),
-                );
+                  );
 
                 if (isNarrow) {
                   return Column(
