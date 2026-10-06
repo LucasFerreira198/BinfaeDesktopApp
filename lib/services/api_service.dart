@@ -1,9 +1,56 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item.dart';
 import '../models/user.dart';
 import '../models/cautela.dart';
+
+class AppHttpOverrides extends HttpOverrides {
+  final bool enabled;
+  final String host;
+  final int port;
+  final String? username;
+  final String? password;
+  final bool bypassSsl;
+
+  AppHttpOverrides({
+    required this.enabled,
+    required this.host,
+    required this.port,
+    this.username,
+    this.password,
+    this.bypassSsl = true,
+  });
+
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    final client = super.createHttpClient(context);
+    if (enabled && host.trim().isNotEmpty) {
+      final cleanHost = host.trim();
+      client.findProxy = (uri) {
+        return "PROXY $cleanHost:$port";
+      };
+      if (username != null && username!.trim().isNotEmpty) {
+        final cleanUser = username!.trim();
+        final cleanPass = password ?? '';
+        client.authenticateProxy = (String h, int p, String scheme, String? realm) {
+          client.addProxyCredentials(
+            h,
+            p,
+            realm ?? '',
+            HttpClientBasicCredentials(cleanUser, cleanPass),
+          );
+          return true;
+        };
+      }
+    }
+    if (bypassSsl) {
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    }
+    return client;
+  }
+}
 
 class ApiService {
   static const String defaultBaseUrl = 'https://backend-info-binfae.vercel.app';
@@ -14,11 +61,27 @@ class ApiService {
   static const String _keyRememberMe = 'binfae_desktop_remember_me';
   static const String _keySavedUsername = 'binfae_desktop_saved_username';
 
+  // Chaves de Configuração de Proxy Corporativo
+  static const String _keyProxyEnabled = 'binfae_desktop_proxy_enabled';
+  static const String _keyProxyHost = 'binfae_desktop_proxy_host';
+  static const String _keyProxyPort = 'binfae_desktop_proxy_port';
+  static const String _keyProxyUsername = 'binfae_desktop_proxy_username';
+  static const String _keyProxyPassword = 'binfae_desktop_proxy_password';
+  static const String _keyProxyBypassSsl = 'binfae_desktop_proxy_bypass_ssl';
+
   String _baseUrl = defaultBaseUrl;
   String? _token;
   String? _refreshToken;
   DateTime? _loginTimestamp;
   bool _rememberMe = true;
+
+  // Estado do Proxy
+  bool _proxyEnabled = false;
+  String _proxyHost = '';
+  int _proxyPort = 8080;
+  String _proxyUsername = '';
+  String _proxyPassword = '';
+  bool _proxyBypassSsl = true;
 
   Function()? onSessionExpired;
 
@@ -28,8 +91,25 @@ class ApiService {
   DateTime? get loginTimestamp => _loginTimestamp;
   bool get rememberMe => _rememberMe;
 
+  bool get proxyEnabled => _proxyEnabled;
+  String get proxyHost => _proxyHost;
+  int get proxyPort => _proxyPort;
+  String get proxyUsername => _proxyUsername;
+  String get proxyPassword => _proxyPassword;
+  bool get proxyBypassSsl => _proxyBypassSsl;
+
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Carrega e ativa configurações de Proxy Corporativo imediatamente
+    _proxyEnabled = prefs.getBool(_keyProxyEnabled) ?? false;
+    _proxyHost = prefs.getString(_keyProxyHost) ?? '';
+    _proxyPort = prefs.getInt(_keyProxyPort) ?? 8080;
+    _proxyUsername = prefs.getString(_keyProxyUsername) ?? '';
+    _proxyPassword = prefs.getString(_keyProxyPassword) ?? '';
+    _proxyBypassSsl = prefs.getBool(_keyProxyBypassSsl) ?? true;
+    applyProxyOverrides();
+
     final savedUrl = prefs.getString(_keyBaseUrl);
     if (savedUrl != null && savedUrl.trim().isNotEmpty && !savedUrl.contains('onrender.com')) {
       _baseUrl = savedUrl.trim().replaceAll(RegExp(r'/+$'), '');
@@ -64,6 +144,94 @@ class ApiService {
     } else {
       await clearAuthSession(preserveSavedUsername: true);
       return;
+    }
+  }
+
+  void applyProxyOverrides() {
+    if (_proxyEnabled && _proxyHost.trim().isNotEmpty) {
+      HttpOverrides.global = AppHttpOverrides(
+        enabled: true,
+        host: _proxyHost,
+        port: _proxyPort,
+        username: _proxyUsername,
+        password: _proxyPassword,
+        bypassSsl: _proxyBypassSsl,
+      );
+    } else {
+      if (_proxyBypassSsl) {
+        HttpOverrides.global = AppHttpOverrides(
+          enabled: false,
+          host: '',
+          port: 8080,
+          bypassSsl: true,
+        );
+      } else {
+        HttpOverrides.global = null;
+      }
+    }
+  }
+
+  Future<void> saveProxySettings({
+    required bool enabled,
+    required String host,
+    required int port,
+    required String username,
+    required String password,
+    bool bypassSsl = true,
+  }) async {
+    _proxyEnabled = enabled;
+    _proxyHost = host.trim();
+    _proxyPort = port;
+    _proxyUsername = username.trim();
+    _proxyPassword = password;
+    _proxyBypassSsl = bypassSsl;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyProxyEnabled, _proxyEnabled);
+    await prefs.setString(_keyProxyHost, _proxyHost);
+    await prefs.setInt(_keyProxyPort, _proxyPort);
+    await prefs.setString(_keyProxyUsername, _proxyUsername);
+    await prefs.setString(_keyProxyPassword, _proxyPassword);
+    await prefs.setBool(_keyProxyBypassSsl, _proxyBypassSsl);
+
+    applyProxyOverrides();
+  }
+
+  Future<bool> testProxy({
+    required bool enabled,
+    required String host,
+    required int port,
+    String? username,
+    String? password,
+    bool bypassSsl = true,
+  }) async {
+    final client = HttpClient();
+    client.connectionTimeout = const Duration(seconds: 8);
+    if (enabled && host.trim().isNotEmpty) {
+      client.findProxy = (uri) => "PROXY ${host.trim()}:$port";
+      if (username != null && username.trim().isNotEmpty) {
+        client.authenticateProxy = (h, p, scheme, realm) {
+          client.addProxyCredentials(
+            h,
+            p,
+            realm ?? '',
+            HttpClientBasicCredentials(username.trim(), password ?? ''),
+          );
+          return true;
+        };
+      }
+    }
+    if (bypassSsl) {
+      client.badCertificateCallback = (cert, host, port) => true;
+    }
+    try {
+      final request = await client.getUrl(Uri.parse('$_baseUrl/'));
+      final response = await request.close().timeout(const Duration(seconds: 10));
+      client.close();
+      return response.statusCode < 500;
+    } catch (e) {
+      client.close();
+      rethrow;
     }
   }
 

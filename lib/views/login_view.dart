@@ -127,11 +127,427 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
+  void _showProxyConfigDialog() {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+
+    bool enabled = apiService.proxyEnabled;
+    final hostController = TextEditingController(text: apiService.proxyHost);
+    final portController = TextEditingController(
+      text: apiService.proxyPort > 0 ? apiService.proxyPort.toString() : '8080',
+    );
+    final userController = TextEditingController(text: apiService.proxyUsername);
+    final passController = TextEditingController(text: apiService.proxyPassword);
+    bool bypassSsl = apiService.proxyBypassSsl;
+    bool obscurePassword = true;
+
+    bool isTesting = false;
+    String? testResult;
+    bool? testSuccess;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return StatefulBuilder(
+          builder: (dialogCtx, setModalState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.settings_ethernet_rounded, color: AppColors.primaryLight, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Configurações de Proxy', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text('Rede Corporativa / Militar Autenticada', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 460,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Switch para Usar ou Não o Proxy
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: enabled
+                              ? AppColors.primary.withOpacity(0.12)
+                              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: enabled
+                                ? AppColors.primary
+                                : (isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0)),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  enabled ? Icons.vpn_lock_rounded : Icons.public_off_rounded,
+                                  color: enabled ? AppColors.primaryLight : Colors.grey,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Usar Servidor Proxy', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      enabled ? 'O tráfego passará pelo proxy corporativo' : 'Conexão direta sem proxy',
+                                      style: TextStyle(fontSize: 10.5, color: isDark ? Colors.white60 : Colors.black54),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: enabled,
+                              activeColor: AppColors.primary,
+                              onChanged: (val) {
+                                setModalState(() {
+                                  enabled = val;
+                                  testResult = null;
+                                  testSuccess = null;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Campos de Configuração do Proxy
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: enabled ? 1.0 : 0.45,
+                        child: AbsorbPointer(
+                          absorbing: !enabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Servidor Proxy (Host / IP)
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Servidor / IP do Proxy', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                        const SizedBox(height: 6),
+                                        TextField(
+                                          controller: hostController,
+                                          style: const TextStyle(fontSize: 12.5),
+                                          decoration: InputDecoration(
+                                            hintText: 'proxy.galeao.intraer',
+                                            prefixIcon: const Icon(Icons.dns_rounded, size: 18),
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                            filled: true,
+                                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  // Porta
+                                  Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Porta', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                        const SizedBox(height: 6),
+                                        TextField(
+                                          controller: portController,
+                                          keyboardType: TextInputType.number,
+                                          style: const TextStyle(fontSize: 12.5),
+                                          decoration: InputDecoration(
+                                            hintText: '8080',
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                            filled: true,
+                                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+
+                              // Usuário do Proxy
+                              Text('Usuário da Rede / SARAM (se autenticado)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: userController,
+                                style: const TextStyle(fontSize: 12.5),
+                                decoration: InputDecoration(
+                                  hintText: 'Ex: usuario ou dominio\\usuario',
+                                  prefixIcon: const Icon(Icons.person_outline_rounded, size: 18),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                  filled: true,
+                                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+
+                              // Senha do Proxy
+                              Text('Senha de Acesso ao Proxy', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: passController,
+                                obscureText: obscurePassword,
+                                style: const TextStyle(fontSize: 12.5),
+                                decoration: InputDecoration(
+                                  hintText: 'Senha da rede corporativa',
+                                  prefixIcon: const Icon(Icons.lock_outline_rounded, size: 18),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                      size: 18,
+                                    ),
+                                    onPressed: () => setModalState(() => obscurePassword = !obscurePassword),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                  filled: true,
+                                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+
+                              // Opção de Bypass SSL (Inspeção HTTPS de Proxy)
+                              InkWell(
+                                onTap: () => setModalState(() => bypassSsl = !bypassSsl),
+                                borderRadius: BorderRadius.circular(8),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: Checkbox(
+                                          value: bypassSsl,
+                                          activeColor: AppColors.primary,
+                                          onChanged: (v) => setModalState(() => bypassSsl = v ?? true),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          'Permitir inspeção SSL de Proxy (Ignora erros de certificados intermediários)',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: isDark ? Colors.white70 : Colors.black87,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Feedback do Teste
+                      if (testResult != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: testSuccess == true
+                                ? AppColors.success.withOpacity(0.12)
+                                : AppColors.danger.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: testSuccess == true
+                                  ? AppColors.success.withOpacity(0.4)
+                                  : AppColors.danger.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                testSuccess == true ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                                size: 18,
+                                color: testSuccess == true ? AppColors.success : AppColors.danger,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  testResult!,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: testSuccess == true
+                                        ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF065F46))
+                                        : (isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // Botão de Testar Conexão
+                      if (enabled)
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: isTesting
+                                ? null
+                                : () async {
+                                    setModalState(() {
+                                      isTesting = true;
+                                      testResult = null;
+                                      testSuccess = null;
+                                    });
+                                    final host = hostController.text.trim();
+                                    final port = int.tryParse(portController.text.trim()) ?? 8080;
+                                    final user = userController.text.trim();
+                                    final pass = passController.text;
+
+                                    if (host.isEmpty) {
+                                      setModalState(() {
+                                        isTesting = false;
+                                        testResult = 'Informe o host/IP do servidor proxy.';
+                                        testSuccess = false;
+                                      });
+                                      return;
+                                    }
+
+                                    try {
+                                      final sw = Stopwatch()..start();
+                                      final ok = await apiService.testProxy(
+                                        enabled: true,
+                                        host: host,
+                                        port: port,
+                                        username: user,
+                                        password: pass,
+                                        bypassSsl: bypassSsl,
+                                      );
+                                      sw.stop();
+                                      setModalState(() {
+                                        isTesting = false;
+                                        if (ok) {
+                                          testSuccess = true;
+                                          testResult = 'Conexão via proxy bem-sucedida! (${sw.elapsedMilliseconds} ms)';
+                                        } else {
+                                          testSuccess = false;
+                                          testResult = 'Proxy respondeu, mas a API retornou código de erro.';
+                                        }
+                                      });
+                                    } catch (e) {
+                                      setModalState(() {
+                                        isTesting = false;
+                                        testSuccess = false;
+                                        testResult = 'Erro no proxy: $e';
+                                      });
+                                    }
+                                  },
+                            icon: isTesting
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                                : const Icon(Icons.network_check_rounded, size: 16),
+                            label: Text(isTesting ? 'Testando Conexão...' : 'Testar Conexão com o Proxy'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    final host = hostController.text.trim();
+                    final port = int.tryParse(portController.text.trim()) ?? 8080;
+                    final user = userController.text.trim();
+                    final pass = passController.text;
+
+                    await apiService.saveProxySettings(
+                      enabled: enabled,
+                      host: host,
+                      port: port,
+                      username: user,
+                      password: pass,
+                      bypassSsl: bypassSsl,
+                    );
+
+                    Navigator.of(ctx).pop();
+                    await _checkServer(showFeedback: true);
+
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: AppColors.success,
+                          content: Text(
+                            enabled
+                                ? 'Configurações de proxy salvas e ativadas com sucesso!'
+                                : 'Proxy desativado. Conexão direta restaurada.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Salvar Configurações'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final auth = Provider.of<AuthProvider>(context);
+    final apiService = Provider.of<ApiService>(context);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF080C14) : const Color(0xFFF1F5F9),
@@ -173,6 +589,73 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
 
+          // Botão de Engrenagem no canto superior direito da janela
+          Positioned(
+            top: 24,
+            right: 24,
+            child: Material(
+              color: Colors.transparent,
+              child: Tooltip(
+                message: apiService.proxyEnabled
+                    ? 'Proxy Ativo (${apiService.proxyHost}:${apiService.proxyPort}) - Clique para ajustar'
+                    : 'Configurações de Proxy Corporativo',
+                child: InkWell(
+                  onTap: _showProxyConfigDialog,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF131D31) : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: apiService.proxyEnabled
+                            ? AppColors.primary
+                            : (isDark ? const Color(0xFF1E293B) : const Color(0xFFCBD5E1)),
+                        width: apiService.proxyEnabled ? 1.5 : 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(
+                          Icons.settings_outlined,
+                          size: 22,
+                          color: apiService.proxyEnabled
+                              ? AppColors.primaryLight
+                              : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                        ),
+                        if (apiService.proxyEnabled)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xFF10B981),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF131D31) : Colors.white,
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // Centro com o Cartão de Login Modernizado
           Center(
             child: SingleChildScrollView(
@@ -195,9 +678,45 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
+                    // Botão discreto de engrenagem no canto superior direito do cartão
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Tooltip(
+                        message: 'Configurações de Proxy de Rede',
+                        child: InkWell(
+                          onTap: _showProxyConfigDialog,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(
+                              color: apiService.proxyEnabled
+                                  ? AppColors.primary.withOpacity(0.12)
+                                  : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: apiService.proxyEnabled
+                                    ? AppColors.primary
+                                    : (isDark ? const Color(0xFF2E3D5B) : const Color(0xFFCBD5E1)),
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.settings_outlined,
+                              size: 18,
+                              color: apiService.proxyEnabled
+                                  ? AppColors.primaryLight
+                                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                     // Emblema Institucional Militar FAB / BINFAE
                     Container(
                       width: 76,
@@ -349,6 +868,34 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ),
+                    if (apiService.proxyEnabled) ...[
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _showProxyConfigDialog,
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.vpn_lock_rounded, size: 12, color: AppColors.primaryLight),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Proxy: ${apiService.proxyHost}:${apiService.proxyPort}',
+                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.edit_outlined, size: 11, color: isDark ? Colors.white54 : Colors.black45),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 22),
 
                     // Banner de Erro Inline (se houver)
@@ -635,6 +1182,8 @@ class _LoginViewState extends State<LoginView> {
                         color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8),
                       ),
                     ),
+                  ],
+                ),
                   ],
                 ),
               ),
