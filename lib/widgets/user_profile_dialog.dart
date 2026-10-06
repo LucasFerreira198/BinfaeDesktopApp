@@ -119,7 +119,8 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
       if (mounted) setState(() => _isLoadingImage = false);
     }
 
-    if (bytes != null && mounted) {
+    final validBytes = bytes;
+    if (validBytes != null && mounted) {
       final auth = Provider.of<AuthProvider>(context, listen: false);
       final user = auth.user;
       final militar = user?.militar;
@@ -128,7 +129,7 @@ class _UserProfileDialogState extends State<UserProfileDialog> {
         context: context,
         barrierDismissible: false,
         builder: (_) => AvatarEditorDialog(
-          imageBytes: bytes,
+          imageBytes: validBytes,
           userName: user?.displayName,
           postoGraduacao: militar?.postoGraduacao,
         ),
