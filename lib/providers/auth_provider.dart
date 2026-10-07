@@ -20,6 +20,7 @@ class AuthProvider extends ChangeNotifier {
 
   UserModel? get user => _user;
   bool get isAuthenticated => _user != null && _apiService.token != null;
+  bool get isAdmin => _user?.admin ?? false;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 

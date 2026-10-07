@@ -79,7 +79,7 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
         builder: (context, setDialogState) => AlertDialog(
           title: const Row(
             children: [
-              Icon(Icons.add_task_rounded, color: AppColors.primaryBlue),
+              Icon(Icons.add_task_rounded, color: AppColors.primary),
               SizedBox(width: 10),
               Text('Nova Pendência ou Meta'),
             ],
@@ -143,7 +143,7 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                   const SizedBox(height: 14),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.calendar_today_rounded, color: AppColors.primaryBlue),
+                    leading: const Icon(Icons.calendar_today_rounded, color: AppColors.primary),
                     title: Text(prazo == null
                         ? 'Sem prazo definido'
                         : 'Prazo: ${DateFormat('dd/MM/yyyy').format(prazo!)}'),
@@ -435,12 +435,12 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: p.isManutencao ? Colors.amber.withOpacity(0.15) : AppColors.primaryBlue.withOpacity(0.15),
+                    color: p.isManutencao ? Colors.amber.withOpacity(0.15) : AppColors.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     p.isManutencao ? Icons.handyman_rounded : Icons.task_alt_rounded,
-                    color: p.isManutencao ? Colors.amber[800] : AppColors.primaryBlue,
+                    color: p.isManutencao ? Colors.amber[800] : AppColors.primary,
                     size: 20,
                   ),
                 ),
