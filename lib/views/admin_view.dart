@@ -504,6 +504,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             if (mounted) {
                               Navigator.pop(ctx);
                               _loadUsers();
+                              _loadMilitaries();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(backgroundColor: AppColors.success, content: Text('Usuário criado com sucesso!')),
                               );
@@ -658,6 +659,13 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                     if (mounted) {
                                       Navigator.pop(ctx);
                                       _loadUsers();
+                                      _loadMilitaries();
+                                      try {
+                                        final auth = Provider.of<AuthProvider>(context, listen: false);
+                                        if (auth.user?.id == user.id) {
+                                          auth.refreshUser();
+                                        }
+                                      } catch (_) {}
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(backgroundColor: AppColors.success, content: Text('Usuário atualizado com sucesso!')),
                                       );
@@ -980,6 +988,13 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             if (mounted) {
                               Navigator.pop(ctx);
                               _loadMilitaries();
+                              _loadUsers();
+                              try {
+                                final auth = Provider.of<AuthProvider>(context, listen: false);
+                                if (auth.user?.militarId == military?.id || auth.user?.militar?.saram == military?.saram) {
+                                  auth.refreshUser();
+                                }
+                              } catch (_) {}
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   backgroundColor: AppColors.success,
