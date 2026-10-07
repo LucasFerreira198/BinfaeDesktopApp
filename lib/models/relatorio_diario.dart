@@ -38,6 +38,15 @@ class RelatorioDiarioModel {
   List<dynamic> get itensManutencao =>
       dadosAutomaticos['itens_manutencao'] as List<dynamic>? ?? [];
 
+  List<dynamic> get itensConsertados =>
+      dadosAutomaticos['itens_consertados'] as List<dynamic>? ?? [];
+
+  List<dynamic> get itensBaixados =>
+      dadosAutomaticos['itens_baixados'] as List<dynamic>? ?? [];
+
+  List<dynamic> get missoesCautelas =>
+      dadosAutomaticos['missoes_cautelas'] as List<dynamic>? ?? [];
+
   List<dynamic> get cautelasPeriodo =>
       dadosAutomaticos['cautelas_periodo'] as List<dynamic>? ?? [];
 

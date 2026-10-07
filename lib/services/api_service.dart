@@ -62,6 +62,7 @@ class ApiService {
   ApiService._internal();
 
   static const String defaultBaseUrl = 'https://backend-info-binfae.vercel.app';
+  static const Duration requestTimeout = Duration(seconds: 30);
   static const String _keyBaseUrl = 'binfae_desktop_api_url';
   static const String _keyToken = 'binfae_desktop_token';
   static const String _keyRefreshToken = 'binfae_desktop_refresh_token';
@@ -214,7 +215,7 @@ class ApiService {
     bool bypassSsl = true,
   }) async {
     final client = HttpClient();
-    client.connectionTimeout = const Duration(seconds: 8);
+    client.connectionTimeout = requestTimeout;
     if (enabled && host.trim().isNotEmpty) {
       client.findProxy = (uri) => "PROXY ${host.trim()}:$port";
       if (username != null && username.trim().isNotEmpty) {
@@ -234,7 +235,7 @@ class ApiService {
     }
     try {
       final request = await client.getUrl(Uri.parse('$_baseUrl/'));
-      final response = await request.close().timeout(const Duration(seconds: 10));
+      final response = await request.close().timeout(requestTimeout);
       client.close();
       return response.statusCode < 500;
     } catch (e) {
@@ -324,7 +325,7 @@ class ApiService {
           'Accept': 'application/json',
         },
         body: jsonEncode({'refresh_token': _refreshToken}),
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(requestTimeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
@@ -388,7 +389,7 @@ class ApiService {
     try {
       final response = await http
           .get(Uri.parse('$_baseUrl/'))
-          .timeout(const Duration(seconds: 12));
+          .timeout(requestTimeout);
       return response.statusCode < 500;
     } catch (_) {
       return false;
@@ -407,7 +408,7 @@ class ApiService {
         'username': username.trim(),
         'password': password,
       },
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
 
     if (response.statusCode != 200) {
       String msg = 'Credenciais incorretas';
@@ -447,7 +448,7 @@ class ApiService {
 
   Future<UserModel> getMe() async {
     final uri = Uri.parse('$_baseUrl/auth/me');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception('Sessão expirada. Faça login novamente.');
     }
@@ -475,7 +476,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(body),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar dados de perfil (${response.statusCode})'));
     }
@@ -485,7 +486,7 @@ class ApiService {
   Future<Map<String, dynamic>?> getSyncStatus() async {
     try {
       final uri = Uri.parse('$_baseUrl/system/sync-status');
-      final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 4));
+      final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
       }
@@ -495,7 +496,7 @@ class ApiService {
 
   Future<List<ItemModel>> fetchItems() async {
     final uri = Uri.parse('$_baseUrl/stock/items');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 20));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception('Falha ao obter lista de materiais (${response.statusCode})');
     }
@@ -519,7 +520,7 @@ class ApiService {
 
   Future<List<GroupModel>> fetchGroups() async {
     final uri = Uri.parse('$_baseUrl/stock/groups');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => GroupModel.fromJson(json)).toList();
@@ -527,7 +528,7 @@ class ApiService {
 
   Future<List<SubgroupModel>> fetchSubgroups() async {
     final uri = Uri.parse('$_baseUrl/stock/subgroups');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => SubgroupModel.fromJson(json)).toList();
@@ -539,7 +540,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao criar grupo (${response.statusCode})'));
     }
@@ -552,7 +553,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar grupo (${response.statusCode})'));
     }
@@ -561,7 +562,7 @@ class ApiService {
 
   Future<void> deleteGroup(int id) async {
     final uri = Uri.parse('$_baseUrl/stock/groups/$id');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir grupo (${response.statusCode})'));
     }
@@ -573,7 +574,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao criar subgrupo (${response.statusCode})'));
     }
@@ -586,7 +587,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar subgrupo (${response.statusCode})'));
     }
@@ -595,7 +596,7 @@ class ApiService {
 
   Future<void> deleteSubgroup(int id) async {
     final uri = Uri.parse('$_baseUrl/stock/subgroups/$id');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir subgrupo (${response.statusCode})'));
     }
@@ -603,7 +604,7 @@ class ApiService {
 
   Future<List<LocationModel>> fetchLocations() async {
     final uri = Uri.parse('$_baseUrl/stock/locations');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => LocationModel.fromJson(json)).toList();
@@ -615,7 +616,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao criar local (${response.statusCode})'));
     }
@@ -628,7 +629,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar local (${response.statusCode})'));
     }
@@ -637,7 +638,7 @@ class ApiService {
 
   Future<void> deleteLocation(int id) async {
     final uri = Uri.parse('$_baseUrl/stock/locations/$id');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir local (${response.statusCode})'));
     }
@@ -649,7 +650,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 20));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao cadastrar material (${response.statusCode})'));
     }
@@ -662,7 +663,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 20));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar material (${response.statusCode})'));
     }
@@ -671,7 +672,7 @@ class ApiService {
 
   Future<void> deleteItem(int id) async {
     final uri = Uri.parse('$_baseUrl/stock/items/$id');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir material (${response.statusCode})'));
     }
@@ -694,7 +695,7 @@ class ApiService {
         'destino_local_id': destinoLocalId,
         'motivo': motivo,
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
 
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Erro ao registrar movimentação'));
@@ -706,7 +707,7 @@ class ApiService {
   Future<List<ItemMovementModel>> fetchMovements({int? itemId}) async {
     final query = itemId != null ? '?item_id=$itemId' : '';
     final uri = Uri.parse('$_baseUrl/stock/movements$query');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 20));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => ItemMovementModel.fromJson(json)).toList();
@@ -716,7 +717,7 @@ class ApiService {
   Future<List<UserModel>> listUsers() async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/users/listUsers');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao listar usuários'));
     }
@@ -746,7 +747,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(body),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao criar usuário (${response.statusCode})'));
     }
@@ -773,7 +774,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(body),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar usuário (${response.statusCode})'));
     }
@@ -782,7 +783,7 @@ class ApiService {
 
   Future<void> deleteUser(dynamic identifier) async {
     final uri = Uri.parse('$_baseUrl/users/delete/$identifier');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir usuário (${response.statusCode})'));
     }
@@ -792,7 +793,7 @@ class ApiService {
   Future<List<MilitaryModel>> listMilitaries() async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/list');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao listar efetivo militar'));
     }
@@ -807,7 +808,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao cadastrar militar (${response.statusCode})'));
     }
@@ -821,7 +822,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao atualizar militar (${response.statusCode})'));
     }
@@ -831,7 +832,7 @@ class ApiService {
   Future<void> deleteMilitary(int saram) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/delete/$saram');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir militar (${response.statusCode})'));
     }
@@ -863,7 +864,7 @@ class ApiService {
     if (search != null && search.isNotEmpty) queryParams['search'] = search;
 
     final uri = Uri.parse('$_baseUrl/cautelas').replace(queryParameters: queryParams.isNotEmpty ? queryParams : null);
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode == 401) {
       final refreshed = await refreshToken();
       if (refreshed) {
@@ -880,7 +881,7 @@ class ApiService {
 
   Future<CautelaModel> getCautela(int id) async {
     final uri = Uri.parse('$_baseUrl/cautelas/$id');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode == 401) {
       final refreshed = await refreshToken();
       if (refreshed) return getCautela(id);
@@ -902,7 +903,7 @@ class ApiService {
         'tipo': tipo,
         if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode == 401) {
       final refreshed = await refreshToken();
       if (refreshed) return createCautela(nome, tipo: tipo, observacoes: observacoes);
@@ -935,7 +936,7 @@ class ApiService {
         'condicao_saida': condicaoSaida ?? 'BOM',
         if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode == 401) {
       final refreshed = await refreshToken();
       if (refreshed) {
@@ -978,7 +979,7 @@ class ApiService {
         'condicao_saida': condicaoSaida ?? 'BOM',
         if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao adicionar materiais em lote'));
     }
@@ -1000,7 +1001,7 @@ class ApiService {
         if (condicaoRetorno != null && condicaoRetorno.isNotEmpty) 'condicao_retorno': condicaoRetorno.trim(),
         if (observacoes != null && observacoes.isNotEmpty) 'observacoes': observacoes.trim(),
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao devolver material'));
     }
@@ -1010,7 +1011,7 @@ class ApiService {
   Future<CautelaItemModel> scanDevolverItem(String code) async {
     final cleanCode = Uri.encodeComponent(code.trim());
     final uri = Uri.parse('$_baseUrl/cautelas/devolver/scan/$cleanCode');
-    final response = await http.post(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.post(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao descautelar material via leitor'));
     }
@@ -1020,7 +1021,7 @@ class ApiService {
   Future<Map<String, dynamic>> checkItemCautelaStatus(String code) async {
     final cleanCode = Uri.encodeComponent(code.trim());
     final uri = Uri.parse('$_baseUrl/cautelas/item/$cleanCode/status');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 10));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao checar status do item'));
     }
@@ -1035,7 +1036,7 @@ class ApiService {
     if (prioridade != null && prioridade.isNotEmpty) params['prioridade'] = prioridade;
 
     final uri = Uri.parse('$_baseUrl/pendencias').replace(queryParameters: params.isNotEmpty ? params : null);
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => PendenciaModel.fromJson(json as Map<String, dynamic>)).toList();
@@ -1044,7 +1045,7 @@ class ApiService {
   Future<List<PendenciaModel>> listPendenciasConcluidas({int limit = 100}) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/concluidas?limit=$limit');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => PendenciaModel.fromJson(json as Map<String, dynamic>)).toList();
@@ -1057,7 +1058,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception(_extractError(response, 'Falha ao criar pendência'));
     }
@@ -1082,7 +1083,7 @@ class ApiService {
         'retornar_estoque': retornarEstoque,
         if (destinoLocalId != null) 'destino_local_id': destinoLocalId,
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao concluir pendência'));
     }
@@ -1103,7 +1104,7 @@ class ApiService {
         'justificativa_baixa': justificativaBaixa.trim(),
         if (resolucao != null && resolucao.isNotEmpty) 'resolucao': resolucao.trim(),
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao dar baixa no item'));
     }
@@ -1113,7 +1114,7 @@ class ApiService {
   Future<void> deletePendencia(int pendenciaId) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId');
-    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.delete(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir pendência'));
     }
@@ -1123,7 +1124,7 @@ class ApiService {
   Future<List<Map<String, dynamic>>> listMilitaresInformatica() async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/escalas/militares');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.cast<Map<String, dynamic>>();
@@ -1132,7 +1133,7 @@ class ApiService {
   Future<EscalaMensalModel> getEscalaMensal(int ano, int mes) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao carregar escala do mês'));
     }
@@ -1146,7 +1147,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao salvar escala'));
     }
@@ -1157,7 +1158,7 @@ class ApiService {
   Future<RelatorioDiarioModel> getRelatorioHoje() async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/hoje');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao carregar relatório de hoje'));
     }
@@ -1167,7 +1168,7 @@ class ApiService {
   Future<RelatorioDiarioModel> getRelatorioPorData(String dataStr) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/por-data/$dataStr');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao buscar relatório por data'));
     }
@@ -1177,7 +1178,7 @@ class ApiService {
   Future<List<RelatorioDiarioModel>> listHistoricoRelatorios({int limit = 30}) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/historico?limit=$limit');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) return [];
     final List list = jsonDecode(utf8.decode(response.bodyBytes));
     return list.map((json) => RelatorioDiarioModel.fromJson(json as Map<String, dynamic>)).toList();
@@ -1197,7 +1198,7 @@ class ApiService {
         if (ocorrencias != null) 'ocorrencias_militar': ocorrencias,
         if (militarServicoId != null) 'militar_servico_id': militarServicoId,
       }),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao salvar rascunho'));
     }
@@ -1222,7 +1223,7 @@ class ApiService {
         'enviar_email': enviarEmail,
         'enviar_whatsapp': enviarWhatsapp,
       }),
-    ).timeout(const Duration(seconds: 20));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao lançar relatório'));
     }
@@ -1233,7 +1234,7 @@ class ApiService {
   Future<InformaticaConfigModel> getConfigTI() async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti');
-    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    final response = await http.get(uri, headers: _headers()).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao carregar configurações da TI'));
     }
@@ -1247,7 +1248,7 @@ class ApiService {
       uri,
       headers: _headers(),
       body: jsonEncode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao salvar configurações da TI'));
     }
@@ -1264,7 +1265,7 @@ class ApiService {
       body: jsonEncode({
         if (destinatario != null && destinatario.trim().isNotEmpty) 'destinatario': destinatario.trim(),
       }),
-    ).timeout(const Duration(seconds: 25));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao testar envio de e-mail'));
     }
@@ -1290,7 +1291,7 @@ class ApiService {
         if (militarIds != null && militarIds.isNotEmpty) 'militar_ids': militarIds,
         if (emailsAdicionais != null && emailsAdicionais.isNotEmpty) 'emails_adicionais': emailsAdicionais,
       }),
-    ).timeout(const Duration(seconds: 30));
+    ).timeout(requestTimeout);
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao enviar e-mail para os usuários'));
     }

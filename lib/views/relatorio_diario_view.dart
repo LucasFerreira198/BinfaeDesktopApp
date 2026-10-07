@@ -294,6 +294,8 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                                   children: [
                                     _buildCardInfoGeral(isDark),
                                     const SizedBox(height: 12),
+                                    _buildCardItensConsertados(isDark),
+                                    const SizedBox(height: 12),
                                     _buildCardManutencao(isDark),
                                     const SizedBox(height: 12),
                                     _buildCardCautelas(isDark),
@@ -384,29 +386,147 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                 const Text('Militar de Serviço: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 Expanded(
                   child: isLancado
-                      ? Text(r.militarServicoNome ?? 'Não informado', style: const TextStyle(fontSize: 13))
-                      : DropdownButtonHideUnderline(
-                          child: DropdownButton<int?>(
-                            value: r.militarServicoId,
-                            hint: const Text('Selecionar militar...', style: TextStyle(fontSize: 12)),
-                            items: _militaresTI.map((m) {
-                              return DropdownMenuItem<int?>(
-                                value: m['id'] as int,
-                                child: Text(m['label'] as String, style: const TextStyle(fontSize: 12)),
-                              );
-                            }).toList(),
-                            onChanged: (id) {
-                              setState(() {
-                                r.militarServicoId = id;
-                                final m = _militaresTI.firstWhere((x) => x['id'] == id, orElse: () => {});
-                                r.militarServicoNome = m['label'];
-                              });
-                            },
-                          ),
+                      ? Text(r.militarServicoNome ?? 'Não informado', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold))
+                      : Row(
+                          children: [
+                            if (r.militarServicoId != null) ...[
+                              Text(
+                                r.militarServicoNome ?? 'Militar escalado',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'Definido pela Escala',
+                                  style: TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            // Seletor ativo se não houver militar ou se desejar alterar
+                            Expanded(
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int?>(
+                                  value: r.militarServicoId,
+                                  isExpanded: true,
+                                  hint: const Text('⚠️ Nenhum na escala. Selecione...', style: TextStyle(fontSize: 12, color: Colors.orange)),
+                                  items: _militaresTI.map((m) {
+                                    return DropdownMenuItem<int?>(
+                                      value: m['id'] as int,
+                                      child: Text(m['label'] as String, style: const TextStyle(fontSize: 12)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (id) {
+                                    setState(() {
+                                      r.militarServicoId = id;
+                                      final m = _militaresTI.firstWhere((x) => x['id'] == id, orElse: () => {});
+                                      r.militarServicoNome = m['label'];
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardItensConsertados(bool isDark) {
+    final consertados = _relatorio!.itensConsertados;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDark ? const Color(0xFF161E2E) : Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Colors.tealAccent, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Computadores Consertados / Saídos da Manutenção (${consertados.length})',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            consertados.isEmpty
+                ? const Text(
+                    'Nenhum computador ou material finalizou manutenção no período.',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  )
+                : Column(
+                    children: consertados.map((it) {
+                      final serial = it['numero_serie'] != null && it['numero_serie'].toString().isNotEmpty
+                          ? ' | Série: ${it['numero_serie']}'
+                          : '';
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.teal.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.computer_rounded, size: 16, color: Colors.tealAccent),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    '${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'}$serial)',
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.teal.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'CONSERTADO',
+                                    style: TextStyle(fontSize: 10, color: Colors.tealAccent, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '✔ Resolução/Laudo: ${it['resolucao'] ?? 'Reparo concluído com êxito'}',
+                              style: TextStyle(fontSize: 12, color: isDark ? Colors.tealAccent.shade100 : Colors.teal.shade800),
+                            ),
+                            if (it['defeito'] != null && it['defeito'].toString().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  'Defeito original: ${it['defeito']}',
+                                  style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
           ],
         ),
       ),
@@ -429,12 +549,12 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               children: [
                 const Icon(Icons.handyman_rounded, color: Colors.amber, size: 18),
                 const SizedBox(width: 8),
-                Text('Itens em Manutenção (${itens.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('Itens em Manutenção Atualmente (${itens.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
             itens.isEmpty
-                ? const Text('Nenhum item deu entrada em manutenção nas 24h.', style: TextStyle(fontSize: 12, color: Colors.grey))
+                ? const Text('Nenhum item aguardando manutenção.', style: TextStyle(fontSize: 12, color: Colors.grey))
                 : Column(
                     children: itens.map((it) {
                       return ListTile(
@@ -453,6 +573,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   }
 
   Widget _buildCardCautelas(bool isDark) {
+    final missoes = _relatorio!.missoesCautelas;
     final cautelas = _relatorio!.cautelasPeriodo;
     final devs = _relatorio!.devolucoesPeriodo;
 
@@ -469,12 +590,100 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               children: [
                 const Icon(Icons.inventory_2_rounded, color: Colors.blue, size: 18),
                 const SizedBox(width: 8),
-                Text('Cautelas e Devoluções (24h)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  'Missões e Cautelas de Materiais (${missoes.length} Missões / ${cautelas.length} Itens)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text('• ${cautelas.length} saídas de material / missões ativas', style: const TextStyle(fontSize: 12.5)),
-            Text('• ${devs.length} devoluções de material registradas', style: const TextStyle(fontSize: 12.5)),
+            const SizedBox(height: 10),
+            if (missoes.isEmpty)
+              const Text('Nenhuma nova cautela ou missão nas últimas 24h.', style: TextStyle(fontSize: 12, color: Colors.grey))
+            else
+              Column(
+                children: missoes.map((m) {
+                  final isMissao = m['tipo'] == 'Missão';
+                  final materiais = (m['materiais'] as List?) ?? [];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: isMissao ? Colors.blue.withOpacity(0.4) : Colors.purple.withOpacity(0.4)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                m['missao_nome'] ?? 'Cautela',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isMissao ? Colors.blue.withOpacity(0.2) : Colors.purple.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                m['tipo'] ?? 'Missão',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isMissao ? Colors.lightBlueAccent : Colors.purpleAccent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Responsável: ${m['militar_responsavel'] ?? 'Não informado'} | Total: ${m['total_materiais'] ?? materiais.length} material(is)',
+                          style: TextStyle(fontSize: 11.5, color: Colors.grey[400]),
+                        ),
+                        const SizedBox(height: 6),
+                        ...materiais.map((mat) => Padding(
+                          padding: const EdgeInsets.only(left: 6, bottom: 2),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.arrow_right_rounded, size: 16, color: Colors.grey),
+                              Expanded(
+                                child: Text(
+                                  '${mat['nome']} (BMP: ${mat['bmp'] ?? 'S/N'}${mat['numero_serie'] != null ? ' | Série: ${mat['numero_serie']}' : ''})',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+
+            if (devs.isNotEmpty) ...[
+              const Divider(height: 20),
+              Row(
+                children: [
+                  const Icon(Icons.assignment_return_rounded, color: Colors.tealAccent, size: 16),
+                  const SizedBox(width: 6),
+                  Text('Devoluções Realizadas (${devs.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ...devs.map((d) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• ${d['item_nome']} (BMP: ${d['bmp'] ?? 'S/N'}) - Devolvido por ${d['militar_nome']} (${d['missao_nome']})',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              )),
+            ],
           ],
         ),
       ),
@@ -498,12 +707,99 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               children: [
                 const Icon(Icons.checklist_rounded, color: Colors.green, size: 18),
                 const SizedBox(width: 8),
-                Text('Pendências e Metas do Período', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Text('Pendências e Metas do Período', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
-            const SizedBox(height: 8),
-            Text('• ${criadas.length} pendências criadas no período', style: const TextStyle(fontSize: 12.5)),
-            Text('• ${resolvidas.length} pendências solucionadas no período', style: const TextStyle(fontSize: 12.5)),
+            const SizedBox(height: 10),
+
+            // Resolvidas
+            Text(
+              '✔ Solucionadas no Plantão (${resolvidas.length}):',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
+            ),
+            const SizedBox(height: 4),
+            if (resolvidas.isEmpty)
+              const Text('Nenhuma pendência finalizada no período.', style: TextStyle(fontSize: 12, color: Colors.grey))
+            else
+              ...resolvidas.map((p) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1FDF5),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.green.withOpacity(0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '✔ Resolução: ${p['resolucao'] ?? 'Concluída'} ${p['responsavel'] != null ? '(${p['responsavel']})' : ''}',
+                      style: TextStyle(fontSize: 11.5, color: isDark ? Colors.green.shade200 : Colors.green.shade800),
+                    ),
+                  ],
+                ),
+              )),
+
+            const Divider(height: 18),
+
+            // Criadas
+            Text(
+              '⚠️ Novas Pendências Registradas (${criadas.length}):',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange),
+            ),
+            const SizedBox(height: 4),
+            if (criadas.isEmpty)
+              const Text('Nenhuma nova pendência aberta no plantão.', style: TextStyle(fontSize: 12, color: Colors.grey))
+            else
+              ...criadas.map((p) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
+                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        if (p['prioridade'] != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              p['prioridade'],
+                              style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (p['descricao'] != null && p['descricao'].toString().isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(p['descricao'], style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                    ],
+                    if (p['responsavel'] != null) ...[
+                      const SizedBox(height: 2),
+                      Text('Responsável: ${p['responsavel']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ],
+                ),
+              )),
           ],
         ),
       ),
