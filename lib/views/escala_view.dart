@@ -168,7 +168,9 @@ class _EscalaViewState extends State<EscalaView> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final auth = Provider.of<AuthProvider>(context);
-    final isAdmin = auth.user?.admin ?? auth.isAdmin;
+    final isAdmin = (auth.user?.admin ?? auth.isAdmin) ||
+        (auth.user?.militar?.is_informatica ?? false) ||
+        (auth.user?.militar?.secao?.toLowerCase().contains('inform') ?? false);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0E17) : const Color(0xFFF8FAFC),
