@@ -600,26 +600,58 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                           if (ctx.mounted) Navigator.pop(ctx);
                           if (mounted) {
                             final total = res['total_enviados'] ?? 0;
+                            final isSuccess = res['sucesso'] == true && total > 0;
                             final listDest = (res['destinatarios'] as List?)?.join(', ') ?? '';
+                            final msgStatus = res['mensagem'] as String? ?? '';
+
                             showDialog(
                               context: context,
                               builder: (dCtx) => AlertDialog(
                                 backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                title: const Row(
+                                title: Row(
                                   children: [
-                                    Icon(Icons.check_circle_rounded, color: AppColors.success, size: 24),
-                                    SizedBox(width: 10),
-                                    Text('E-mails Disparados com Sucesso!'),
+                                    Icon(
+                                      isSuccess ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                                      color: isSuccess ? AppColors.success : AppColors.danger,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(isSuccess ? 'E-mails Disparados com Sucesso!' : 'Falha no Envio de E-mails'),
                                   ],
                                 ),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Total de mensagens entregues: $total'),
-                                    const SizedBox(height: 8),
-                                    Text('Destinatários: $listDest', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                    Text(isSuccess
+                                        ? 'Total de mensagens entregues: $total'
+                                        : 'Nenhum e-mail pôde ser entregue.'),
+                                    if (msgStatus.isNotEmpty) ...[
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: isSuccess ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          msgStatus,
+                                          style: TextStyle(fontSize: 12, color: isSuccess ? Colors.green : Colors.redAccent),
+                                        ),
+                                      ),
+                                    ],
+                                    if (listDest.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text('Destinatários: $listDest', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                    ],
+                                    if (!isSuccess) ...[
+                                      const SizedBox(height: 12),
+                                      const Text(
+                                        'Dica: Acesse a aba "Configurações da TI", preencha o Servidor SMTP (Host, Porta, Usuário e Senha de Aplicativo), salve e use o botão "Testar Conexão".',
+                                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                                      ),
+                                    ],
                                   ],
                                 ),
                                 actions: [
@@ -634,8 +666,40 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                         } catch (e) {
                           setModalState(() => isSending = false);
                           if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Erro: $e'), backgroundColor: AppColors.danger),
+                            showDialog(
+                              context: context,
+                              builder: (dCtx) => AlertDialog(
+                                backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                title: const Row(
+                                  children: [
+                                    Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 24),
+                                    SizedBox(width: 10),
+                                    Text('Erro no Envio de E-mail'),
+                                  ],
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      e.toString().replaceAll('Exception: ', ''),
+                                      style: const TextStyle(fontSize: 13, color: Colors.redAccent),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Acesse a aba "Configurações da TI", configure as credenciais do Servidor SMTP (Host, Usuário e Senha de Aplicativo), clique em "Salvar" e faça o teste com o botão "Testar Conexão".',
+                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(dCtx),
+                                    child: const Text('Entendi'),
+                                  ),
+                                ],
+                              ),
                             );
                           }
                         }
