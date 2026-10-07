@@ -29,6 +29,13 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   String? _userError;
   String? _militaryError;
 
+  final TextEditingController _smtpHostCtrl = TextEditingController();
+  final TextEditingController _smtpPortCtrl = TextEditingController();
+  final TextEditingController _smtpUserCtrl = TextEditingController();
+  final TextEditingController _smtpPasswordCtrl = TextEditingController();
+  final TextEditingController _smtpFromCtrl = TextEditingController();
+  bool _obscureSmtpPassword = true;
+
   final List<String> _postosGraduacoes = [
     'S2',
     'S1',
@@ -68,6 +75,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
+    _smtpHostCtrl.dispose();
+    _smtpPortCtrl.dispose();
+    _smtpUserCtrl.dispose();
+    _smtpPasswordCtrl.dispose();
+    _smtpFromCtrl.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -134,6 +146,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
       if (mounted) {
         setState(() {
           _configTI = cfg;
+          _smtpHostCtrl.text = cfg.smtpHost ?? '';
+          _smtpPortCtrl.text = cfg.smtpPort.toString();
+          _smtpUserCtrl.text = cfg.smtpUser ?? '';
+          _smtpPasswordCtrl.text = cfg.smtpPassword ?? '';
+          _smtpFromCtrl.text = cfg.smtpFrom ?? '';
           _isLoadingConfigTI = false;
         });
       }
@@ -146,6 +163,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     if (_configTI == null) return;
     setState(() => _isSavingConfigTI = true);
     try {
+      _configTI!.smtpHost = _smtpHostCtrl.text.trim();
+      _configTI!.smtpPort = int.tryParse(_smtpPortCtrl.text.trim()) ?? 587;
+      _configTI!.smtpUser = _smtpUserCtrl.text.trim();
+      if (_smtpPasswordCtrl.text.trim().isNotEmpty) {
+        _configTI!.smtpPassword = _smtpPasswordCtrl.text.trim();
+      }
+      _configTI!.smtpFrom = _smtpFromCtrl.text.trim();
+
       final api = Provider.of<ApiService>(context, listen: false);
       final updated = await api.updateConfigTI(_configTI!.toJson());
       if (mounted) {
@@ -171,6 +196,456 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
         );
       }
     }
+  }
+
+  // --- Diálogo: Testar Envio de E-mail SMTP ---
+  Future<void> _openTestEmailDialog() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final defaultDest = auth.user?.email ?? _smtpFromCtrl.text.trim();
+    final destCtrl = TextEditingController(text: defaultDest);
+    bool isTesting = false;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.mark_email_read_outlined, color: Colors.amber, size: 22),
+                ),
+                const SizedBox(width: 12),
+                const Text('Testar Conexão SMTP', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: SizedBox(
+              width: 480,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Dispara um e-mail de teste para validar se o servidor SMTP, porta, credenciais e TLS estão funcionando corretamente.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: destCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'E-mail de Destino do Teste *',
+                      hintText: 'ex: seu.email@fab.mil.br',
+                      prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                      filled: true,
+                      fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                  if (isTesting) ...[
+                    const SizedBox(height: 18),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                        SizedBox(width: 12),
+                        Text('Conectando e enviando e-mail de teste...', style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isTesting ? null : () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.send_rounded, size: 18),
+                label: const Text('Disparar Teste', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: isTesting
+                    ? null
+                    : () async {
+                        final email = destCtrl.text.trim();
+                        if (email.isEmpty || !email.contains('@')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Informe um e-mail de teste válido.'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+
+                        setModalState(() => isTesting = true);
+                        try {
+                          final api = Provider.of<ApiService>(context, listen: false);
+                          final res = await api.testarEmail(destinatario: email);
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (mounted) {
+                            final sucesso = res['sucesso'] == true;
+                            showDialog(
+                              context: context,
+                              builder: (dCtx) => AlertDialog(
+                                backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                title: Row(
+                                  children: [
+                                    Icon(sucesso ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                                        color: sucesso ? AppColors.success : AppColors.danger, size: 24),
+                                    const SizedBox(width: 10),
+                                    Text(sucesso ? 'Teste com Sucesso!' : 'Falha no Teste SMTP'),
+                                  ],
+                                ),
+                                content: Text(res['mensagem']?.toString() ?? ''),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(dCtx),
+                                    child: const Text('Fechar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setModalState(() => isTesting = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erro: $e'), backgroundColor: AppColors.danger),
+                            );
+                          }
+                        }
+                      },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // --- Diálogo: Disparar Comunicado / E-mail para Usuários Selecionados ---
+  Future<void> _openSendEmailDialog({UserModel? preselectedUser}) async {
+    final assuntoCtrl = TextEditingController();
+    final msgCtrl = TextEditingController();
+    final emailsExtrasCtrl = TextEditingController();
+    final selectedUserIds = <int>{};
+
+    if (preselectedUser != null) {
+      selectedUserIds.add(preselectedUser.id);
+    } else {
+      for (final u in _users) {
+        if (u.hasEmail) selectedUserIds.add(u.id);
+      }
+    }
+
+    bool isSending = false;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final usersWithEmailCount = _users.where((u) => u.hasEmail).length;
+
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.forward_to_inbox_rounded, color: AppColors.primary, size: 22),
+                ),
+                const SizedBox(width: 12),
+                const Text('Disparar Comunicado por E-mail', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: SizedBox(
+              width: 650,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Selecione os usuários cadastrados que devem receber este comunicado oficial por e-mail.',
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    // Assunto
+                    TextFormField(
+                      controller: assuntoCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Assunto do E-mail *',
+                        hintText: 'Ex: Convocação para Reunião da TI / Aviso de Manutenção',
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    // Mensagem
+                    TextFormField(
+                      controller: msgCtrl,
+                      minLines: 4,
+                      maxLines: 7,
+                      decoration: InputDecoration(
+                        labelText: 'Mensagem / Corpo do E-mail *',
+                        hintText: 'Digite o texto do comunicado institucional que será enviado aos militares...',
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Destinatários Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Destinatários (${selectedUserIds.length} selecionados / $usersWithEmailCount com e-mail)',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                setModalState(() {
+                                  for (final u in _users) {
+                                    if (u.hasEmail) selectedUserIds.add(u.id);
+                                  }
+                                });
+                              },
+                              child: const Text('Marcar Todos', style: TextStyle(fontSize: 12)),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setModalState(() => selectedUserIds.clear());
+                              },
+                              child: const Text('Limpar', style: TextStyle(fontSize: 12)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Lista de Usuários
+                    Container(
+                      height: 180,
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                      ),
+                      child: ListView.separated(
+                        itemCount: _users.length,
+                        separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? Colors.grey[900]! : Colors.grey[200]!),
+                        itemBuilder: (context, idx) {
+                          final u = _users[idx];
+                          final hasMail = u.hasEmail;
+                          final isSelected = selectedUserIds.contains(u.id);
+
+                          return CheckboxListTile(
+                            dense: true,
+                            enabled: hasMail,
+                            value: isSelected,
+                            activeColor: AppColors.primary,
+                            checkColor: Colors.black,
+                            title: Row(
+                              children: [
+                                Text(u.displayName, style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: hasMail ? null : Colors.grey,
+                                )),
+                                const SizedBox(width: 8),
+                                if (u.admin)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text('ADMIN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                                  ),
+                              ],
+                            ),
+                            subtitle: Text(
+                              hasMail ? '✉️ ${u.email}' : '❌ Sem e-mail cadastrado',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: hasMail ? (isDark ? Colors.grey[400] : Colors.grey[700]) : Colors.red[300],
+                              ),
+                            ),
+                            onChanged: hasMail
+                                ? (val) {
+                                    setModalState(() {
+                                      if (val == true) {
+                                        selectedUserIds.add(u.id);
+                                      } else {
+                                        selectedUserIds.remove(u.id);
+                                      }
+                                    });
+                                  }
+                                : null,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // E-mails extras opcionais
+                    TextFormField(
+                      controller: emailsExtrasCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Outros E-mails Adicionais (opcional)',
+                        hintText: 'Separe múltiplos e-mails por vírgula (ex: chefe@fab.mil.br, ti@binfae.fab.mil.br)',
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+
+                    if (isSending) ...[
+                      const SizedBox(height: 18),
+                      const Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                            SizedBox(width: 12),
+                            Text('Disparando e-mails para os destinatários...', style: TextStyle(fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSending ? null : () => Navigator.pop(ctx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.send_rounded, size: 18),
+                label: Text(
+                  'Enviar (${selectedUserIds.length} destinatários)',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: isSending
+                    ? null
+                    : () async {
+                        final assunto = assuntoCtrl.text.trim();
+                        final msg = msgCtrl.text.trim();
+                        if (assunto.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Informe o assunto do e-mail.'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+                        if (msg.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Informe a mensagem do e-mail.'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+
+                        final extras = emailsExtrasCtrl.text
+                            .split(RegExp(r'[,;]'))
+                            .map((e) => e.trim())
+                            .where((e) => e.isNotEmpty && e.contains('@'))
+                            .toList();
+
+                        if (selectedUserIds.isEmpty && extras.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Selecione pelo menos um usuário ou insira um e-mail adicional.'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+
+                        setModalState(() => isSending = true);
+                        try {
+                          final api = Provider.of<ApiService>(context, listen: false);
+                          final res = await api.enviarEmailUsuarios(
+                            assunto: assunto,
+                            mensagem: msg,
+                            usuarioIds: selectedUserIds.toList(),
+                            emailsAdicionais: extras,
+                          );
+
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (mounted) {
+                            final total = res['total_enviados'] ?? 0;
+                            final listDest = (res['destinatarios'] as List?)?.join(', ') ?? '';
+                            showDialog(
+                              context: context,
+                              builder: (dCtx) => AlertDialog(
+                                backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                title: const Row(
+                                  children: [
+                                    Icon(Icons.check_circle_rounded, color: AppColors.success, size: 24),
+                                    SizedBox(width: 10),
+                                    Text('E-mails Disparados com Sucesso!'),
+                                  ],
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Total de mensagens entregues: $total'),
+                                    const SizedBox(height: 8),
+                                    Text('Destinatários: $listDest', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(dCtx),
+                                    child: const Text('Fechar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setModalState(() => isSending = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erro: $e'), backgroundColor: AppColors.danger),
+                            );
+                          }
+                        }
+                      },
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   // --- Diálogo: Criar Usuário ---
@@ -1110,15 +1585,30 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
               '${_users.length} contas cadastradas',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
             ),
-            ElevatedButton.icon(
-              onPressed: _openCreateUserDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              icon: const Icon(Icons.person_add_alt_1_outlined, size: 18),
-              label: const Text('Novo Usuário', style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _openSendEmailDialog(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.mark_email_read_outlined, size: 18),
+                  label: const Text('Enviar Comunicado', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: _openCreateUserDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.person_add_alt_1_outlined, size: 18),
+                  label: const Text('Novo Usuário', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
           ],
         ),
@@ -1170,6 +1660,22 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                               : 'Username: ${u.username}',
                                           style: const TextStyle(fontSize: 11, color: Colors.grey),
                                         ),
+                                        if (u.hasEmail) ...[
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.email_outlined, size: 12, color: AppColors.primary.withOpacity(0.8)),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                u.email!,
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
@@ -1207,6 +1713,17 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                     ),
                                   ),
                                   const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.mail_outline_rounded,
+                                      size: 18,
+                                      color: u.hasEmail ? AppColors.primary : Colors.grey.withOpacity(0.4),
+                                    ),
+                                    tooltip: u.hasEmail
+                                        ? 'Enviar e-mail para ${u.displayName}'
+                                        : 'Usuário sem e-mail cadastrado',
+                                    onPressed: u.hasEmail ? () => _openSendEmailDialog(preselectedUser: u) : null,
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.edit_outlined, size: 18),
                                     tooltip: 'Editar Usuário e Permissões',
@@ -1370,6 +1887,179 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Servidor SMTP & E-mail
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.mark_email_read_rounded, color: AppColors.primary, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Servidor de E-mail (SMTP)',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Configurações para envio do Relatório Diário e Comunicados',
+                              style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.network_check_rounded, size: 18),
+                        label: const Text('Testar Conexão'),
+                        onPressed: _openTestEmailDialog,
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        icon: const Icon(Icons.send_rounded, size: 18),
+                        label: const Text('Enviar Comunicado', style: TextStyle(fontWeight: FontWeight.bold)),
+                        onPressed: () => _openSendEmailDialog(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Host do Servidor SMTP *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _smtpHostCtrl,
+                          decoration: InputDecoration(
+                            hintText: 'ex: smtp.gmail.com ou mail.fab.mil.br',
+                            prefixIcon: const Icon(Icons.dns_outlined, size: 18),
+                            filled: true,
+                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Porta *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _smtpPortCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: '587 ou 465',
+                            prefixIcon: const Icon(Icons.tag_rounded, size: 18),
+                            filled: true,
+                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Usuário / E-mail de Autenticação', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _smtpUserCtrl,
+                          decoration: InputDecoration(
+                            hintText: 'ex: informatica.binfae@gmail.com',
+                            prefixIcon: const Icon(Icons.account_circle_outlined, size: 18),
+                            filled: true,
+                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Remetente (From Header)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _smtpFromCtrl,
+                          decoration: InputDecoration(
+                            hintText: 'ex: informatica.binfae@gmail.com',
+                            prefixIcon: const Icon(Icons.alternate_email_rounded, size: 18),
+                            filled: true,
+                            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Senha SMTP / Senha de App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 6),
+                  TextFormField(
+                    controller: _smtpPasswordCtrl,
+                    obscureText: _obscureSmtpPassword,
+                    decoration: InputDecoration(
+                      hintText: 'Senha de aplicativo ou do servidor de e-mail',
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, size: 18),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscureSmtpPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 18),
+                        onPressed: () => setState(() => _obscureSmtpPassword = !_obscureSmtpPassword),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(height: 32),
+
               Row(
                 children: [
                   Container(

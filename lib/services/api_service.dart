@@ -1253,4 +1253,47 @@ class ApiService {
     }
     return InformaticaConfigModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
+
+  // ================= E-MAIL & COMUNICADOS ADMIN =================
+  Future<Map<String, dynamic>> testarEmail({String? destinatario}) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/admin/config-ti/testar-email');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (destinatario != null && destinatario.trim().isNotEmpty) 'destinatario': destinatario.trim(),
+      }),
+    ).timeout(const Duration(seconds: 25));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao testar envio de e-mail'));
+    }
+    return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> enviarEmailUsuarios({
+    required String assunto,
+    required String mensagem,
+    List<int>? usuarioIds,
+    List<int>? militarIds,
+    List<String>? emailsAdicionais,
+  }) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/admin/config-ti/enviar-email');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'assunto': assunto.trim(),
+        'mensagem': mensagem.trim(),
+        if (usuarioIds != null && usuarioIds.isNotEmpty) 'usuario_ids': usuarioIds,
+        if (militarIds != null && militarIds.isNotEmpty) 'militar_ids': militarIds,
+        if (emailsAdicionais != null && emailsAdicionais.isNotEmpty) 'emails_adicionais': emailsAdicionais,
+      }),
+    ).timeout(const Duration(seconds: 30));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao enviar e-mail para os usuários'));
+    }
+    return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+  }
 }

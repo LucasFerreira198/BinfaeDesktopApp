@@ -11,6 +11,7 @@ class InformaticaConfigModel {
   String? smtpHost;
   int smtpPort;
   String? smtpUser;
+  String? smtpPassword;
   String? smtpFrom;
 
   InformaticaConfigModel({
@@ -26,6 +27,7 @@ class InformaticaConfigModel {
     this.smtpHost,
     this.smtpPort = 587,
     this.smtpUser,
+    this.smtpPassword,
     this.smtpFrom,
   });
 
@@ -43,6 +45,7 @@ class InformaticaConfigModel {
       smtpHost: json['smtp_host'] as String?,
       smtpPort: json['smtp_port'] as int? ?? 587,
       smtpUser: json['smtp_user'] as String?,
+      smtpPassword: json['smtp_password'] as String?,
       smtpFrom: json['smtp_from'] as String?,
     );
   }
@@ -57,6 +60,7 @@ class InformaticaConfigModel {
     'smtp_host': smtpHost,
     'smtp_port': smtpPort,
     'smtp_user': smtpUser,
+    if (smtpPassword != null && smtpPassword!.trim().isNotEmpty) 'smtp_password': smtpPassword!.trim(),
     'smtp_from': smtpFrom,
   };
 }

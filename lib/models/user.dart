@@ -123,4 +123,7 @@ class UserModel {
   int? get saram => militar?.saram;
   String? get celular => militar?.celular;
   String? get telefone => militar?.celular;
+  String? get email => militar?.email;
+  List<String> get emails => militar?.emails ?? (email != null ? [email!] : []);
+  bool get hasEmail => (militar?.email != null && militar!.email!.trim().isNotEmpty) || (militar?.emails.isNotEmpty ?? false);
 }
