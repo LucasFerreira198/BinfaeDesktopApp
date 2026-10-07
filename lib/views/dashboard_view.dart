@@ -17,6 +17,9 @@ import 'home_dashboard_view.dart';
 import 'stock_view.dart';
 import 'cautelas_view.dart';
 import 'maintenance_view.dart';
+import 'pendencias_view.dart';
+import 'escala_view.dart';
+import 'relatorio_diario_view.dart';
 import 'locations_view.dart';
 import 'groups_view.dart';
 import 'history_view.dart';
@@ -373,6 +376,15 @@ class _DashboardViewState extends State<DashboardView> {
       MaintenanceView(
         onNavigate: (index) => setState(() => _selectedIndex = index),
       ),
+      PendenciasView(
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
+      EscalaView(
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
+      RelatorioDiarioView(
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
       const LocationsView(),
       const GroupsView(),
       const HistoryView(),
@@ -389,6 +401,9 @@ class _DashboardViewState extends State<DashboardView> {
       'Materiais e Gestão de Estoque',
       'Cautela de Materiais e Missões',
       'Manutenção e Reparos',
+      'Pendências e Metas',
+      'Escala de Sobreaviso',
+      'Relatório Diário (24h)',
       'Locais Físicos e Estrutura',
       'Grupos e Subgrupos',
       'Histórico Geral de Movimentações',
@@ -401,6 +416,9 @@ class _DashboardViewState extends State<DashboardView> {
       Icons.inventory_2_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.handyman_outlined,
+      Icons.checklist_rtl_outlined,
+      Icons.calendar_month_outlined,
+      Icons.assignment_outlined,
       Icons.place_outlined,
       Icons.category_outlined,
       Icons.history_outlined,
@@ -579,6 +597,33 @@ class _DashboardViewState extends State<DashboardView> {
                         _NavHoverItem(
                           index: 4,
                           currentIndex: _selectedIndex,
+                          label: 'Pendências e Metas',
+                          icon: Icons.checklist_rtl_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 4),
+                        ),
+                        _NavHoverItem(
+                          index: 5,
+                          currentIndex: _selectedIndex,
+                          label: 'Escala de Sobreaviso',
+                          icon: Icons.calendar_month_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 5),
+                        ),
+                        _NavHoverItem(
+                          index: 6,
+                          currentIndex: _selectedIndex,
+                          label: 'Relatório Diário (24h)',
+                          icon: Icons.assignment_outlined,
+                          isDark: isDark,
+                          isCollapsed: isCollapsed,
+                          onTap: () => setState(() => _selectedIndex = 6),
+                        ),
+                        _NavHoverItem(
+                          index: 7,
+                          currentIndex: _selectedIndex,
                           label: 'Locais Físicos',
                           icon: Icons.place_outlined,
                           isDark: isDark,
@@ -598,44 +643,44 @@ class _DashboardViewState extends State<DashboardView> {
                               ],
                             ),
                           ),
-                          onTap: () => setState(() => _selectedIndex = 4),
+                          onTap: () => setState(() => _selectedIndex = 7),
                         ),
                         _NavHoverItem(
-                          index: 5,
+                          index: 8,
                           currentIndex: _selectedIndex,
                           label: 'Grupos e Subgrupos',
                           icon: Icons.category_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
-                          onTap: () => setState(() => _selectedIndex = 5),
+                          onTap: () => setState(() => _selectedIndex = 8),
                         ),
                         _NavHoverItem(
-                          index: 6,
+                          index: 9,
                           currentIndex: _selectedIndex,
                           label: 'Histórico Geral',
                           icon: Icons.history_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
-                          onTap: () => setState(() => _selectedIndex = 6),
+                          onTap: () => setState(() => _selectedIndex = 9),
                         ),
                         if (isAdmin)
                           _NavHoverItem(
-                            index: 7,
+                            index: 10,
                             currentIndex: _selectedIndex,
                             label: 'Painel Administrativo',
                             icon: Icons.admin_panel_settings_outlined,
                             isDark: isDark,
                             isCollapsed: isCollapsed,
-                            onTap: () => setState(() => _selectedIndex = 7),
+                            onTap: () => setState(() => _selectedIndex = 10),
                           ),
                         _NavHoverItem(
-                          index: isAdmin ? 8 : 7,
+                          index: isAdmin ? 11 : 10,
                           currentIndex: _selectedIndex,
                           label: 'Configurações',
                           icon: Icons.settings_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
-                          onTap: () => setState(() => _selectedIndex = isAdmin ? 8 : 7),
+                          onTap: () => setState(() => _selectedIndex = isAdmin ? 11 : 10),
                         ),
                       ],
                     ),
@@ -970,7 +1015,7 @@ class _DashboardViewState extends State<DashboardView> {
                                   builder: (_) => const UserProfileDialog(),
                                 );
                               } else if (val == 'settings') {
-                                setState(() => _selectedIndex = isAdmin ? 8 : 7);
+                                setState(() => _selectedIndex = isAdmin ? 11 : 10);
                               } else if (val == 'update') {
                                 _checkForUpdates(manual: true);
                               } else if (val == 'fullscreen') {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
+import '../models/config_ti.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/image_picker_helper.dart';
@@ -19,8 +20,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
   List<UserModel> _users = [];
   List<MilitaryModel> _militaries = [];
+  InformaticaConfigModel? _configTI;
   bool _isLoadingUsers = true;
   bool _isLoadingMilitaries = true;
+  bool _isLoadingConfigTI = true;
+  bool _isSavingConfigTI = false;
   String? _userError;
   String? _militaryError;
 
@@ -57,7 +61,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadAll();
   }
 
@@ -70,6 +74,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   Future<void> _loadAll() async {
     _loadUsers();
     _loadMilitaries();
+    _loadConfigTI();
   }
 
   Future<void> _loadUsers() async {
@@ -116,6 +121,53 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           _militaryError = e.toString().replaceAll('Exception: ', '');
           _isLoadingMilitaries = false;
         });
+      }
+    }
+  }
+
+  Future<void> _loadConfigTI() async {
+    setState(() => _isLoadingConfigTI = true);
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final cfg = await api.getConfigTI();
+      if (mounted) {
+        setState(() {
+          _configTI = cfg;
+          _isLoadingConfigTI = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingConfigTI = false);
+    }
+  }
+
+  Future<void> _saveConfigTI() async {
+    if (_configTI == null) return;
+    setState(() => _isSavingConfigTI = true);
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final updated = await api.updateConfigTI(_configTI!.toJson());
+      if (mounted) {
+        setState(() {
+          _configTI = updated;
+          _isSavingConfigTI = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppColors.success,
+            content: Text('Configurações da TI salvas com sucesso!'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSavingConfigTI = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+          ),
+        );
       }
     }
   }
@@ -723,10 +775,15 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     final nomeCompletoController = TextEditingController(text: military?.nomeCompleto ?? '');
     final nomeGuerraController = TextEditingController(text: military?.nomeGuerra ?? '');
     final secaoController = TextEditingController(text: military?.secao ?? '');
-    final emailController = TextEditingController(text: military?.email ?? '');
+    final emailController = TextEditingController(
+      text: military != null
+          ? (military.emails.isNotEmpty ? military.emails.join(', ') : (military.email ?? ''))
+          : '',
+    );
     final celularController = TextEditingController(text: military?.celular ?? '');
     final fotoUrlController = TextEditingController(text: military?.fotoUrl ?? '');
     String posto = military?.postoGraduacao ?? 'S2';
+    bool isInformatica = military?.isInformatica ?? (military?.secao?.toLowerCase().contains('inform') ?? false);
 
     showDialog(
       context: context,
@@ -813,8 +870,8 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             child: TextField(
                               controller: emailController,
                               decoration: const InputDecoration(
-                                labelText: 'E-mail',
-                                hintText: 'Ex: militar@fab.mil.br',
+                                labelText: 'E-mails (separe por vírgula)',
+                                hintText: 'Ex: oficial@fab.mil.br, pessoal@gmail.com',
                               ),
                             ),
                           ),
@@ -829,6 +886,16 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      SwitchListTile(
+                        title: const Text('Militar da Seção de Informática (Elegível para Escala)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        subtitle: const Text('Permite ser escalado de sobreaviso ou expediente na TI', style: TextStyle(fontSize: 11)),
+                        value: isInformatica,
+                        activeColor: AppColors.primary,
+                        onChanged: (v) => setModalState(() => isInformatica = v),
+                        contentPadding: EdgeInsets.zero,
                       ),
                       const SizedBox(height: 12),
 
@@ -882,6 +949,13 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             return;
                           }
 
+                          final rawEmails = emailController.text
+                              .split(',')
+                              .map((e) => e.trim())
+                              .where((e) => e.isNotEmpty)
+                              .toList();
+                          final primaryEmail = rawEmails.isNotEmpty ? rawEmails.first : null;
+
                           setModalState(() => isSubmitting = true);
                           final data = <String, dynamic>{
                             'saram': saram,
@@ -889,9 +963,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             'nome_guerra': nomeGuerraController.text.trim(),
                             'nome_completo': nomeCompletoController.text.trim(),
                             'secao': secaoController.text.trim().isEmpty ? null : secaoController.text.trim(),
-                            'email': emailController.text.trim().isEmpty ? null : emailController.text.trim(),
+                            'email': primaryEmail,
+                            'emails': rawEmails,
                             'celular': celularController.text.trim().isEmpty ? null : celularController.text.trim(),
                             'foto_url': fotoUrlController.text.trim().isEmpty ? null : fotoUrlController.text.trim(),
+                            'is_informatica': isInformatica,
                           };
 
                           try {
@@ -985,6 +1061,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 tabs: const [
                   Tab(icon: Icon(Icons.people_alt_outlined, size: 18), text: 'Usuários do Sistema'),
                   Tab(icon: Icon(Icons.shield_outlined, size: 18), text: 'Militares do Efetivo'),
+                  Tab(icon: Icon(Icons.settings_suggest_outlined, size: 18), text: 'Chefia & Notificações TI'),
                 ],
               ),
             ],
@@ -998,6 +1075,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
               children: [
                 _buildUsersTab(isDark),
                 _buildMilitariesTab(isDark),
+                _buildConfigTITab(isDark),
               ],
             ),
           ),
@@ -1252,6 +1330,152 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     ),
         ),
       ],
+    );
+  }
+
+  Widget _buildConfigTITab(bool isDark) {
+    if (_isLoadingConfigTI) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final cfg = _configTI ?? InformaticaConfigModel(id: 1);
+
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          padding: const EdgeInsets.all(24),
+          margin: const EdgeInsets.only(top: 8, bottom: 24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF161E2E) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.security_rounded, color: Colors.blue, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Chefia da Seção de Informática & Destinatários',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('Configuração dos 2 militares mais antigos que recebem cópia do relatório diário',
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(height: 32),
+
+              // 1º Militar mais antigo
+              const Text('1º Militar Mais Antigo da Seção de TI *',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<int?>(
+                value: cfg.militarAntigo1Id,
+                decoration: InputDecoration(
+                  hintText: 'Selecione o 1º militar mais antigo...',
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                items: [
+                  const DropdownMenuItem<int?>(value: null, child: Text('(Nenhum selecionado)')),
+                  ..._militaries.map((m) => DropdownMenuItem<int?>(
+                        value: m.id ?? m.saram,
+                        child: Text('${m.postoGraduacao} ${m.nomeGuerra} (SARAM: ${m.saram})'),
+                      )),
+                ],
+                onChanged: (id) => setState(() => cfg.militarAntigo1Id = id),
+              ),
+              const SizedBox(height: 18),
+
+              // 2º Militar mais antigo
+              const Text('2º Militar Mais Antigo da Seção de TI *',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<int?>(
+                value: cfg.militarAntigo2Id,
+                decoration: InputDecoration(
+                  hintText: 'Selecione o 2º militar mais antigo...',
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                items: [
+                  const DropdownMenuItem<int?>(value: null, child: Text('(Nenhum selecionado)')),
+                  ..._militaries.map((m) => DropdownMenuItem<int?>(
+                        value: m.id ?? m.saram,
+                        child: Text('${m.postoGraduacao} ${m.nomeGuerra} (SARAM: ${m.saram})'),
+                      )),
+                ],
+                onChanged: (id) => setState(() => cfg.militarAntigo2Id = id),
+              ),
+              const Divider(height: 32),
+
+              // Canais de Notificação
+              const Text('Canais de Disparo do Relatório Diário 24h',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 12),
+
+              SwitchListTile(
+                title: const Text('Disparo Automático por E-mail',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                subtitle: const Text(
+                    'Envia o relatório diário das últimas 24h para o militar de serviço e os 2 chefes ao clicar em "Lançar Relatório"',
+                    style: TextStyle(fontSize: 12)),
+                value: cfg.notificarEmailAtivo,
+                activeColor: Colors.blue,
+                onChanged: (v) => setState(() => cfg.notificarEmailAtivo = v),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 8),
+
+              SwitchListTile(
+                title: const Text('Disparo via WhatsApp (Integração Futura)',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                subtitle: const Text(
+                    'Prepara a rota para envio automático de cópia do relatório no grupo de WhatsApp da Informática',
+                    style: TextStyle(fontSize: 12)),
+                value: cfg.notificarWhatsappAtivo,
+                activeColor: Colors.green,
+                onChanged: (v) => setState(() => cfg.notificarWhatsappAtivo = v),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 24),
+
+              // Botão Salvar
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: _isSavingConfigTI
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.save_rounded, size: 20),
+                  label: const Text('Salvar Configurações da TI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  onPressed: _isSavingConfigTI ? null : _saveConfigTI,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

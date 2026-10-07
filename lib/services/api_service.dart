@@ -5,6 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item.dart';
 import '../models/user.dart';
 import '../models/cautela.dart';
+import '../models/pendencia.dart';
+import '../models/escala.dart';
+import '../models/relatorio_diario.dart';
+import '../models/config_ti.dart';
 
 class AppHttpOverrides extends HttpOverrides {
   final bool enabled;
@@ -994,5 +998,216 @@ class ApiService {
       throw Exception(_extractError(response, 'Falha ao checar status do item'));
     }
     return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+  }
+
+  // ================= PENDÊNCIAS E METAS =================
+  Future<List<PendenciaModel>> listPendenciasAtivas({String? tipo, String? prioridade}) async {
+    final params = <String, String>{};
+    if (tipo != null && tipo.isNotEmpty) params['tipo'] = tipo;
+    if (prioridade != null && prioridade.isNotEmpty) params['prioridade'] = prioridade;
+
+    final uri = Uri.parse('$_baseUrl/pendencias').replace(queryParameters: params.isNotEmpty ? params : null);
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => PendenciaModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<List<PendenciaModel>> listPendenciasConcluidas({int limit = 100}) async {
+    final uri = Uri.parse('$_baseUrl/pendencias/concluidas?limit=$limit');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => PendenciaModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<PendenciaModel> createPendencia(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/pendencias');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao criar pendência'));
+    }
+    return PendenciaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<PendenciaModel> concluirPendencia(
+    int pendenciaId, {
+    required String resolucao,
+    String? laudoTecnico,
+    bool retornarEstoque = true,
+    int? destinoLocalId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId/concluir');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'resolucao': resolucao.trim(),
+        if (laudoTecnico != null && laudoTecnico.isNotEmpty) 'laudo_tecnico': laudoTecnico.trim(),
+        'retornar_estoque': retornarEstoque,
+        if (destinoLocalId != null) 'destino_local_id': destinoLocalId,
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao concluir pendência'));
+    }
+    return PendenciaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<PendenciaModel> baixarItemPendencia(
+    int pendenciaId, {
+    required String justificativaBaixa,
+    String? resolucao,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId/baixar-item');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'justificativa_baixa': justificativaBaixa.trim(),
+        if (resolucao != null && resolucao.isNotEmpty) 'resolucao': resolucao.trim(),
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao dar baixa no item'));
+    }
+    return PendenciaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deletePendencia(int pendenciaId) async {
+    final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId');
+    final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir pendência'));
+    }
+  }
+
+  // ================= ESCALA DE SERVIÇO =================
+  Future<List<Map<String, dynamic>>> listMilitaresInformatica() async {
+    final uri = Uri.parse('$_baseUrl/escalas/militares');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.cast<Map<String, dynamic>>();
+  }
+
+  Future<EscalaMensalModel> getEscalaMensal(int ano, int mes) async {
+    final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao carregar escala do mês'));
+    }
+    return EscalaMensalModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<EscalaMensalModel> salvarEscalaMensal(int ano, int mes, Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao salvar escala'));
+    }
+    return EscalaMensalModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  // ================= RELATÓRIO DIÁRIO (24 HORAS) =================
+  Future<RelatorioDiarioModel> getRelatorioHoje() async {
+    final uri = Uri.parse('$_baseUrl/relatorios-diarios/hoje');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao carregar relatório de hoje'));
+    }
+    return RelatorioDiarioModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<RelatorioDiarioModel> getRelatorioPorData(String dataStr) async {
+    final uri = Uri.parse('$_baseUrl/relatorios-diarios/por-data/$dataStr');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao buscar relatório por data'));
+    }
+    return RelatorioDiarioModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<List<RelatorioDiarioModel>> listHistoricoRelatorios({int limit = 30}) async {
+    final uri = Uri.parse('$_baseUrl/relatorios-diarios/historico?limit=$limit');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => RelatorioDiarioModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<RelatorioDiarioModel> salvarRascunhoRelatorio(
+    int relatorioId, {
+    String? ocorrencias,
+    int? militarServicoId,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/relatorios-diarios/$relatorioId/salvar-rascunho');
+    final response = await http.put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (ocorrencias != null) 'ocorrencias_militar': ocorrencias,
+        if (militarServicoId != null) 'militar_servico_id': militarServicoId,
+      }),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao salvar rascunho'));
+    }
+    return RelatorioDiarioModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<RelatorioDiarioModel> lancarRelatorio(
+    int relatorioId, {
+    String? ocorrencias,
+    int? militarServicoId,
+    bool enviarEmail = true,
+    bool enviarWhatsapp = false,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/relatorios-diarios/$relatorioId/lancar');
+    final response = await http.post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (ocorrencias != null) 'ocorrencias_militar': ocorrencias,
+        if (militarServicoId != null) 'militar_servico_id': militarServicoId,
+        'enviar_email': enviarEmail,
+        'enviar_whatsapp': enviarWhatsapp,
+      }),
+    ).timeout(const Duration(seconds: 20));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao lançar relatório'));
+    }
+    return RelatorioDiarioModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  // ================= CONFIGURAÇÕES TI (ADMIN) =================
+  Future<InformaticaConfigModel> getConfigTI() async {
+    final uri = Uri.parse('$_baseUrl/admin/config-ti');
+    final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao carregar configurações da TI'));
+    }
+    return InformaticaConfigModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<InformaticaConfigModel> updateConfigTI(Map<String, dynamic> data) async {
+    final uri = Uri.parse('$_baseUrl/admin/config-ti');
+    final response = await http.put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao salvar configurações da TI'));
+    }
+    return InformaticaConfigModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 }

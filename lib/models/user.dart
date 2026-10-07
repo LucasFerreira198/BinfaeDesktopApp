@@ -1,4 +1,5 @@
 class MilitaryModel {
+  final int? id;
   final int saram;
   final String nomeCompleto;
   final String nomeGuerra;
@@ -6,10 +7,13 @@ class MilitaryModel {
   final String? quadroEspecialidade;
   final String? secao;
   final String? email;
+  final List<String> emails;
   final String? celular;
   final String? fotoUrl;
+  final bool isInformatica;
 
   MilitaryModel({
+    this.id,
     required this.saram,
     required this.nomeCompleto,
     required this.nomeGuerra,
@@ -17,12 +21,20 @@ class MilitaryModel {
     this.quadroEspecialidade,
     this.secao,
     this.email,
+    this.emails = const [],
     this.celular,
     this.fotoUrl,
+    this.isInformatica = false,
   });
 
   factory MilitaryModel.fromJson(Map<String, dynamic> json) {
+    final rawEmails = json['emails'] as List?;
+    final parsedEmails = rawEmails != null
+        ? rawEmails.map((e) => e.toString()).toList()
+        : (json['email'] != null ? [json['email'].toString()] : <String>[]);
+
     return MilitaryModel(
+      id: json['id'] as int?,
       saram: json['saram'] as int? ?? 0,
       nomeCompleto: json['nome_completo'] as String? ?? '',
       nomeGuerra: json['nome_guerra'] as String? ?? '',
@@ -30,12 +42,15 @@ class MilitaryModel {
       quadroEspecialidade: json['quadro_especialidade'] as String?,
       secao: json['secao'] as String?,
       email: json['email'] as String?,
+      emails: parsedEmails,
       celular: json['celular'] as String?,
       fotoUrl: json['foto_url'] as String?,
+      isInformatica: json['is_informatica'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toJson() => {
+    if (id != null) 'id': id,
     'saram': saram,
     'nome_completo': nomeCompleto,
     'nome_guerra': nomeGuerra,
@@ -43,8 +58,10 @@ class MilitaryModel {
     'quadro_especialidade': quadroEspecialidade,
     'secao': secao,
     'email': email,
+    'emails': emails,
     'celular': celular,
     'foto_url': fotoUrl,
+    'is_informatica': isInformatica,
   };
 
   String? get telefone => celular;
@@ -107,4 +124,3 @@ class UserModel {
   String? get celular => militar?.celular;
   String? get telefone => militar?.celular;
 }
-
