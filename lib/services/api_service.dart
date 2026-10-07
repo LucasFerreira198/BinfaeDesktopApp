@@ -57,6 +57,10 @@ class AppHttpOverrides extends HttpOverrides {
 }
 
 class ApiService {
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+  ApiService._internal();
+
   static const String defaultBaseUrl = 'https://backend-info-binfae.vercel.app';
   static const String _keyBaseUrl = 'binfae_desktop_api_url';
   static const String _keyToken = 'binfae_desktop_token';
@@ -342,6 +346,23 @@ class ApiService {
     return false;
   }
 
+  Future<void> _ensureAuth() async {
+    if (_token == null || _token!.trim().isEmpty) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedToken = prefs.getString(_keyToken);
+        if (savedToken != null && savedToken.trim().isNotEmpty) {
+          _token = savedToken.trim();
+          _refreshToken = prefs.getString(_keyRefreshToken);
+          final rawTimestamp = prefs.getString(_keyLoginTimestamp);
+          if (rawTimestamp != null) {
+            _loginTimestamp = DateTime.tryParse(rawTimestamp);
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
   Map<String, String> _headers([bool isJson = true]) {
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -349,7 +370,7 @@ class ApiService {
     if (isJson) {
       headers['Content-Type'] = 'application/json';
     }
-    if (_token != null) {
+    if (_token != null && _token!.trim().isNotEmpty) {
       // Se houver timestamp de login e ultrapassar 24h, expira a sessão
       if (_loginTimestamp != null &&
           DateTime.now().difference(_loginTimestamp!).inHours >= 24) {
@@ -357,7 +378,7 @@ class ApiService {
         clearAuthSession();
         onSessionExpired?.call();
       } else {
-        headers['Authorization'] = 'Bearer $_token';
+        headers['Authorization'] = 'Bearer ${_token!.trim()}';
       }
     }
     return headers;
@@ -693,6 +714,7 @@ class ApiService {
 
   // --- Gestão de Usuários (Admin) ---
   Future<List<UserModel>> listUsers() async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/users/listUsers');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -768,6 +790,7 @@ class ApiService {
 
   // --- Gestão de Militares (Admin) ---
   Future<List<MilitaryModel>> listMilitaries() async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/list');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -778,6 +801,7 @@ class ApiService {
   }
 
   Future<MilitaryModel> createMilitary(Map<String, dynamic> data) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/create');
     final response = await http.post(
       uri,
@@ -791,6 +815,7 @@ class ApiService {
   }
 
   Future<MilitaryModel> updateMilitary(int saram, Map<String, dynamic> data) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/update/$saram');
     final response = await http.patch(
       uri,
@@ -804,6 +829,7 @@ class ApiService {
   }
 
   Future<void> deleteMilitary(int saram) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/military/delete/$saram');
     final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200 && response.statusCode != 204) {
@@ -830,6 +856,7 @@ class ApiService {
   // ============================================================================
 
   Future<List<CautelaModel>> listCautelas({String? tipo, String? status, String? search}) async {
+    await _ensureAuth();
     final queryParams = <String, String>{};
     if (tipo != null && tipo.isNotEmpty) queryParams['tipo'] = tipo;
     if (status != null && status.isNotEmpty) queryParams['status'] = status;
@@ -1002,6 +1029,7 @@ class ApiService {
 
   // ================= PENDÊNCIAS E METAS =================
   Future<List<PendenciaModel>> listPendenciasAtivas({String? tipo, String? prioridade}) async {
+    await _ensureAuth();
     final params = <String, String>{};
     if (tipo != null && tipo.isNotEmpty) params['tipo'] = tipo;
     if (prioridade != null && prioridade.isNotEmpty) params['prioridade'] = prioridade;
@@ -1014,6 +1042,7 @@ class ApiService {
   }
 
   Future<List<PendenciaModel>> listPendenciasConcluidas({int limit = 100}) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/concluidas?limit=$limit');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) return [];
@@ -1022,6 +1051,7 @@ class ApiService {
   }
 
   Future<PendenciaModel> createPendencia(Map<String, dynamic> data) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias');
     final response = await http.post(
       uri,
@@ -1041,6 +1071,7 @@ class ApiService {
     bool retornarEstoque = true,
     int? destinoLocalId,
   }) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId/concluir');
     final response = await http.post(
       uri,
@@ -1063,6 +1094,7 @@ class ApiService {
     required String justificativaBaixa,
     String? resolucao,
   }) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId/baixar-item');
     final response = await http.post(
       uri,
@@ -1079,6 +1111,7 @@ class ApiService {
   }
 
   Future<void> deletePendencia(int pendenciaId) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId');
     final response = await http.delete(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200 && response.statusCode != 204) {
@@ -1088,6 +1121,7 @@ class ApiService {
 
   // ================= ESCALA DE SERVIÇO =================
   Future<List<Map<String, dynamic>>> listMilitaresInformatica() async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/escalas/militares');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) return [];
@@ -1096,6 +1130,7 @@ class ApiService {
   }
 
   Future<EscalaMensalModel> getEscalaMensal(int ano, int mes) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -1105,6 +1140,7 @@ class ApiService {
   }
 
   Future<EscalaMensalModel> salvarEscalaMensal(int ano, int mes, Map<String, dynamic> data) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
     final response = await http.post(
       uri,
@@ -1119,6 +1155,7 @@ class ApiService {
 
   // ================= RELATÓRIO DIÁRIO (24 HORAS) =================
   Future<RelatorioDiarioModel> getRelatorioHoje() async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/hoje');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -1128,6 +1165,7 @@ class ApiService {
   }
 
   Future<RelatorioDiarioModel> getRelatorioPorData(String dataStr) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/por-data/$dataStr');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -1137,6 +1175,7 @@ class ApiService {
   }
 
   Future<List<RelatorioDiarioModel>> listHistoricoRelatorios({int limit = 30}) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/historico?limit=$limit');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) return [];
@@ -1149,6 +1188,7 @@ class ApiService {
     String? ocorrencias,
     int? militarServicoId,
   }) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/$relatorioId/salvar-rascunho');
     final response = await http.put(
       uri,
@@ -1171,6 +1211,7 @@ class ApiService {
     bool enviarEmail = true,
     bool enviarWhatsapp = false,
   }) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/relatorios-diarios/$relatorioId/lancar');
     final response = await http.post(
       uri,
@@ -1190,6 +1231,7 @@ class ApiService {
 
   // ================= CONFIGURAÇÕES TI (ADMIN) =================
   Future<InformaticaConfigModel> getConfigTI() async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti');
     final response = await http.get(uri, headers: _headers()).timeout(const Duration(seconds: 15));
     if (response.statusCode != 200) {
@@ -1199,6 +1241,7 @@ class ApiService {
   }
 
   Future<InformaticaConfigModel> updateConfigTI(Map<String, dynamic> data) async {
+    await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti');
     final response = await http.put(
       uri,
