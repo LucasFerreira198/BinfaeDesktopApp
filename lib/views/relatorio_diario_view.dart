@@ -553,6 +553,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
 
   Widget _buildCardManutencao(bool isDark) {
     final itens = _relatorio!.itensManutencao;
+    final entrados = _relatorio!.itensEntradosManutencao;
 
     return Card(
       elevation: 2,
@@ -567,23 +568,109 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               children: [
                 const Icon(Icons.handyman_rounded, color: Colors.amber, size: 18),
                 const SizedBox(width: 8),
-                Text('Itens em Manutenção Atualmente (${itens.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('Oficina & Manutenção de Equipamentos', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
-            const SizedBox(height: 8),
-            itens.isEmpty
-                ? const Text('Nenhum item aguardando manutenção.', style: TextStyle(fontSize: 12, color: Colors.grey))
-                : Column(
-                    children: itens.map((it) {
-                      return ListTile(
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.computer_rounded, size: 18),
-                        title: Text('${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'})', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                        subtitle: Text('Defeito: ${it['defeito'] ?? 'Não especificado'}', style: const TextStyle(fontSize: 11.5)),
-                      );
-                    }).toList(),
-                  ),
+            const SizedBox(height: 12),
+
+            // 1. Entradas em Manutenção nas 24h
+            Row(
+              children: [
+                const Icon(Icons.login_rounded, size: 15, color: Colors.orange),
+                const SizedBox(width: 6),
+                Text(
+                  'Entradas para Reparo no Plantão (${entrados.length}):',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: Colors.orange),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (entrados.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(left: 6, bottom: 8),
+                child: Text('Nenhum novo equipamento deu entrada para conserto nas 24h.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
+            else
+              ...entrados.map((it) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• ${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'}${it['numero_serie'] != null ? ' | Série: ${it['numero_serie']}' : ''})',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Defeito: ${it['defeito'] ?? 'Recolhido para reparo'}',
+                      style: TextStyle(fontSize: 11.5, color: isDark ? Colors.orange.shade200 : Colors.orange.shade800),
+                    ),
+                  ],
+                ),
+              )),
+
+            const Divider(height: 18),
+
+            // 2. Bancada Atual
+            Row(
+              children: [
+                const Icon(Icons.build_circle_rounded, size: 15, color: Colors.amber),
+                const SizedBox(width: 6),
+                Text(
+                  'Equipamentos na Bancada Atualmente (${itens.length}):',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: Colors.amber),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (itens.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(left: 6),
+                child: Text('Nenhum equipamento aguardando manutenção na bancada.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
+            else
+              ...itens.map((it) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.amber.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.computer_rounded, size: 16, color: Colors.amber),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'})', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                          Text('Defeito: ${it['defeito'] ?? 'Em análise'}', style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                        ],
+                      ),
+                    ),
+                    if (it['status_etapa'] != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          it['status_etapa'].toString(),
+                          style: const TextStyle(fontSize: 10, color: Colors.amber, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                  ],
+                ),
+              )),
           ],
         ),
       ),
@@ -591,9 +678,14 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   }
 
   Widget _buildCardCautelas(bool isDark) {
-    final missoes = _relatorio!.missoesCautelas;
-    final cautelas = _relatorio!.cautelasPeriodo;
+    final missoesAbertas = _relatorio!.missoesEmAberto;
+    final missoesIniciadas = _relatorio!.missoesIniciadasDia;
+    final missoesConcluidas = _relatorio!.missoesConcluidasDia;
+    final todasMissoes = _relatorio!.missoesCautelas;
     final devs = _relatorio!.devolucoesPeriodo;
+
+    // Se missoesEmAberto estiver vazio mas missoesCautelas tiver dados (ex: relatório legado em cache)
+    final listaParaExibir = missoesAbertas.isNotEmpty ? missoesAbertas : todasMissoes;
 
     return Card(
       elevation: 2,
@@ -609,88 +701,150 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                 const Icon(Icons.inventory_2_rounded, color: Colors.blue, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  'Missões e Cautelas de Materiais (${missoes.length} Missões / ${cautelas.length} Itens)',
+                  'Missões e Cautelas de Materiais (${listaParaExibir.length} em Aberto / ${devs.length} Devoluções)',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            if (missoes.isEmpty)
-              const Text('Nenhuma nova cautela ou missão nas últimas 24h.', style: TextStyle(fontSize: 12, color: Colors.grey))
+            const SizedBox(height: 12),
+
+            // 1. Missões em Aberto / Em Andamento
+            Text(
+              '🚀 Missões e Cautelas Ativas / Em Andamento (${listaParaExibir.length}):',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blue),
+            ),
+            const SizedBox(height: 6),
+            if (listaParaExibir.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(left: 6, bottom: 8),
+                child: Text('Nenhuma missão ou cautela de material atualmente em aberto.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
             else
-              Column(
-                children: missoes.map((m) {
-                  final isMissao = m['tipo'] == 'Missão';
-                  final materiais = (m['materiais'] as List?) ?? [];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: isMissao ? Colors.blue.withOpacity(0.4) : Colors.purple.withOpacity(0.4)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+              ...listaParaExibir.map((m) {
+                final isMissao = m['tipo'] == 'Missão';
+                final materiais = (m['materiais'] as List?) ?? [];
+                final statusTag = m['status_relatorio'] ?? m['status'] ?? 'ATIVA';
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: isMissao ? Colors.blue.withOpacity(0.4) : Colors.purple.withOpacity(0.4)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              m['missao_nome'] ?? 'Cautela',
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isMissao ? Colors.blue.withOpacity(0.2) : Colors.purple.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              m['tipo'] ?? 'Missão',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: isMissao ? Colors.lightBlueAccent : Colors.purpleAccent,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              statusTag,
+                              style: const TextStyle(fontSize: 10, color: Colors.greenAccent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Responsável: ${m['militar_responsavel'] ?? 'Não informado'} | Total: ${m['total_materiais'] ?? materiais.length} material(is)',
+                        style: TextStyle(fontSize: 11.5, color: Colors.grey[400]),
+                      ),
+                      const SizedBox(height: 6),
+                      ...materiais.map((mat) => Padding(
+                        padding: const EdgeInsets.only(left: 6, bottom: 3),
+                        child: Row(
                           children: [
+                            const Icon(Icons.arrow_right_rounded, size: 16, color: Colors.grey),
                             Expanded(
                               child: Text(
-                                m['missao_nome'] ?? 'Cautela',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                '${mat['nome']} (BMP: ${mat['bmp'] ?? 'S/N'}${mat['numero_serie'] != null ? ' | Série: ${mat['numero_serie']}' : ''}) - ${mat['condicao_saida'] ?? 'Bom estado'}',
+                                style: const TextStyle(fontSize: 12),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: isMissao ? Colors.blue.withOpacity(0.2) : Colors.purple.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                m['tipo'] ?? 'Missão',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: isMissao ? Colors.lightBlueAccent : Colors.purpleAccent,
-                                ),
-                              ),
-                            ),
+                            if (mat['status'] == 'DEVOLVIDO')
+                              const Text('[DEVOLVIDO]', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Responsável: ${m['militar_responsavel'] ?? 'Não informado'} | Total: ${m['total_materiais'] ?? materiais.length} material(is)',
-                          style: TextStyle(fontSize: 11.5, color: Colors.grey[400]),
+                      )),
+                    ],
+                  ),
+                );
+              }),
+
+            // 2. Missões Concluídas no Plantão (se houver)
+            if (missoesConcluidas.isNotEmpty) ...[
+              const Divider(height: 18),
+              Text(
+                '🏁 Missões Concluídas no Plantão (${missoesConcluidas.length}):',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.tealAccent),
+              ),
+              const SizedBox(height: 6),
+              ...missoesConcluidas.map((mc) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.teal.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text('✔ ${mc['missao_nome']} (${mc['tipo']})', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
                         ),
-                        const SizedBox(height: 6),
-                        ...materiais.map((mat) => Padding(
-                          padding: const EdgeInsets.only(left: 6, bottom: 2),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.arrow_right_rounded, size: 16, color: Colors.grey),
-                              Expanded(
-                                child: Text(
-                                  '${mat['nome']} (BMP: ${mat['bmp'] ?? 'S/N'}${mat['numero_serie'] != null ? ' | Série: ${mat['numero_serie']}' : ''})',
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: Colors.teal.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
+                          child: const Text('CONCLUÍDA', style: TextStyle(fontSize: 10, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
+                        ),
                       ],
                     ),
-                  );
-                }).toList(),
-              ),
+                    const SizedBox(height: 2),
+                    Text('Responsável: ${mc['militar_responsavel']} | Total: ${mc['total_materiais']} materiais devolvidos', style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                  ],
+                ),
+              )),
+            ],
 
+            // 3. Devoluções de Materiais
             if (devs.isNotEmpty) ...[
-              const Divider(height: 20),
+              const Divider(height: 18),
               Row(
                 children: [
                   const Icon(Icons.assignment_return_rounded, color: Colors.tealAccent, size: 16),
                   const SizedBox(width: 6),
-                  Text('Devoluções Realizadas (${devs.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text('Devoluções Realizadas no Plantão (${devs.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 ],
               ),
               const SizedBox(height: 6),
@@ -709,6 +863,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   }
 
   Widget _buildCardPendencias(bool isDark) {
+    final abertas = _relatorio!.pendenciasEmAberto;
     final criadas = _relatorio!.pendenciasCriadas;
     final resolvidas = _relatorio!.pendenciasResolvidas;
 
@@ -725,19 +880,93 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               children: [
                 const Icon(Icons.checklist_rounded, color: Colors.green, size: 18),
                 const SizedBox(width: 8),
-                const Text('Pendências e Metas do Período', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Text('Gestão de Pendências & Passagem de Serviço', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
-            // Resolvidas
-            Text(
-              '✔ Solucionadas no Plantão (${resolvidas.length}):',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
+            // 1. Pendências em Aberto para Passagem de Serviço
+            Row(
+              children: [
+                const Icon(Icons.pending_actions_rounded, size: 15, color: Colors.amber),
+                const SizedBox(width: 6),
+                Text(
+                  '📌 Pendências em Aberto para o Próximo Serviço (${abertas.length}):',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
+            if (abertas.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(left: 6, bottom: 8),
+                child: Text('Nenhuma pendência aberta na Seção de Informática.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
+            else
+              ...abertas.map((p) => Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
+                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        if (p['prioridade'] != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              p['prioridade'],
+                              style: const TextStyle(fontSize: 10, color: Colors.redAccent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (p['descricao'] != null && p['descricao'].toString().isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(p['descricao'], style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                    ],
+                    if (p['responsavel'] != null) ...[
+                      const SizedBox(height: 2),
+                      Text('Responsável: ${p['responsavel']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ],
+                ),
+              )),
+
+            const Divider(height: 18),
+
+            // 2. Resolvidas no Plantão
+            Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, size: 15, color: Colors.green),
+                const SizedBox(width: 6),
+                Text(
+                  '✔ Solucionadas no Plantão (${resolvidas.length}):',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
             if (resolvidas.isEmpty)
-              const Text('Nenhuma pendência finalizada no período.', style: TextStyle(fontSize: 12, color: Colors.grey))
+              const Padding(
+                padding: EdgeInsets.only(left: 6, bottom: 8),
+                child: Text('Nenhuma pendência finalizada no período.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
             else
               ...resolvidas.map((p) => Container(
                 margin: const EdgeInsets.only(bottom: 6),
@@ -765,14 +994,23 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
 
             const Divider(height: 18),
 
-            // Criadas
-            Text(
-              '⚠️ Novas Pendências Registradas (${criadas.length}):',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange),
+            // 3. Criadas no Plantão
+            Row(
+              children: [
+                const Icon(Icons.add_circle_outline_rounded, size: 15, color: Colors.orange),
+                const SizedBox(width: 6),
+                Text(
+                  '⚠️ Novas Pendências Abertas no Plantão (${criadas.length}):',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             if (criadas.isEmpty)
-              const Text('Nenhuma nova pendência aberta no plantão.', style: TextStyle(fontSize: 12, color: Colors.grey))
+              const Padding(
+                padding: EdgeInsets.only(left: 6),
+                child: Text('Nenhuma nova pendência aberta no plantão.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              )
             else
               ...criadas.map((p) => Container(
                 margin: const EdgeInsets.only(bottom: 6),
@@ -785,35 +1023,13 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
-                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        if (p['prioridade'] != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              p['prioridade'],
-                              style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                      ],
+                    Text(
+                      '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
                     ),
                     if (p['descricao'] != null && p['descricao'].toString().isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(p['descricao'], style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
-                    ],
-                    if (p['responsavel'] != null) ...[
-                      const SizedBox(height: 2),
-                      Text('Responsável: ${p['responsavel']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
                     ],
                   ],
                 ),
