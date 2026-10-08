@@ -1290,6 +1290,11 @@ class ApiService {
     List<int>? usuarioIds,
     List<int>? militarIds,
     List<String>? emailsAdicionais,
+    String? smtpHost,
+    int? smtpPort,
+    String? smtpUser,
+    String? smtpPassword,
+    String? smtpFrom,
   }) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti/enviar-email');
@@ -1302,6 +1307,11 @@ class ApiService {
         if (usuarioIds != null && usuarioIds.isNotEmpty) 'usuario_ids': usuarioIds,
         if (militarIds != null && militarIds.isNotEmpty) 'militar_ids': militarIds,
         if (emailsAdicionais != null && emailsAdicionais.isNotEmpty) 'emails_adicionais': emailsAdicionais,
+        if (smtpHost != null && smtpHost.isNotEmpty) 'smtp_host': smtpHost,
+        if (smtpPort != null && smtpPort > 0) 'smtp_port': smtpPort,
+        if (smtpUser != null && smtpUser.isNotEmpty) 'smtp_user': smtpUser,
+        if (smtpPassword != null && smtpPassword.isNotEmpty) 'smtp_password': smtpPassword,
+        if (smtpFrom != null && smtpFrom.isNotEmpty) 'smtp_from': smtpFrom,
       }),
     ).timeout(requestTimeout);
     if (response.statusCode != 200) {

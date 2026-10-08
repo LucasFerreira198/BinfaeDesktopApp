@@ -602,6 +602,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             mensagem: msg,
                             usuarioIds: selectedUserIds.toList(),
                             emailsAdicionais: extras,
+                            smtpHost: _smtpHostCtrl.text.trim(),
+                            smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 465,
+                            smtpUser: _smtpUserCtrl.text.trim(),
+                            smtpPassword: _smtpPasswordCtrl.text.trim(),
+                            smtpFrom: _smtpFromCtrl.text.trim(),
                           );
 
                           if (ctx.mounted) Navigator.pop(ctx);
