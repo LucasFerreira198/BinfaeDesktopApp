@@ -78,4 +78,22 @@ class RelatorioDiarioModel {
       whatsappStatus: json['whatsapp_status'] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'data_referencia': dataReferencia.toIso8601String(),
+    'periodo_inicio': periodoInicio.toIso8601String(),
+    'periodo_fim': periodoFim.toIso8601String(),
+    'militar_servico_id': militarServicoId,
+    'militar_servico_nome': militarServicoNome,
+    'militar_servico_posto': militarServicoPosto,
+    'militar_servico_guerra': militarServicoGuerra,
+    'dados_automaticos': dadosAutomaticos,
+    'ocorrencias_militar': ocorrenciasMilitar,
+    'status': status,
+    'lancado_em': lancadoEm?.toIso8601String(),
+    'lancado_por_nome': lancadoPorNome,
+    'emails_disparados': emailsDisparados,
+    'whatsapp_status': whatsappStatus,
+  };
 }
