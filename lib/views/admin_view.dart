@@ -290,7 +290,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                         setModalState(() => isTesting = true);
                         try {
                           final api = Provider.of<ApiService>(context, listen: false);
-                          final res = await api.testarEmail(destinatario: email);
+                          final res = await api.testarEmail(
+                            destinatario: email,
+                            smtpHost: _smtpHostCtrl.text.trim(),
+                            smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 587,
+                            smtpUser: _smtpUserCtrl.text.trim(),
+                            smtpPassword: _smtpPasswordCtrl.text.trim(),
+                            smtpFrom: _smtpFromCtrl.text.trim(),
+                          );
                           if (ctx.mounted) Navigator.pop(ctx);
                           if (mounted) {
                             final sucesso = res['sucesso'] == true;

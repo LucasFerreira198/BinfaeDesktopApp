@@ -1256,7 +1256,14 @@ class ApiService {
   }
 
   // ================= E-MAIL & COMUNICADOS ADMIN =================
-  Future<Map<String, dynamic>> testarEmail({String? destinatario}) async {
+  Future<Map<String, dynamic>> testarEmail({
+    String? destinatario,
+    String? smtpHost,
+    int? smtpPort,
+    String? smtpUser,
+    String? smtpPassword,
+    String? smtpFrom,
+  }) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti/testar-email');
     final response = await http.post(
@@ -1264,6 +1271,11 @@ class ApiService {
       headers: _headers(),
       body: jsonEncode({
         if (destinatario != null && destinatario.trim().isNotEmpty) 'destinatario': destinatario.trim(),
+        if (smtpHost != null && smtpHost.trim().isNotEmpty) 'smtp_host': smtpHost.trim(),
+        if (smtpPort != null) 'smtp_port': smtpPort,
+        if (smtpUser != null && smtpUser.trim().isNotEmpty) 'smtp_user': smtpUser.trim(),
+        if (smtpPassword != null && smtpPassword.trim().isNotEmpty) 'smtp_password': smtpPassword.trim(),
+        if (smtpFrom != null && smtpFrom.trim().isNotEmpty) 'smtp_from': smtpFrom.trim(),
       }),
     ).timeout(requestTimeout);
     if (response.statusCode != 200) {
