@@ -85,9 +85,9 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   }
 
   Future<void> _loadAll() async {
-    _loadUsers();
-    _loadMilitaries();
-    _loadConfigTI();
+    await _loadUsers();
+    if (mounted) await _loadMilitaries();
+    if (mounted) await _loadConfigTI();
   }
 
   Future<void> _loadUsers() async {
@@ -1657,9 +1657,19 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${_users.length} contas cadastradas',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+            Row(
+              children: [
+                Text(
+                  '${_users.length} contas cadastradas',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 18),
+                  tooltip: 'Atualizar Lista de Usuários',
+                  onPressed: _isLoadingUsers ? null : _loadUsers,
+                ),
+              ],
             ),
             Row(
               children: [
@@ -1693,7 +1703,40 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           child: _isLoadingUsers
               ? const Center(child: CircularProgressIndicator())
               : _userError != null
-                  ? Center(child: Text('Erro: $_userError'))
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud_off_rounded, size: 48, color: Colors.orange[400]),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Não foi possível carregar a lista de usuários',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _userError!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: _loadUsers,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('Tentar Novamente', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   : Container(
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF151D2F) : Colors.white,
@@ -1829,9 +1872,19 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${_militaries.length} militares no efetivo',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+            Row(
+              children: [
+                Text(
+                  '${_militaries.length} militares no efetivo',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 18),
+                  tooltip: 'Atualizar Lista de Militares',
+                  onPressed: _isLoadingMilitaries ? null : _loadMilitaries,
+                ),
+              ],
             ),
             ElevatedButton.icon(
               onPressed: () => _openMilitaryDialog(),
@@ -1850,7 +1903,40 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           child: _isLoadingMilitaries
               ? const Center(child: CircularProgressIndicator())
               : _militaryError != null
-                  ? Center(child: Text('Erro: $_militaryError'))
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud_off_rounded, size: 48, color: Colors.orange[400]),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Não foi possível carregar a lista de militares',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _militaryError!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: _loadMilitaries,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('Tentar Novamente', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   : Container(
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF151D2F) : Colors.white,
