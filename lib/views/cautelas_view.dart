@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/cautela.dart';
 import '../providers/stock_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/date_utils.dart';
 import '../widgets/cautela_detail_dialog.dart';
@@ -36,6 +37,12 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
         setState(() {});
       }
     });
+    // 0ms Stale-While-Revalidate: renderiza imediatamente dados salvos localmente
+    final cached = StorageService().cautelas;
+    if (cached.isNotEmpty) {
+      _cautelas = cached;
+      _isLoading = false;
+    }
     _loadCautelas();
   }
 
@@ -64,6 +71,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
     try {
       final api = Provider.of<ApiService>(context, listen: false);
       final list = await api.listCautelas();
+      StorageService().persistCautelas(list);
       if (mounted) {
         setState(() {
           _cautelas = list;
@@ -73,14 +81,17 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   }
 
   Future<void> _loadCautelas() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (_cautelas.isEmpty) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     try {
       final api = Provider.of<ApiService>(context, listen: false);
       final list = await api.listCautelas();
+      StorageService().persistCautelas(list);
       if (mounted) {
         setState(() {
           _cautelas = list;
@@ -89,10 +100,15 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _error = e.toString().replaceAll('Exception: ', '');
-          _isLoading = false;
-        });
+        // Se já temos dados no cache local, não trava a tela com erro
+        if (_cautelas.isNotEmpty) {
+          setState(() => _isLoading = false);
+        } else {
+          setState(() {
+            _error = e.toString().replaceAll('Exception: ', '');
+            _isLoading = false;
+          });
+        }
       }
     }
   }

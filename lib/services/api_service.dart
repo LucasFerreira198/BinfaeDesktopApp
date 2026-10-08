@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item.dart';
 import '../models/user.dart';
@@ -59,7 +60,42 @@ class AppHttpOverrides extends HttpOverrides {
 class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
-  ApiService._internal();
+  ApiService._internal() {
+    _updateHttpClient();
+  }
+
+  http.Client _client = http.Client();
+
+  void _updateHttpClient() {
+    try {
+      final io = HttpClient();
+      io.connectionTimeout = requestTimeout;
+      if (_proxyEnabled && _proxyHost.trim().isNotEmpty) {
+        final cleanHost = _proxyHost.trim();
+        final port = _proxyPort;
+        io.findProxy = (uri) => "PROXY $cleanHost:$port";
+        if (_proxyUsername.trim().isNotEmpty) {
+          final user = _proxyUsername.trim();
+          final pass = _proxyPassword;
+          io.authenticateProxy = (String host, int p, String scheme, String? realm) async {
+            io.addProxyCredentials(
+              host,
+              p,
+              realm ?? '',
+              HttpClientBasicCredentials(user, pass),
+            );
+            return true;
+          };
+        }
+      }
+      if (_proxyBypassSsl) {
+        io.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      }
+      _client = IOClient(io);
+    } catch (_) {
+      _client = http.Client();
+    }
+  }
 
   static const String defaultBaseUrl = 'https://backend-info-binfae.vercel.app';
   static const Duration requestTimeout = Duration(seconds: 30);
@@ -118,6 +154,7 @@ class ApiService {
     _proxyPassword = prefs.getString(_keyProxyPassword) ?? '';
     _proxyBypassSsl = prefs.getBool(_keyProxyBypassSsl) ?? true;
     applyProxyOverrides();
+    _updateHttpClient();
 
     final savedUrl = prefs.getString(_keyBaseUrl);
     if (savedUrl != null && savedUrl.trim().isNotEmpty && !savedUrl.contains('onrender.com')) {
@@ -204,6 +241,7 @@ class ApiService {
     await prefs.setBool(_keyProxyBypassSsl, _proxyBypassSsl);
 
     applyProxyOverrides();
+    _updateHttpClient();
   }
 
   Future<bool> testProxy({
@@ -384,8 +422,6 @@ class ApiService {
     }
     return headers;
   }
-
-  final http.Client _client = http.Client();
 
   Future<http.Response> _get(Uri uri, {Map<String, String>? headers, Duration? timeout}) async {
     int attempts = 0;
@@ -1377,6 +1413,11 @@ class ApiService {
   }) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti/testar-email');
+    final cleanPass = (smtpPassword != null &&
+            smtpPassword.trim().isNotEmpty &&
+            smtpPassword.trim() != '••••••••')
+        ? smtpPassword.trim()
+        : null;
     final response = await _post(
       uri,
       headers: _headers(),
@@ -1385,7 +1426,7 @@ class ApiService {
         if (smtpHost != null && smtpHost.trim().isNotEmpty) 'smtp_host': smtpHost.trim(),
         if (smtpPort != null) 'smtp_port': smtpPort,
         if (smtpUser != null && smtpUser.trim().isNotEmpty) 'smtp_user': smtpUser.trim(),
-        if (smtpPassword != null && smtpPassword.trim().isNotEmpty) 'smtp_password': smtpPassword.trim(),
+        if (cleanPass != null) 'smtp_password': cleanPass,
         if (smtpFrom != null && smtpFrom.trim().isNotEmpty) 'smtp_from': smtpFrom.trim(),
       }),
     );
@@ -1409,6 +1450,11 @@ class ApiService {
   }) async {
     await _ensureAuth();
     final uri = Uri.parse('$_baseUrl/admin/config-ti/enviar-email');
+    final cleanPass = (smtpPassword != null &&
+            smtpPassword.trim().isNotEmpty &&
+            smtpPassword.trim() != '••••••••')
+        ? smtpPassword.trim()
+        : null;
     final response = await _post(
       uri,
       headers: _headers(),
@@ -1421,7 +1467,7 @@ class ApiService {
         if (smtpHost != null && smtpHost.isNotEmpty) 'smtp_host': smtpHost,
         if (smtpPort != null && smtpPort > 0) 'smtp_port': smtpPort,
         if (smtpUser != null && smtpUser.isNotEmpty) 'smtp_user': smtpUser,
-        if (smtpPassword != null && smtpPassword.isNotEmpty) 'smtp_password': smtpPassword,
+        if (cleanPass != null) 'smtp_password': cleanPass,
         if (smtpFrom != null && smtpFrom.isNotEmpty) 'smtp_from': smtpFrom,
       }),
     );

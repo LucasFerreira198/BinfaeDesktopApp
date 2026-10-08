@@ -1,25 +1,75 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item.dart';
+import '../models/cautela.dart';
+import '../models/pendencia.dart';
+import '../models/relatorio_diario.dart';
+import '../models/config_ti.dart';
 
 class StorageService {
+  static final StorageService _instance = StorageService._internal();
+  factory StorageService() => _instance;
+  StorageService._internal();
+
   static const String _keyItems = 'binfae_desktop_cached_items';
   static const String _keyGroups = 'binfae_desktop_cached_groups';
   static const String _keySubgroups = 'binfae_desktop_cached_subgroups';
   static const String _keyLocations = 'binfae_desktop_cached_locations';
+  static const String _keyCautelas = 'binfae_desktop_cached_cautelas';
+  static const String _keyPendenciasAtivas = 'binfae_desktop_cached_pendencias_ativas';
+  static const String _keyPendenciasConcluidas = 'binfae_desktop_cached_pendencias_concluidas';
+  static const String _keyMilitares = 'binfae_desktop_cached_militares';
+  static const String _keyUltimoRelatorio = 'binfae_desktop_cached_ultimo_relatorio';
+  static const String _keyConfigTI = 'binfae_desktop_cached_config_ti';
   static const String _keyLastSync = 'binfae_desktop_last_sync';
 
   List<ItemModel> _memoryItems = [];
   List<GroupModel> _memoryGroups = [];
   List<SubgroupModel> _memorySubgroups = [];
   List<LocationModel> _memoryLocations = [];
+  List<CautelaModel> _memoryCautelas = [];
+  List<PendenciaModel> _memoryPendenciasAtivas = [];
+  List<PendenciaModel> _memoryPendenciasConcluidas = [];
+  List<Map<String, dynamic>> _memoryMilitares = [];
+  RelatorioDiarioModel? _memoryUltimoRelatorio;
+  InformaticaConfigModel? _memoryConfigTI;
   DateTime? _lastSync;
 
   List<ItemModel> get items => _memoryItems;
   List<GroupModel> get groups => _memoryGroups;
   List<SubgroupModel> get subgroups => _memorySubgroups;
   List<LocationModel> get locations => _memoryLocations;
+  List<CautelaModel> get cautelas => _memoryCautelas;
+  List<PendenciaModel> get pendenciasAtivas => _memoryPendenciasAtivas;
+  List<PendenciaModel> get pendenciasConcluidas => _memoryPendenciasConcluidas;
+  List<Map<String, dynamic>> get militares => _memoryMilitares;
+  RelatorioDiarioModel? get ultimoRelatorio => _memoryUltimoRelatorio;
+  InformaticaConfigModel? get configTI => _memoryConfigTI;
   DateTime? get lastSync => _lastSync;
+
+  /// Retorna o caminho do arquivo físico permanente de backup local no Windows/sistema.
+  /// Salvo em: %USERPROFILE%\Documents\BINFAE_Backups\binfae_backup_local.json
+  static File _getPermanentBackupFile() {
+    String basePath = '';
+    final sep = Platform.pathSeparator;
+    if (Platform.isWindows) {
+      final userProfile = Platform.environment['USERPROFILE'] ?? Platform.environment['HOME'];
+      if (userProfile != null && userProfile.isNotEmpty) {
+        basePath = '$userProfile${sep}Documents${sep}BINFAE_Backups';
+      }
+    }
+    if (basePath.isEmpty) {
+      basePath = '${Directory.current.path}${sep}BINFAE_Backups';
+    }
+    final dir = Directory(basePath);
+    if (!dir.existsSync()) {
+      try {
+        dir.createSync(recursive: true);
+      } catch (_) {}
+    }
+    return File('$basePath${sep}binfae_backup_local.json');
+  }
 
   Future<void> loadLocalDatabase() async {
     try {
@@ -28,6 +78,12 @@ class StorageService {
       final rawGroups = prefs.getString(_keyGroups);
       final rawSubgroups = prefs.getString(_keySubgroups);
       final rawLocations = prefs.getString(_keyLocations);
+      final rawCautelas = prefs.getString(_keyCautelas);
+      final rawAtivas = prefs.getString(_keyPendenciasAtivas);
+      final rawConcluidas = prefs.getString(_keyPendenciasConcluidas);
+      final rawMilitares = prefs.getString(_keyMilitares);
+      final rawRelatorio = prefs.getString(_keyUltimoRelatorio);
+      final rawConfigTI = prefs.getString(_keyConfigTI);
       final rawSync = prefs.getString(_keyLastSync);
 
       if (rawItems != null) {
@@ -50,12 +106,132 @@ class StorageService {
         _memoryLocations = list.map((json) => LocationModel.fromJson(json)).toList();
       }
 
+      if (rawCautelas != null) {
+        final List list = jsonDecode(rawCautelas);
+        _memoryCautelas = list.map((json) => CautelaModel.fromJson(json)).toList();
+      }
+
+      if (rawAtivas != null) {
+        final List list = jsonDecode(rawAtivas);
+        _memoryPendenciasAtivas = list.map((json) => PendenciaModel.fromJson(json)).toList();
+      }
+
+      if (rawConcluidas != null) {
+        final List list = jsonDecode(rawConcluidas);
+        _memoryPendenciasConcluidas = list.map((json) => PendenciaModel.fromJson(json)).toList();
+      }
+
+      if (rawMilitares != null) {
+        final List list = jsonDecode(rawMilitares);
+        _memoryMilitares = list.map((m) => Map<String, dynamic>.from(m)).toList();
+      }
+
+      if (rawRelatorio != null) {
+        _memoryUltimoRelatorio = RelatorioDiarioModel.fromJson(jsonDecode(rawRelatorio));
+      }
+
+      if (rawConfigTI != null) {
+        _memoryConfigTI = InformaticaConfigModel.fromJson(jsonDecode(rawConfigTI));
+      }
+
       if (rawSync != null) {
         _lastSync = DateTime.tryParse(rawSync);
       }
-    } catch (e) {
-      // Ignora falha de deserialização inicial
+
+      // Se o SharedPreferences estiver vazio ou com itens zerados (ex: app recém-atualizado),
+      // restaura imediatamente a partir do arquivo físico permanente de backup local!
+      if (_memoryItems.isEmpty) {
+        await _restoreFromPermanentBackupFile();
+      }
+    } catch (_) {
+      // Fallback: tenta recuperar do arquivo físico de backup
+      await _restoreFromPermanentBackupFile();
     }
+  }
+
+  Future<void> _restoreFromPermanentBackupFile() async {
+    try {
+      final file = _getPermanentBackupFile();
+      if (!file.existsSync()) return;
+      final rawContent = await file.readAsString();
+      if (rawContent.trim().isEmpty) return;
+
+      final data = jsonDecode(rawContent) as Map<String, dynamic>;
+
+      if (data['items'] is List && (data['items'] as List).isNotEmpty) {
+        _memoryItems = (data['items'] as List).map((json) => ItemModel.fromJson(json)).toList();
+      }
+      if (data['groups'] is List) {
+        _memoryGroups = (data['groups'] as List).map((json) => GroupModel.fromJson(json)).toList();
+      }
+      if (data['subgroups'] is List) {
+        _memorySubgroups = (data['subgroups'] as List).map((json) => SubgroupModel.fromJson(json)).toList();
+      }
+      if (data['locations'] is List) {
+        _memoryLocations = (data['locations'] as List).map((json) => LocationModel.fromJson(json)).toList();
+      }
+      if (data['cautelas'] is List) {
+        _memoryCautelas = (data['cautelas'] as List).map((json) => CautelaModel.fromJson(json)).toList();
+      }
+      if (data['pendencias_ativas'] is List) {
+        _memoryPendenciasAtivas = (data['pendencias_ativas'] as List).map((json) => PendenciaModel.fromJson(json)).toList();
+      }
+      if (data['pendencias_concluidas'] is List) {
+        _memoryPendenciasConcluidas = (data['pendencias_concluidas'] as List).map((json) => PendenciaModel.fromJson(json)).toList();
+      }
+      if (data['militares'] is List) {
+        _memoryMilitares = (data['militares'] as List).map((m) => Map<String, dynamic>.from(m)).toList();
+      }
+      if (data['ultimo_relatorio'] is Map) {
+        _memoryUltimoRelatorio = RelatorioDiarioModel.fromJson(data['ultimo_relatorio']);
+      }
+      if (data['config_ti'] is Map) {
+        _memoryConfigTI = InformaticaConfigModel.fromJson(data['config_ti']);
+      }
+      if (data['last_sync'] != null) {
+        _lastSync = DateTime.tryParse(data['last_sync'].toString());
+      }
+
+      // Sincroniza de volta no SharedPreferences para acessos imediatos
+      final prefs = await SharedPreferences.getInstance();
+      if (_memoryItems.isNotEmpty) {
+        await prefs.setString(_keyItems, jsonEncode(_memoryItems.map((i) => i.toJson()).toList()));
+      }
+      if (_memoryCautelas.isNotEmpty) {
+        await prefs.setString(_keyCautelas, jsonEncode(_memoryCautelas.map((c) => c.toJson()).toList()));
+      }
+      if (_memoryPendenciasAtivas.isNotEmpty) {
+        await prefs.setString(_keyPendenciasAtivas, jsonEncode(_memoryPendenciasAtivas.map((p) => p.toJson()).toList()));
+      }
+      if (_memoryPendenciasConcluidas.isNotEmpty) {
+        await prefs.setString(_keyPendenciasConcluidas, jsonEncode(_memoryPendenciasConcluidas.map((p) => p.toJson()).toList()));
+      }
+    } catch (_) {}
+  }
+
+  void _triggerPermanentDiskBackup() {
+    // Gravação assíncrona desacoplada em disco sem bloquear o fluxo principal
+    Future.microtask(() async {
+      try {
+        final file = _getPermanentBackupFile();
+        final backupData = {
+          'version': 1,
+          'last_sync': (_lastSync ?? DateTime.now()).toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+          'items': _memoryItems.map((i) => i.toJson()).toList(),
+          'groups': _memoryGroups.map((g) => g.toJson()).toList(),
+          'subgroups': _memorySubgroups.map((s) => s.toJson()).toList(),
+          'locations': _memoryLocations.map((l) => l.toJson()).toList(),
+          'cautelas': _memoryCautelas.map((c) => c.toJson()).toList(),
+          'pendencias_ativas': _memoryPendenciasAtivas.map((p) => p.toJson()).toList(),
+          'pendencias_concluidas': _memoryPendenciasConcluidas.map((p) => p.toJson()).toList(),
+          'militares': _memoryMilitares,
+          if (_memoryUltimoRelatorio != null) 'ultimo_relatorio': _memoryUltimoRelatorio!.toJson(),
+          if (_memoryConfigTI != null) 'config_ti': _memoryConfigTI!.toJson(),
+        };
+        await file.writeAsString(jsonEncode(backupData), flush: true);
+      } catch (_) {}
+    });
   }
 
   Future<void> persistDatabase({
@@ -83,6 +259,62 @@ class StorageService {
     if (locations != null) {
       await prefs.setString(_keyLocations, jsonEncode(locations.map((l) => l.toJson()).toList()));
     }
+
+    _triggerPermanentDiskBackup();
+  }
+
+  Future<void> persistCautelas(List<CautelaModel> cautelas) async {
+    _memoryCautelas = cautelas;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyCautelas, jsonEncode(cautelas.map((c) => c.toJson()).toList()));
+      _triggerPermanentDiskBackup();
+    } catch (_) {}
+  }
+
+  Future<void> persistPendencias({
+    List<PendenciaModel>? ativas,
+    List<PendenciaModel>? concluidas,
+  }) async {
+    if (ativas != null) _memoryPendenciasAtivas = ativas;
+    if (concluidas != null) _memoryPendenciasConcluidas = concluidas;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (ativas != null) {
+        await prefs.setString(_keyPendenciasAtivas, jsonEncode(ativas.map((p) => p.toJson()).toList()));
+      }
+      if (concluidas != null) {
+        await prefs.setString(_keyPendenciasConcluidas, jsonEncode(concluidas.map((p) => p.toJson()).toList()));
+      }
+      _triggerPermanentDiskBackup();
+    } catch (_) {}
+  }
+
+  Future<void> persistMilitares(List<Map<String, dynamic>> militares) async {
+    _memoryMilitares = militares;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyMilitares, jsonEncode(militares));
+      _triggerPermanentDiskBackup();
+    } catch (_) {}
+  }
+
+  Future<void> persistUltimoRelatorio(RelatorioDiarioModel relatorio) async {
+    _memoryUltimoRelatorio = relatorio;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyUltimoRelatorio, jsonEncode(relatorio.toJson()));
+      _triggerPermanentDiskBackup();
+    } catch (_) {}
+  }
+
+  Future<void> persistConfigTI(InformaticaConfigModel config) async {
+    _memoryConfigTI = config;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyConfigTI, jsonEncode(config.toJson()));
+      _triggerPermanentDiskBackup();
+    } catch (_) {}
   }
 
   List<ItemModel> filterLocalItems({

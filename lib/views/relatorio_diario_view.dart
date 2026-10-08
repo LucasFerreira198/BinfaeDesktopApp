@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/relatorio_diario.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 
 class RelatorioDiarioView extends StatefulWidget {
@@ -30,6 +31,17 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   @override
   void initState() {
     super.initState();
+    // 0ms Stale-While-Revalidate: renderiza imediatamente último relatório e militares salvos
+    final cachedRel = StorageService().ultimoRelatorio;
+    final cachedMil = StorageService().militares;
+    if (cachedRel != null || cachedMil.isNotEmpty) {
+      _relatorio = cachedRel;
+      _militaresTI = cachedMil;
+      if (cachedRel?.ocorrenciasMilitar != null) {
+        _ocorrenciasCtrl.text = cachedRel!.ocorrenciasMilitar!;
+      }
+      _isLoading = false;
+    }
     _carregarRelatorioHoje();
   }
 
@@ -40,11 +52,15 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   }
 
   Future<void> _carregarRelatorioHoje() async {
-    setState(() => _isLoading = true);
+    if (_relatorio == null && _militaresTI.isEmpty) {
+      setState(() => _isLoading = true);
+    }
     try {
       final mil = await _api.listMilitaresInformatica();
       final rel = await _api.getRelatorioHoje();
       final hist = await _api.listHistoricoRelatorios();
+      StorageService().persistMilitares(mil);
+      StorageService().persistUltimoRelatorio(rel);
       if (mounted) {
         setState(() {
           _militaresTI = mil;
@@ -57,9 +73,11 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar relatório: $e'), backgroundColor: Colors.red),
-        );
+        if (_relatorio == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao carregar relatório: $e'), backgroundColor: Colors.red),
+          );
+        }
       }
     }
   }

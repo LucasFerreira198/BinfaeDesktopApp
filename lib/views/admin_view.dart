@@ -4,6 +4,7 @@ import '../models/user.dart';
 import '../models/config_ti.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/image_picker_helper.dart';
 import '../widgets/avatar_editor_dialog.dart';
@@ -139,17 +140,30 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   }
 
   Future<void> _loadConfigTI() async {
-    setState(() => _isLoadingConfigTI = true);
+    final cached = StorageService().configTI;
+    if (cached != null && _configTI == null) {
+      _configTI = cached;
+      _smtpHostCtrl.text = cached.smtpHost ?? '';
+      _smtpPortCtrl.text = cached.smtpPort.toString();
+      _smtpUserCtrl.text = cached.smtpUser ?? '';
+      _smtpPasswordCtrl.text = cached.hasSmtpPassword ? '••••••••' : (cached.smtpPassword ?? '');
+      _smtpFromCtrl.text = cached.smtpFrom ?? '';
+      _isLoadingConfigTI = false;
+    } else if (_configTI == null) {
+      setState(() => _isLoadingConfigTI = true);
+    }
+
     try {
       final api = Provider.of<ApiService>(context, listen: false);
       final cfg = await api.getConfigTI();
+      StorageService().persistConfigTI(cfg);
       if (mounted) {
         setState(() {
           _configTI = cfg;
           _smtpHostCtrl.text = cfg.smtpHost ?? '';
           _smtpPortCtrl.text = cfg.smtpPort.toString();
           _smtpUserCtrl.text = cfg.smtpUser ?? '';
-          _smtpPasswordCtrl.text = cfg.smtpPassword ?? '';
+          _smtpPasswordCtrl.text = cfg.hasSmtpPassword ? '••••••••' : (cfg.smtpPassword ?? '');
           _smtpFromCtrl.text = cfg.smtpFrom ?? '';
           _isLoadingConfigTI = false;
         });
@@ -166,16 +180,23 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
       _configTI!.smtpHost = _smtpHostCtrl.text.trim();
       _configTI!.smtpPort = int.tryParse(_smtpPortCtrl.text.trim()) ?? 587;
       _configTI!.smtpUser = _smtpUserCtrl.text.trim();
-      if (_smtpPasswordCtrl.text.trim().isNotEmpty) {
-        _configTI!.smtpPassword = _smtpPasswordCtrl.text.trim();
+      final passText = _smtpPasswordCtrl.text.trim();
+      if (passText.isNotEmpty && passText != '••••••••') {
+        _configTI!.smtpPassword = passText;
+      } else {
+        _configTI!.smtpPassword = null;
       }
       _configTI!.smtpFrom = _smtpFromCtrl.text.trim();
 
       final api = Provider.of<ApiService>(context, listen: false);
       final updated = await api.updateConfigTI(_configTI!.toJson());
+      StorageService().persistConfigTI(updated);
       if (mounted) {
         setState(() {
           _configTI = updated;
+          if (updated.hasSmtpPassword && _smtpPasswordCtrl.text.trim().isEmpty) {
+            _smtpPasswordCtrl.text = '••••••••';
+          }
           _isSavingConfigTI = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -295,7 +316,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             smtpHost: _smtpHostCtrl.text.trim(),
                             smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 587,
                             smtpUser: _smtpUserCtrl.text.trim(),
-                            smtpPassword: _smtpPasswordCtrl.text.trim(),
+                            smtpPassword: _smtpPasswordCtrl.text.trim() == '••••••••' ? null : _smtpPasswordCtrl.text.trim(),
                             smtpFrom: _smtpFromCtrl.text.trim(),
                           );
                           if (ctx.mounted) Navigator.pop(ctx);
@@ -605,7 +626,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             smtpHost: _smtpHostCtrl.text.trim(),
                             smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 465,
                             smtpUser: _smtpUserCtrl.text.trim(),
-                            smtpPassword: _smtpPasswordCtrl.text.trim(),
+                            smtpPassword: _smtpPasswordCtrl.text.trim() == '••••••••' ? null : _smtpPasswordCtrl.text.trim(),
                             smtpFrom: _smtpFromCtrl.text.trim(),
                           );
 
@@ -2201,13 +2222,49 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Senha SMTP / Senha de App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Row(
+                    children: [
+                      const Text('Senha SMTP / Senha de App', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      const SizedBox(width: 8),
+                      if (_configTI?.hasSmtpPassword == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.green.withOpacity(0.4)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 12),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Senha Salva no Servidor',
+                                style: TextStyle(
+                                  color: isDark ? Colors.green[300] : Colors.green[800],
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: _smtpPasswordCtrl,
                     obscureText: _obscureSmtpPassword,
                     decoration: InputDecoration(
                       hintText: 'Senha de aplicativo ou do servidor de e-mail',
+                      helperText: _configTI?.hasSmtpPassword == true
+                          ? 'Mantenha os pontos para preservar a senha atual cadastrada'
+                          : null,
+                      helperStyle: TextStyle(
+                        color: isDark ? Colors.green[300] : Colors.green[800],
+                        fontSize: 11,
+                      ),
                       prefixIcon: const Icon(Icons.lock_outline_rounded, size: 18),
                       suffixIcon: IconButton(
                         icon: Icon(_obscureSmtpPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 18),

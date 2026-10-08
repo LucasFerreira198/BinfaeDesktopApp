@@ -13,6 +13,7 @@ class InformaticaConfigModel {
   String? smtpUser;
   String? smtpPassword;
   String? smtpFrom;
+  final bool hasSmtpPassword;
 
   InformaticaConfigModel({
     required this.id,
@@ -29,9 +30,12 @@ class InformaticaConfigModel {
     this.smtpUser,
     this.smtpPassword,
     this.smtpFrom,
+    this.hasSmtpPassword = false,
   });
 
   factory InformaticaConfigModel.fromJson(Map<String, dynamic> json) {
+    final hasPass = json['has_smtp_password'] as bool? ??
+        ((json['smtp_password'] as String?)?.isNotEmpty ?? false);
     return InformaticaConfigModel(
       id: json['id'] as int? ?? 1,
       militarAntigo1Id: json['militar_antigo_1_id'] as int?,
@@ -47,6 +51,7 @@ class InformaticaConfigModel {
       smtpUser: json['smtp_user'] as String?,
       smtpPassword: json['smtp_password'] as String?,
       smtpFrom: json['smtp_from'] as String?,
+      hasSmtpPassword: hasPass,
     );
   }
 
@@ -60,7 +65,10 @@ class InformaticaConfigModel {
     'smtp_host': smtpHost,
     'smtp_port': smtpPort,
     'smtp_user': smtpUser,
-    if (smtpPassword != null && smtpPassword!.trim().isNotEmpty) 'smtp_password': smtpPassword!.trim(),
+    if (smtpPassword != null &&
+        smtpPassword!.trim().isNotEmpty &&
+        smtpPassword!.trim() != '••••••••')
+      'smtp_password': smtpPassword!.trim(),
     'smtp_from': smtpFrom,
   };
 }

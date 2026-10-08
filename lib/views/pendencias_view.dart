@@ -5,6 +5,7 @@ import '../models/pendencia.dart';
 import '../models/user.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 
 class PendenciasView extends StatefulWidget {
@@ -31,6 +32,14 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // 0ms Stale-While-Revalidate: renderiza dados locais imediatamente
+    final cachedAtivas = StorageService().pendenciasAtivas;
+    final cachedConcluidas = StorageService().pendenciasConcluidas;
+    if (cachedAtivas.isNotEmpty || cachedConcluidas.isNotEmpty) {
+      _ativas = cachedAtivas;
+      _concluidas = cachedConcluidas;
+      _isLoading = false;
+    }
     _loadPendencias();
   }
 
@@ -41,13 +50,16 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
   }
 
   Future<void> _loadPendencias() async {
-    setState(() => _isLoading = true);
+    if (_ativas.isEmpty && _concluidas.isEmpty) {
+      setState(() => _isLoading = true);
+    }
     try {
       final ativas = await _api.listPendenciasAtivas(
         tipo: _filtroTipo,
         prioridade: _filtroPrioridade,
       );
       final concluidas = await _api.listPendenciasConcluidas();
+      StorageService().persistPendencias(ativas: ativas, concluidas: concluidas);
       if (mounted) {
         setState(() {
           _ativas = ativas;
@@ -58,9 +70,11 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar pendências: $e'), backgroundColor: Colors.red),
-        );
+        if (_ativas.isEmpty && _concluidas.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao carregar pendências: $e'), backgroundColor: Colors.red),
+          );
+        }
       }
     }
   }
