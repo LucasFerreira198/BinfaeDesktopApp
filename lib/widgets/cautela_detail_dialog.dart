@@ -7,6 +7,7 @@ import '../models/item.dart';
 import '../models/user.dart';
 import '../providers/stock_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 
 class CautelaDetailDialog extends StatefulWidget {
@@ -191,6 +192,7 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
         observacoes: obsController.text,
       );
       await stock.syncData();
+      await StorageService().invalidateUltimoRelatorio();
       await _refreshDetails();
 
       if (mounted) {
@@ -1247,6 +1249,7 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
         );
       }
 
+      await StorageService().invalidateUltimoRelatorio();
       widget.onAdded();
       if (mounted) {
         Navigator.of(context).pop();

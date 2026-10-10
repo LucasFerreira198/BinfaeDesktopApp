@@ -308,6 +308,14 @@ class StorageService {
     } catch (_) {}
   }
 
+  Future<void> invalidateUltimoRelatorio() async {
+    _memoryUltimoRelatorio = null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_keyUltimoRelatorio);
+    } catch (_) {}
+  }
+
   Future<void> persistConfigTI(InformaticaConfigModel config) async {
     _memoryConfigTI = config;
     try {

@@ -25,6 +25,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
 
   final TextEditingController _ocorrenciasCtrl = TextEditingController();
   bool _isLoading = true;
+  bool _isRefreshing = false;
   bool _isSaving = false;
   bool _isLaunching = false;
 
@@ -51,9 +52,11 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
     super.dispose();
   }
 
-  Future<void> _carregarRelatorioHoje() async {
+  Future<void> _carregarRelatorioHoje({bool isManual = false}) async {
     if (_relatorio == null && _militaresTI.isEmpty) {
       setState(() => _isLoading = true);
+    } else {
+      setState(() => _isRefreshing = true);
     }
     try {
       final mil = await _api.listMilitaresInformatica();
@@ -68,16 +71,27 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           _historico = hist;
           _ocorrenciasCtrl.text = rel.ocorrenciasMilitar ?? '';
           _isLoading = false;
+          _isRefreshing = false;
         });
+        if (isManual) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Relatório de serviço sincronizado com sucesso!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
-        if (_relatorio == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao carregar relatório: $e'), backgroundColor: Colors.red),
-          );
-        }
+        setState(() {
+          _isLoading = false;
+          _isRefreshing = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar relatório: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -287,9 +301,15 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.refresh_rounded),
-                  tooltip: 'Atualizar',
-                  onPressed: _carregarRelatorioHoje,
+                  icon: _isRefreshing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.refresh_rounded),
+                  tooltip: 'Atualizar Relatório',
+                  onPressed: _isRefreshing ? null : () => _carregarRelatorioHoje(isManual: true),
                 ),
               ],
             ),
