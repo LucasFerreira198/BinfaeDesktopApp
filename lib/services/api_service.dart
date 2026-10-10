@@ -1175,6 +1175,32 @@ class ApiService {
     return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
   }
 
+  Future<CautelaModel> updateCautela(int cautelaId, {String? nome, String? observacoes}) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/cautelas/$cautelaId');
+    final response = await _put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (nome != null && nome.isNotEmpty) 'nome': nome.trim(),
+        if (observacoes != null) 'observacoes': observacoes.trim(),
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar missão/cautela'));
+    }
+    return CautelaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<void> deleteCautela(int cautelaId) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/cautelas/$cautelaId');
+    final response = await _delete(uri, headers: _headers());
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_extractError(response, 'Falha ao excluir missão/cautela'));
+    }
+  }
+
   // ================= PENDÊNCIAS E METAS =================
   Future<List<PendenciaModel>> listPendenciasAtivas({String? tipo, String? prioridade}) async {
     await _ensureAuth();
@@ -1265,6 +1291,20 @@ class ApiService {
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(_extractError(response, 'Falha ao excluir pendência'));
     }
+  }
+
+  Future<PendenciaModel> updatePendencia(int pendenciaId, Map<String, dynamic> data) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/pendencias/$pendenciaId');
+    final response = await _put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode(data),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao atualizar pendência'));
+    }
+    return PendenciaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
   // ================= ESCALA DE SERVIÇO =================

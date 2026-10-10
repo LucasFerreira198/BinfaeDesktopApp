@@ -58,6 +58,184 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
     }
   }
 
+  Future<void> _confirmDeleteCautela() async {
+    final itensAtivos = _cautela.itens.where((i) => i.status == 'CAUTELADO' || i.status == 'EM_USO').toList();
+    if (itensAtivos.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              SizedBox(width: 8),
+              Text('Exclusão Bloqueada'),
+            ],
+          ),
+          content: Text(
+            'Esta ${_cautela.isMissao ? "missão" : "cautela"} possui ${itensAtivos.length} material(is) ainda cautelado(s). Devolva todos os materiais antes de excluir.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.delete_forever_rounded, color: AppColors.danger),
+            SizedBox(width: 8),
+            Text('Excluir Cautela / Missão'),
+          ],
+        ),
+        content: Text(
+          'Deseja excluir permanentemente "${_cautela.nome}"?\nEsta ação não poderá ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger, foregroundColor: Colors.white),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Excluir Permanentemente'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      await api.deleteCautela(_cautela.id);
+      widget.onUpdated();
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Missão/Cautela excluída com sucesso.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao excluir: ${e.toString().replaceAll("Exception: ", "")}'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _abrirModalEditarCautela() async {
+    final nomeCtrl = TextEditingController(text: _cautela.nome);
+    final obsCtrl = TextEditingController(text: _cautela.observacoes ?? '');
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final salvar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.edit_note_rounded, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text('Editar ${_cautela.isMissao ? "Missão" : "Cautela"}'),
+          ],
+        ),
+        content: SizedBox(
+          width: 440,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: nomeCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Nome / Identificação *',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: obsCtrl,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Observações (opcional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+            onPressed: () {
+              if (nomeCtrl.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('O nome não pode ser vazio.'), backgroundColor: Colors.red),
+                );
+                return;
+              }
+              Navigator.of(ctx).pop(true);
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+
+    if (salvar != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final updated = await api.updateCautela(
+        _cautela.id,
+        nome: nomeCtrl.text.trim(),
+        observacoes: obsCtrl.text.trim(),
+      );
+      if (mounted) {
+        setState(() {
+          _cautela = updated;
+          _isLoading = false;
+        });
+        widget.onUpdated();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cautela atualizada com sucesso!'), backgroundColor: AppColors.success),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar: $e'), backgroundColor: AppColors.danger),
+        );
+      }
+    }
+  }
+
   Future<void> _confirmDevolverItem(CautelaItemModel item) async {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -768,10 +946,25 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip: 'Fechar',
-                  onPressed: () => Navigator.of(context).pop(),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                      tooltip: 'Editar Identificação / Observações',
+                      onPressed: _abrirModalEditarCautela,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                      tooltip: 'Excluir Cautela / Missão',
+                      onPressed: _confirmDeleteCautela,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Fechar',
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
               ],
             ),

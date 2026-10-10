@@ -423,6 +423,190 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
     }
   }
 
+  Future<void> _confirmExcluirPendencia(PendenciaModel p) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.delete_forever_rounded, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Excluir Pendência'),
+          ],
+        ),
+        content: Text('Deseja excluir permanentemente a pendência "${p.titulo}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await _api.deletePendencia(p.id);
+      _loadPendencias();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pendência excluída com sucesso!'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao excluir pendência: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  void _abrirModalEditarPendencia(PendenciaModel p) {
+    final titleCtrl = TextEditingController(text: p.titulo);
+    final descCtrl = TextEditingController(text: p.descricao ?? '');
+    String prioridade = p.prioridade;
+    DateTime? prazo = p.prazoLimite;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.edit_note_rounded, color: AppColors.primary),
+              SizedBox(width: 10),
+              Text('Editar Pendência / Meta'),
+            ],
+          ),
+          content: SizedBox(
+            width: 500,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: titleCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Título da Pendência / Meta *',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: descCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Descrição Detalhada',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: prioridade,
+                    decoration: const InputDecoration(
+                      labelText: 'Prioridade',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'BAIXA', child: Text('Baixa (Verde)')),
+                      DropdownMenuItem(value: 'MEDIA', child: Text('Média (Amarelo)')),
+                      DropdownMenuItem(value: 'ALTA', child: Text('Alta (Laranja)')),
+                      DropdownMenuItem(value: 'URGENTE', child: Text('Urgente (Vermelho)')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setDialogState(() => prioridade = val);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          prazo != null
+                              ? 'Prazo: ${DateFormat('dd/MM/yyyy').format(prazo!)}'
+                              : 'Sem prazo definido',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.calendar_month_rounded, size: 18),
+                        label: const Text('Alterar Data'),
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: prazo ?? DateTime.now().add(const Duration(days: 3)),
+                            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                            lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => prazo = picked);
+                          }
+                        },
+                      ),
+                      if (prazo != null)
+                        IconButton(
+                          icon: const Icon(Icons.clear, size: 16),
+                          tooltip: 'Remover prazo',
+                          onPressed: () => setDialogState(() => prazo = null),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+              onPressed: () async {
+                if (titleCtrl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('O título é obrigatório.'), backgroundColor: Colors.red),
+                  );
+                  return;
+                }
+                Navigator.of(ctx).pop();
+                try {
+                  await _api.updatePendencia(p.id, {
+                    'titulo': titleCtrl.text.trim(),
+                    'descricao': descCtrl.text.trim(),
+                    'prioridade': prioridade,
+                    'prazo_limite': prazo?.toUtc().toIso8601String(),
+                  });
+                  _loadPendencias();
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Pendência atualizada com sucesso!'), backgroundColor: Colors.green),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Erro ao atualizar: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCardPendencia(PendenciaModel p, bool isConcluida) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -523,7 +707,7 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                 ],
                 const Spacer(),
                 // Resolução para concluídas
-                if (isConcluida && p.resolucao != null)
+                if (isConcluida && p.resolucao != null) ...[
                   Expanded(
                     child: Text(
                       'Resolução: ${p.resolucao}',
@@ -531,6 +715,8 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
+                ],
                 // Ações para ativas
                 if (!isConcluida) ...[
                   if (p.isManutencao) ...[
@@ -548,7 +734,20 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                     label: Text(p.isManutencao ? 'Concluir Manutenção' : 'Concluir'),
                     onPressed: () => _abrirModalConcluir(p),
                   ),
+                  const SizedBox(width: 8),
                 ],
+                // Botões de Editar e Excluir
+                if (!p.isManutencao)
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    tooltip: 'Editar Pendência',
+                    onPressed: () => _abrirModalEditarPendencia(p),
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
+                  tooltip: 'Excluir Pendência',
+                  onPressed: () => _confirmExcluirPendencia(p),
+                ),
               ],
             ),
           ],
