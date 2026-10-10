@@ -194,7 +194,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
       if (mounted) {
         setState(() {
           _configTI = updated;
-          if (updated.hasSmtpPassword && _smtpPasswordCtrl.text.trim().isEmpty) {
+          if (updated.hasSmtpPassword) {
             _smtpPasswordCtrl.text = '••••••••';
           }
           _isSavingConfigTI = false;

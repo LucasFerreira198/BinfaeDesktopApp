@@ -31,10 +31,14 @@ class AppHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = super.createHttpClient(context);
-    if (enabled && host.trim().isNotEmpty) {
-      final cleanHost = host.trim();
+    final cleanHost = ApiService.sanitizeProxyHost(host);
+    final cleanPort = ApiService.sanitizeProxyPort(host, port);
+    if (enabled && cleanHost.isNotEmpty) {
       client.findProxy = (uri) {
-        return "PROXY $cleanHost:$port";
+        if (uri.host == 'localhost' || uri.host == '127.0.0.1') {
+          return 'DIRECT';
+        }
+        return "PROXY $cleanHost:$cleanPort; DIRECT";
       };
       if (username != null && username!.trim().isNotEmpty) {
         final cleanUser = username!.trim();
@@ -64,6 +68,24 @@ class ApiService {
     _updateHttpClient();
   }
 
+  static String sanitizeProxyHost(String rawHost) {
+    var h = rawHost.trim().replaceAll(RegExp(r'^https?:\/\/'), '').replaceAll(RegExp(r'\/.*$'), '');
+    if (h.contains(':')) {
+      h = h.split(':')[0];
+    }
+    return h;
+  }
+
+  static int sanitizeProxyPort(String rawHost, int defaultPort) {
+    final h = rawHost.trim().replaceAll(RegExp(r'^https?:\/\/'), '').replaceAll(RegExp(r'\/.*$'), '');
+    if (h.contains(':')) {
+      final parts = h.split(':');
+      final p = int.tryParse(parts[1]);
+      if (p != null && p > 0) return p;
+    }
+    return defaultPort > 0 ? defaultPort : 8080;
+  }
+
   http.Client _client = http.Client();
 
   void _updateHttpClient() {
@@ -71,9 +93,14 @@ class ApiService {
       final io = HttpClient();
       io.connectionTimeout = requestTimeout;
       if (_proxyEnabled && _proxyHost.trim().isNotEmpty) {
-        final cleanHost = _proxyHost.trim();
-        final port = _proxyPort;
-        io.findProxy = (uri) => "PROXY $cleanHost:$port";
+        final cleanHost = sanitizeProxyHost(_proxyHost);
+        final cleanPort = sanitizeProxyPort(_proxyHost, _proxyPort);
+        io.findProxy = (uri) {
+          if (uri.host == 'localhost' || uri.host == '127.0.0.1') {
+            return 'DIRECT';
+          }
+          return "PROXY $cleanHost:$cleanPort; DIRECT";
+        };
         if (_proxyUsername.trim().isNotEmpty) {
           final user = _proxyUsername.trim();
           final pass = _proxyPassword;
@@ -225,9 +252,11 @@ class ApiService {
     required String password,
     bool bypassSsl = true,
   }) async {
+    final cleanHost = sanitizeProxyHost(host);
+    final cleanPort = sanitizeProxyPort(host, port);
     _proxyEnabled = enabled;
-    _proxyHost = host.trim();
-    _proxyPort = port;
+    _proxyHost = cleanHost;
+    _proxyPort = cleanPort;
     _proxyUsername = username.trim();
     _proxyPassword = password;
     _proxyBypassSsl = bypassSsl;
@@ -252,10 +281,17 @@ class ApiService {
     String? password,
     bool bypassSsl = true,
   }) async {
+    final cleanHost = sanitizeProxyHost(host);
+    final cleanPort = sanitizeProxyPort(host, port);
     final client = HttpClient();
     client.connectionTimeout = requestTimeout;
-    if (enabled && host.trim().isNotEmpty) {
-      client.findProxy = (uri) => "PROXY ${host.trim()}:$port";
+    if (enabled && cleanHost.isNotEmpty) {
+      client.findProxy = (uri) {
+        if (uri.host == 'localhost' || uri.host == '127.0.0.1') {
+          return 'DIRECT';
+        }
+        return "PROXY $cleanHost:$cleanPort; DIRECT";
+      };
       if (username != null && username.trim().isNotEmpty) {
         client.authenticateProxy = (h, p, scheme, realm) async {
           client.addProxyCredentials(
@@ -269,7 +305,7 @@ class ApiService {
       }
     }
     if (bypassSsl) {
-      client.badCertificateCallback = (cert, host, port) => true;
+      client.badCertificateCallback = (cert, h, p) => true;
     }
     try {
       final request = await client.getUrl(Uri.parse('$_baseUrl/'));
