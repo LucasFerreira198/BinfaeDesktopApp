@@ -1491,7 +1491,8 @@ class ApiService {
     final uri = Uri.parse('$_baseUrl/admin/config-ti/testar-email');
     final cleanPass = (smtpPassword != null &&
             smtpPassword.trim().isNotEmpty &&
-            smtpPassword.trim() != '••••••••')
+            smtpPassword.trim() != '••••••••' &&
+            smtpPassword.trim() != '********')
         ? smtpPassword.trim()
         : null;
     final response = await _post(
@@ -1528,7 +1529,8 @@ class ApiService {
     final uri = Uri.parse('$_baseUrl/admin/config-ti/enviar-email');
     final cleanPass = (smtpPassword != null &&
             smtpPassword.trim().isNotEmpty &&
-            smtpPassword.trim() != '••••••••')
+            smtpPassword.trim() != '••••••••' &&
+            smtpPassword.trim() != '********')
         ? smtpPassword.trim()
         : null;
     final response = await _post(

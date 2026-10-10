@@ -316,7 +316,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             smtpHost: _smtpHostCtrl.text.trim(),
                             smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 587,
                             smtpUser: _smtpUserCtrl.text.trim(),
-                            smtpPassword: _smtpPasswordCtrl.text.trim() == '••••••••' ? null : _smtpPasswordCtrl.text.trim(),
+                            smtpPassword: (_smtpPasswordCtrl.text.trim() == '••••••••' || _smtpPasswordCtrl.text.trim() == '********') ? null : _smtpPasswordCtrl.text.trim(),
                             smtpFrom: _smtpFromCtrl.text.trim(),
                           );
                           if (ctx.mounted) Navigator.pop(ctx);
@@ -626,7 +626,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             smtpHost: _smtpHostCtrl.text.trim(),
                             smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 465,
                             smtpUser: _smtpUserCtrl.text.trim(),
-                            smtpPassword: _smtpPasswordCtrl.text.trim() == '••••••••' ? null : _smtpPasswordCtrl.text.trim(),
+                            smtpPassword: (_smtpPasswordCtrl.text.trim() == '••••••••' || _smtpPasswordCtrl.text.trim() == '********') ? null : _smtpPasswordCtrl.text.trim(),
                             smtpFrom: _smtpFromCtrl.text.trim(),
                           );
 
@@ -2122,6 +2122,32 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     ],
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.language_rounded, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Configuração Universal: As credenciais salvas aqui são compartilhadas centralmente pelo banco de dados para todas as plataformas (Relatórios Diários das 24h, Desktop e Mobile). Para contas Gmail, utilize o host smtp.gmail.com, porta 465 (SSL) ou 587 (TLS) e uma "Senha de Aplicativo" de 16 caracteres gerada na Conta Google (myaccount.google.com/apppasswords).',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
 
