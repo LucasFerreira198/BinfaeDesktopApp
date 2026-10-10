@@ -167,4 +167,6 @@ class CautelaModel {
 
   UserModel? get criador => criadoPor;
   int get itensPendentes => itensCautelados;
+  bool get isMissao => tipo.toUpperCase() == 'MISSAO';
+  bool get isFixa => tipo.toUpperCase() == 'FIXA';
 }
