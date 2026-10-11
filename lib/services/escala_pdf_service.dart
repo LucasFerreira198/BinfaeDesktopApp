@@ -70,7 +70,7 @@ class EscalaPdfService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    'Legenda: [Vermelho] Final de Semana / Feriado Comum | [Roxo] Natal, Ano Novo e Carnaval',
+                    'Legenda: [Vermelho] Final de Semana (FDS) | [Roxo] Natal, Ano Novo e Carnaval',
                     style: const pw.TextStyle(fontSize: 6.5, color: PdfColors.grey700),
                   ),
                   pw.Text(
@@ -118,7 +118,7 @@ class EscalaPdfService {
           if (d.isFeriadoEspecial) {
             rowBg = colorPurpleHoliday;
             textColor = PdfColors.white;
-          } else if (d.isFimDeSemana || d.isFeriado) {
+          } else if (d.isFimDeSemana) {
             rowBg = colorRedWeekend;
             textColor = PdfColors.white;
           }

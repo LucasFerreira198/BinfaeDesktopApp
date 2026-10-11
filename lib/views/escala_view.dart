@@ -517,7 +517,7 @@ class _EscalaViewState extends State<EscalaView> {
                 if (d.isFeriadoEspecial) {
                   rowBg = Colors.purple.shade700;
                   textColor = Colors.white;
-                } else if (d.isFimDeSemana || d.isFeriado) {
+                } else if (d.isFimDeSemana) {
                   rowBg = Colors.red.shade700;
                   textColor = Colors.white;
                 }
@@ -547,7 +547,7 @@ class _EscalaViewState extends State<EscalaView> {
                         child: _buildDropdownMilitar(
                           value: d.militarSvId,
                           textColor: textColor,
-                          isWeekendOrHoliday: d.isFimDeSemana || d.isFeriado,
+                          isWeekendOrHoliday: d.isFimDeSemana,
                           enabled: isAdmin,
                           onChanged: (id) {
                             setState(() {
@@ -565,7 +565,7 @@ class _EscalaViewState extends State<EscalaView> {
                       // Dropdown EXPD 1
                       Expanded(
                         flex: 3,
-                        child: (d.isFimDeSemana || d.isFeriado)
+                        child: d.isFimDeSemana
                             ? const Center(child: Text('-', style: TextStyle(color: Colors.white70)))
                             : _buildDropdownMilitar(
                                 value: d.militarExpd1Id,
@@ -588,7 +588,7 @@ class _EscalaViewState extends State<EscalaView> {
                       // Dropdown EXPD 2
                       Expanded(
                         flex: 3,
-                        child: (d.isFimDeSemana || d.isFeriado)
+                        child: d.isFimDeSemana
                             ? const Center(child: Text('-', style: TextStyle(color: Colors.white70)))
                             : _buildDropdownMilitar(
                                 value: d.militarExpd2Id,
