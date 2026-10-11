@@ -136,6 +136,7 @@ class _EscalaViewState extends State<EscalaView> {
       await Printing.layoutPdf(
         onLayout: (format) async => pdfBytes,
         name: 'Escala_${_meses[_mes]}_$_ano.pdf',
+        format: PdfPageFormat.a4.landscape,
       );
     } catch (e) {
       if (mounted) {
@@ -144,6 +145,176 @@ class _EscalaViewState extends State<EscalaView> {
         );
       }
     }
+  }
+
+  Future<void> _openOrdenarAntiguidadeDialog() async {
+    List<Map<String, dynamic>> listaOrdenada = List.from(_militaresTI);
+    bool isSavingOrdem = false;
+
+    await showDialog(
+      context: context,
+      builder: (dCtx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.format_list_numbered_rounded, color: Colors.blue, size: 22),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Ordem de Antiguidade do Efetivo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('Esta ordem se aplica a todos os meses da escala', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: 480,
+              height: 380,
+              child: ReorderableListView.builder(
+                shrinkWrap: true,
+                itemCount: listaOrdenada.length,
+                onReorder: (oldIndex, newIndex) {
+                  setModalState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = listaOrdenada.removeAt(oldIndex);
+                    listaOrdenada.insert(newIndex, item);
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final m = listaOrdenada[index];
+                  return Container(
+                    key: ValueKey(m['id']),
+                    margin: const EdgeInsets.symmetric(vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 26,
+                          height: 26,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '${index + 1}º',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.blue),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${m['posto_graduacao']} ${m['nome_guerra']}',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              Text(
+                                'SARAM: ${m['saram']} • ${m['nome_completo'] ?? ''}',
+                                style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_upward_rounded, size: 18),
+                          tooltip: 'Mover para cima',
+                          onPressed: index > 0
+                              ? () {
+                                  setModalState(() {
+                                    final item = listaOrdenada.removeAt(index);
+                                    listaOrdenada.insert(index - 1, item);
+                                  });
+                                }
+                              : null,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_downward_rounded, size: 18),
+                          tooltip: 'Mover para baixo',
+                          onPressed: index < listaOrdenada.length - 1
+                              ? () {
+                                  setModalState(() {
+                                    final item = listaOrdenada.removeAt(index);
+                                    listaOrdenada.insert(index + 1, item);
+                                  });
+                                }
+                              : null,
+                        ),
+                        const Icon(Icons.drag_indicator_rounded, color: Colors.grey, size: 20),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSavingOrdem ? null : () => Navigator.pop(dCtx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                icon: isSavingOrdem
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.save_rounded, size: 18),
+                label: const Text('Salvar Ordem para Todos os Meses', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: isSavingOrdem
+                    ? null
+                    : () async {
+                        setModalState(() => isSavingOrdem = true);
+                        try {
+                          final ids = listaOrdenada.map((m) => m['id'] as int).toList();
+                          await _api.salvarOrdemAntiguidade(ids);
+                          if (dCtx.mounted) Navigator.pop(dCtx);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Ordem de antiguidade salva com sucesso para todos os meses!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            _carregarDados();
+                          }
+                        } catch (e) {
+                          setModalState(() => isSavingOrdem = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erro ao salvar antiguidade: $e'), backgroundColor: Colors.red),
+                            );
+                          }
+                        }
+                      },
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   void _mudarMes(int delta) {
@@ -242,6 +413,17 @@ class _EscalaViewState extends State<EscalaView> {
                 if (isAdmin) ...[
                   const SizedBox(width: 8),
                   ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.format_list_numbered_rounded, size: 18),
+                    label: const Text('Ordenar Antiguidade'),
+                    tooltip: 'Definir ordem de antiguidade para todos os meses',
+                    onPressed: _militaresTI.isEmpty ? null : _openOrdenarAntiguidadeDialog,
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
                     icon: _isSaving
                         ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
@@ -329,11 +511,11 @@ class _EscalaViewState extends State<EscalaView> {
                 Color? rowBg;
                 Color textColor = isDark ? Colors.white : Colors.black87;
 
-                if (d.isFimDeSemana) {
-                  rowBg = Colors.red.shade700;
-                  textColor = Colors.white;
-                } else if (d.isFeriado) {
+                if (d.isFeriadoEspecial) {
                   rowBg = Colors.purple.shade700;
+                  textColor = Colors.white;
+                } else if (d.isFimDeSemana || d.isFeriado) {
+                  rowBg = Colors.red.shade700;
                   textColor = Colors.white;
                 }
 
@@ -380,12 +562,12 @@ class _EscalaViewState extends State<EscalaView> {
                       // Dropdown EXPD 1
                       Expanded(
                         flex: 3,
-                        child: d.isFimDeSemana
+                        child: (d.isFimDeSemana || d.isFeriado)
                             ? const Center(child: Text('-', style: TextStyle(color: Colors.white70)))
                             : _buildDropdownMilitar(
                                 value: d.militarExpd1Id,
                                 textColor: textColor,
-                                isWeekendOrHoliday: d.isFeriado,
+                                isWeekendOrHoliday: false,
                                 enabled: isAdmin,
                                 onChanged: (id) {
                                   setState(() {
@@ -403,12 +585,12 @@ class _EscalaViewState extends State<EscalaView> {
                       // Dropdown EXPD 2
                       Expanded(
                         flex: 3,
-                        child: d.isFimDeSemana
+                        child: (d.isFimDeSemana || d.isFeriado)
                             ? const Center(child: Text('-', style: TextStyle(color: Colors.white70)))
                             : _buildDropdownMilitar(
                                 value: d.militarExpd2Id,
                                 textColor: textColor,
-                                isWeekendOrHoliday: d.isFeriado,
+                                isWeekendOrHoliday: false,
                                 enabled: isAdmin,
                                 onChanged: (id) {
                                   setState(() {

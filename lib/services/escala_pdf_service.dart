@@ -48,16 +48,16 @@ class EscalaPdfService {
                 child: pw.Row(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    // --- TABELA DIÁRIA PRINCIPAL (62% da largura) ---
+                    // --- TABELA DIÁRIA PRINCIPAL (58% da largura) ---
                     pw.Expanded(
-                      flex: 62,
+                      flex: 58,
                       child: _buildTabelaDias(escala.dias),
                     ),
                     pw.SizedBox(width: 8),
 
-                    // --- QUADRO ESTATÍSTICO LATERAL (38% da largura) ---
+                    // --- QUADRO ESTATÍSTICO LATERAL (42% da largura) ---
                     pw.Expanded(
-                      flex: 38,
+                      flex: 42,
                       child: _buildTabelaEstatisticas(escala.estatisticas),
                     ),
                   ],
@@ -70,7 +70,7 @@ class EscalaPdfService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    'Legenda: [Vermelho] Final de Semana | [Roxo] Feriado Nacional / Militar',
+                    'Legenda: [Vermelho] Final de Semana / Feriado Comum | [Roxo] Natal, Ano Novo e Carnaval',
                     style: const pw.TextStyle(fontSize: 6.5, color: PdfColors.grey700),
                   ),
                   pw.Text(
@@ -92,8 +92,8 @@ class EscalaPdfService {
     return pw.Table(
       border: pw.TableBorder.all(color: colorBorder, width: 0.5),
       columnWidths: const {
-        0: pw.FixedColumnWidth(48), // DATA
-        1: pw.FixedColumnWidth(64), // DIA
+        0: pw.FixedColumnWidth(46), // DATA
+        1: pw.FixedColumnWidth(58), // DIA
         2: pw.FlexColumnWidth(1.2), // SERVIÇO
         3: pw.FlexColumnWidth(1.0), // EXPD 1
         4: pw.FlexColumnWidth(1.0), // EXPD 2
@@ -115,11 +115,11 @@ class EscalaPdfService {
           PdfColor? rowBg;
           PdfColor textColor = PdfColors.black;
 
-          if (d.isFimDeSemana) {
-            rowBg = colorRedWeekend;
-            textColor = PdfColors.white;
-          } else if (d.isFeriado) {
+          if (d.isFeriadoEspecial) {
             rowBg = colorPurpleHoliday;
+            textColor = PdfColors.white;
+          } else if (d.isFimDeSemana || d.isFeriado) {
+            rowBg = colorRedWeekend;
             textColor = PdfColors.white;
           }
 

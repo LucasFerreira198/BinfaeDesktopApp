@@ -1377,6 +1377,21 @@ class ApiService {
     return EscalaMensalModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   }
 
+  Future<List<Map<String, dynamic>>> salvarOrdemAntiguidade(List<int> militaresIds) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/ordem-antiguidade');
+    final response = await _put(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({'militares_ids': militaresIds}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao salvar ordem de antiguidade'));
+    }
+    final List<dynamic> list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.cast<Map<String, dynamic>>();
+  }
+
   // ================= RELATÓRIO DIÁRIO (24 HORAS) =================
   Future<RelatorioDiarioModel> getRelatorioHoje() async {
     await _ensureAuth();

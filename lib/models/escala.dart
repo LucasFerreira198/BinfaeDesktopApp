@@ -6,6 +6,7 @@ class EscalaDiaModel {
   final int semanaDoMes;
   final bool isFimDeSemana;
   final bool isFeriado;
+  final bool isFeriadoEspecial;
   final String? descricaoFeriado;
   int? militarSvId;
   String? militarSvNome;
@@ -28,6 +29,7 @@ class EscalaDiaModel {
     this.semanaDoMes = 1,
     this.isFimDeSemana = false,
     this.isFeriado = false,
+    this.isFeriadoEspecial = false,
     this.descricaoFeriado,
     this.militarSvId,
     this.militarSvNome,
@@ -52,6 +54,7 @@ class EscalaDiaModel {
       semanaDoMes: json['semana_do_mes'] as int? ?? 1,
       isFimDeSemana: json['is_fim_de_semana'] as bool? ?? false,
       isFeriado: json['is_feriado'] as bool? ?? false,
+      isFeriadoEspecial: json['is_feriado_especial'] as bool? ?? false,
       descricaoFeriado: json['descricao_feriado'] as String?,
       militarSvId: json['militar_sv_id'] as int?,
       militarSvNome: json['militar_sv_nome'] as String?,
