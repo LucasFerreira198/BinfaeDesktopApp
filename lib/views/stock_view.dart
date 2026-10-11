@@ -337,7 +337,7 @@ class _StockViewState extends State<StockView> {
                         const SizedBox(width: 130, child: Text('QUANTIDADE / NÍVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
                         const Expanded(flex: 3, child: Text('LOCALIZAÇÃO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
                         const SizedBox(width: 110, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 90, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                        const SizedBox(width: 125, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
                       ],
                     ),
                   ),
@@ -723,7 +723,7 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
 
               // Ações Rápidas
               SizedBox(
-                width: 90,
+                width: 125,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -760,7 +760,7 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                       constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
                       onPressed: () async {
                         final res = await showDialog(
-                          context: context,
+                           context: context,
                           builder: (ctx) => ItemDetailDialog(
                             item: item,
                             onNavigateView: widget.onNavigate,
@@ -771,12 +771,95 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                         }
                       },
                     ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
+                      tooltip: 'Excluir Material',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                      onPressed: () => _confirmDeleteItem(context, item),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDeleteItem(BuildContext context, ItemModel item) {
+    if (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Este material está cautelado em uso. Efetue a devolução antes de excluir.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (item.status.toUpperCase() == 'EM_MANUTENCAO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Material com manutenção em andamento. Conclua o reparo ou baixe o item na pendência.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Excluir Material'),
+          ],
+        ),
+        content: Text(
+          'Tem certeza que deseja excluir o material "${item.nome}" (ID #${item.id}) do inventário?\n\nEsta ação excluirá permanentemente o registro e o histórico do equipamento.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                final stock = Provider.of<StockProvider>(context, listen: false);
+                await stock.deleteItem(item.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Material "${item.nome}" excluído do estoque com sucesso.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao excluir material: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Excluir'),
+          ),
+        ],
       ),
     );
   }

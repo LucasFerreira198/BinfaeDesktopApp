@@ -536,8 +536,18 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
 
               // Rodapé do Modal com Ações
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if (widget.item != null)
+                    TextButton.icon(
+                      onPressed: _isSubmitting ? null : _confirmDelete,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                      label: const Text('Excluir Material', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  const Spacer(),
                   TextButton(
                     onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
@@ -575,6 +585,87 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDelete() {
+    final item = widget.item;
+    if (item == null) return;
+
+    if (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Este material está cautelado em uso. Efetue a devolução antes de excluir.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (item.status.toUpperCase() == 'EM_MANUTENCAO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Material com ordem de manutenção em andamento. Conclua o reparo ou baixe o item na pendência.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Excluir Material'),
+          ],
+        ),
+        content: Text(
+          'Tem certeza que deseja excluir o material "${item.nome}" (ID #${item.id}) do inventário?\n\nEsta ação excluirá permanentemente o cadastro e histórico deste item.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              setState(() => _isSubmitting = true);
+              try {
+                final stock = Provider.of<StockProvider>(context, listen: false);
+                await stock.deleteItem(item.id);
+                if (mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Material "${item.nome}" excluído com sucesso.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  setState(() => _isSubmitting = false);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao excluir material: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Excluir'),
+          ),
+        ],
       ),
     );
   }

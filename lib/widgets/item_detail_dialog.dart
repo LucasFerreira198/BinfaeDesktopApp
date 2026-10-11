@@ -288,10 +288,19 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  tooltip: 'Fechar (Esc)',
-                  icon: const Icon(Icons.close, size: 22),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _confirmDeleteItem,
+                      tooltip: 'Excluir Material',
+                      icon: const Icon(Icons.delete_outline, size: 22, color: Colors.redAccent),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: 'Fechar (Esc)',
+                      icon: const Icon(Icons.close, size: 22),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -783,6 +792,93 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
             color: AppColors.success,
             isDark: isDark,
             onTap: _printLabel,
+          ),
+          const SizedBox(height: 10),
+
+          // 4. Excluir Material
+          _buildActionButton(
+            label: 'Excluir Este Material do Inventário',
+            description: 'Remover permanentemente este equipamento do cadastro de estoque',
+            icon: Icons.delete_forever_outlined,
+            color: Colors.redAccent,
+            isDark: isDark,
+            onTap: _confirmDeleteItem,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteItem() {
+    if (_currentItem.cautelaAtiva != null || _currentItem.status.toUpperCase() == 'CAUTELADO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Este material está cautelado em uso. Efetue a devolução antes de excluir.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (_currentItem.status.toUpperCase() == 'EM_MANUTENCAO') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não é possível excluir: Material com ordem de manutenção em andamento. Conclua o reparo ou baixe o item na pendência.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            SizedBox(width: 8),
+            Text('Excluir Material'),
+          ],
+        ),
+        content: Text(
+          'Tem certeza que deseja excluir o material "${_currentItem.nome}" (ID #${_currentItem.id}) do inventário?\n\nEsta ação excluirá permanentemente o cadastro e histórico deste item.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                final stock = Provider.of<StockProvider>(context, listen: false);
+                await stock.deleteItem(_currentItem.id);
+                if (mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Material "${_currentItem.nome}" excluído com sucesso.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao excluir material: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Excluir'),
           ),
         ],
       ),
