@@ -181,8 +181,23 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
       _configTI!.smtpPort = int.tryParse(_smtpPortCtrl.text.trim()) ?? 587;
       _configTI!.smtpUser = _smtpUserCtrl.text.trim();
       final passText = _smtpPasswordCtrl.text.trim();
-      if (passText.isNotEmpty && passText != '••••••••') {
-        _configTI!.smtpPassword = passText;
+      final hostLower = _smtpHostCtrl.text.trim().toLowerCase();
+      if (passText.isNotEmpty && passText != '••••••••' && passText != '********') {
+        final cleanPass = passText.replaceAll(' ', '');
+        if (hostLower.contains('gmail') && cleanPass.length != 16) {
+          if (mounted) {
+            setState(() => _isSavingConfigTI = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Atenção: A Senha de Aplicativo do Gmail deve ter 16 letras (você digitou ${cleanPass.length}). Gere em myaccount.google.com/apppasswords'),
+                backgroundColor: Colors.orange[800],
+                duration: const Duration(seconds: 6),
+              ),
+            );
+          }
+          return;
+        }
+        _configTI!.smtpPassword = cleanPass;
       } else {
         _configTI!.smtpPassword = null;
       }
@@ -308,6 +323,20 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                           return;
                         }
 
+                        final hostLower = _smtpHostCtrl.text.trim().toLowerCase();
+                        final passClean = _smtpPasswordCtrl.text.trim().replaceAll(' ', '');
+                        final isMasked = passClean == '••••••••' || passClean == '********';
+                        if (!isMasked && passClean.isNotEmpty && hostLower.contains('gmail') && passClean.length != 16) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Atenção: A Senha de Aplicativo do Gmail deve ter 16 letras (você digitou ${passClean.length}). Gere em myaccount.google.com/apppasswords'),
+                              backgroundColor: Colors.orange[800],
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                          return;
+                        }
+
                         setModalState(() => isTesting = true);
                         try {
                           final api = Provider.of<ApiService>(context, listen: false);
@@ -316,7 +345,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                             smtpHost: _smtpHostCtrl.text.trim(),
                             smtpPort: int.tryParse(_smtpPortCtrl.text.trim()) ?? 587,
                             smtpUser: _smtpUserCtrl.text.trim(),
-                            smtpPassword: (_smtpPasswordCtrl.text.trim() == '••••••••' || _smtpPasswordCtrl.text.trim() == '********') ? null : _smtpPasswordCtrl.text.trim(),
+                            smtpPassword: isMasked ? null : (passClean.isNotEmpty ? passClean : null),
                             smtpFrom: _smtpFromCtrl.text.trim(),
                           );
                           if (ctx.mounted) Navigator.pop(ctx);
@@ -2285,8 +2314,8 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     decoration: InputDecoration(
                       hintText: 'Senha de aplicativo ou do servidor de e-mail',
                       helperText: _configTI?.hasSmtpPassword == true
-                          ? 'Mantenha os pontos para preservar a senha atual cadastrada'
-                          : null,
+                          ? 'Mantenha os pontos para preservar a senha atual. (No Gmail, senhas de app possuem 16 letras)'
+                          : 'No Gmail, use a Senha de Aplicativo de 16 caracteres (myaccount.google.com/apppasswords)',
                       helperStyle: TextStyle(
                         color: isDark ? Colors.green[300] : Colors.green[800],
                         fontSize: 11,
