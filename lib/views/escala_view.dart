@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
 import '../models/escala.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
@@ -412,15 +413,17 @@ class _EscalaViewState extends State<EscalaView> {
                 ),
                 if (isAdmin) ...[
                   const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      foregroundColor: Colors.white,
+                  Tooltip(
+                    message: 'Definir ordem de antiguidade para todos os meses',
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.format_list_numbered_rounded, size: 18),
+                      label: const Text('Ordenar Antiguidade'),
+                      onPressed: _militaresTI.isEmpty ? null : _openOrdenarAntiguidadeDialog,
                     ),
-                    icon: const Icon(Icons.format_list_numbered_rounded, size: 18),
-                    label: const Text('Ordenar Antiguidade'),
-                    tooltip: 'Definir ordem de antiguidade para todos os meses',
-                    onPressed: _militaresTI.isEmpty ? null : _openOrdenarAntiguidadeDialog,
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton.icon(
