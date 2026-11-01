@@ -76,6 +76,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
   }
 
   Future<void> _save() async {
+    if (_isSubmitting) return;
     if (!_formKey.currentState!.validate()) return;
 
     final qty = double.tryParse(_quantidadeController.text.replaceAll(',', '.')) ?? 1.0;

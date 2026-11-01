@@ -25,7 +25,7 @@ class AppHttpOverrides extends HttpOverrides {
     required this.port,
     this.username,
     this.password,
-    this.bypassSsl = true,
+    this.bypassSsl = false,
   });
 
   @override
@@ -153,7 +153,7 @@ class ApiService {
   int _proxyPort = 8080;
   String _proxyUsername = '';
   String _proxyPassword = '';
-  bool _proxyBypassSsl = true;
+  bool _proxyBypassSsl = false;
 
   Function()? onSessionExpired;
 
@@ -179,7 +179,7 @@ class ApiService {
     _proxyPort = prefs.getInt(_keyProxyPort) ?? 8080;
     _proxyUsername = prefs.getString(_keyProxyUsername) ?? '';
     _proxyPassword = prefs.getString(_keyProxyPassword) ?? '';
-    _proxyBypassSsl = prefs.getBool(_keyProxyBypassSsl) ?? true;
+    _proxyBypassSsl = prefs.getBool(_keyProxyBypassSsl) ?? false;
     applyProxyOverrides();
     _updateHttpClient();
 

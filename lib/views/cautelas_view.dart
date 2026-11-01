@@ -194,7 +194,15 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
             ),
             onPressed: () async {
               final nome = nameCtrl.text.trim();
-              if (nome.isEmpty) return;
+              if (nome.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: AppColors.warning,
+                    content: Text('Por favor, informe o nome ou identificação da missão/cautela.'),
+                  ),
+                );
+                return;
+              }
 
               try {
                 final api = Provider.of<ApiService>(context, listen: false);
