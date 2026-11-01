@@ -13,6 +13,7 @@ import '../widgets/item_detail_dialog.dart';
 import '../widgets/item_form_dialog.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/user_profile_dialog.dart';
+import '../widgets/command_palette_dialog.dart';
 import 'home_dashboard_view.dart';
 import 'stock_view.dart';
 import 'cautelas_view.dart';
@@ -116,16 +117,203 @@ class _DashboardViewState extends State<DashboardView> {
     } catch (_) {}
   }
 
+  void _openCommandPalette() {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
+    final stock = Provider.of<StockProvider>(context, listen: false);
+    final isAdmin = auth.user?.admin == true;
+
+    final actions = [
+      // Ações Rápidas
+      CommandPaletteAction(
+        title: 'Novo Material',
+        subtitle: 'Cadastrar novo item no acervo de informática',
+        icon: Icons.add_circle_outline,
+        shortcut: 'Ctrl + N',
+        category: 'Ações',
+        onExecute: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => const ItemFormDialog(),
+          );
+        },
+      ),
+      CommandPaletteAction(
+        title: 'Buscar no Estoque',
+        subtitle: 'Focar campo de pesquisa de materiais',
+        icon: Icons.search,
+        shortcut: 'Ctrl + F',
+        category: 'Ações',
+        onExecute: () {
+          if (_selectedIndex != 1) {
+            setState(() => _selectedIndex = 1);
+          }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _searchFocusNode.requestFocus();
+          });
+        },
+      ),
+      CommandPaletteAction(
+        title: 'Sincronizar Dados',
+        subtitle: 'Atualizar banco de dados local com o servidor',
+        icon: Icons.sync,
+        shortcut: 'F5',
+        category: 'Ações',
+        onExecute: () {
+          stock.syncData();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sincronizando dados com o servidor...'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        },
+      ),
+      CommandPaletteAction(
+        title: 'Alternar Tela Cheia',
+        subtitle: 'Maximizar ou restaurar tamanho da janela',
+        icon: Icons.fullscreen,
+        shortcut: 'F11',
+        category: 'Ações',
+        onExecute: _toggleFullScreen,
+      ),
+      CommandPaletteAction(
+        title: 'Alternar Tema Claro / Escuro',
+        subtitle: 'Mudar tema visual da interface',
+        icon: Icons.brightness_6_outlined,
+        category: 'Ações',
+        onExecute: () => themeProv.toggleTheme(),
+      ),
+      CommandPaletteAction(
+        title: 'Meu Perfil Militar',
+        subtitle: 'Visualizar credenciais, graduação e foto',
+        icon: Icons.person_outline,
+        category: 'Ações',
+        onExecute: () {
+          showDialog(
+            context: context,
+            builder: (_) => const UserProfileDialog(),
+          );
+        },
+      ),
+      CommandPaletteAction(
+        title: 'Verificar Atualizações',
+        subtitle: 'Checar novas versões do Informatica BINFAE-GL',
+        icon: Icons.system_update_alt,
+        category: 'Ações',
+        onExecute: () => _checkForUpdates(manual: true),
+      ),
+
+      // Telas e Módulos
+      CommandPaletteAction(
+        title: 'Dashboard Operacional',
+        subtitle: 'Métricas gerais, resumo de estoque e gráficos',
+        icon: Icons.dashboard_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 0),
+      ),
+      CommandPaletteAction(
+        title: 'Materiais e Gestão de Estoque',
+        subtitle: 'Catálogo de materiais, BMPs e níveis de estoque',
+        icon: Icons.inventory_2_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 1),
+      ),
+      CommandPaletteAction(
+        title: 'Cautela de Materiais e Missões',
+        subtitle: 'Cautelas ativas, devoluções e termos de cautela',
+        icon: Icons.assignment_turned_in_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 2),
+      ),
+      CommandPaletteAction(
+        title: 'Manutenção e Reparos',
+        subtitle: 'Bancada técnica, diagnósticos e laudos de reparo',
+        icon: Icons.handyman_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 3),
+      ),
+      CommandPaletteAction(
+        title: 'Pendências e Metas',
+        subtitle: 'Controle de pendências e tarefas técnicas',
+        icon: Icons.checklist_rtl_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 4),
+      ),
+      CommandPaletteAction(
+        title: 'Escala de Sobreaviso',
+        subtitle: 'Escala militar, contatos de emergência e plantão',
+        icon: Icons.calendar_month_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 5),
+      ),
+      CommandPaletteAction(
+        title: 'Relatório Diário (24h)',
+        subtitle: 'Livro de serviço diário e ocorrências do plantão',
+        icon: Icons.assignment_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 6),
+      ),
+      CommandPaletteAction(
+        title: 'Locais Físicos e Estrutura',
+        subtitle: 'Gestão de armários, gavetas e setores da base',
+        icon: Icons.place_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 7),
+      ),
+      CommandPaletteAction(
+        title: 'Grupos e Subgrupos',
+        subtitle: 'Categorização de peças e equipamentos',
+        icon: Icons.category_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 8),
+      ),
+      CommandPaletteAction(
+        title: 'Histórico Geral de Movimentações',
+        subtitle: 'Auditoria de entradas, saídas e transferências',
+        icon: Icons.history_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = 9),
+      ),
+      if (isAdmin)
+        CommandPaletteAction(
+          title: 'Painel Administrativo',
+          subtitle: 'Gestão de usuários militares, permissões e sistema',
+          icon: Icons.admin_panel_settings_outlined,
+          category: 'Módulos',
+          onExecute: () => setState(() => _selectedIndex = 10),
+        ),
+      CommandPaletteAction(
+        title: 'Configurações e Perfil',
+        subtitle: 'Preferências do sistema, rede e aparência',
+        icon: Icons.settings_outlined,
+        category: 'Módulos',
+        onExecute: () => setState(() => _selectedIndex = isAdmin ? 11 : 10),
+      ),
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => CommandPaletteDialog(actions: actions),
+    );
+  }
+
   bool _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
+
+    final isCtrl = HardwareKeyboard.instance.isControlPressed || HardwareKeyboard.instance.isMetaPressed;
+
+    // Atalho: Ctrl + K / Cmd + K (Command Palette)
+    if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyK) {
+      _openCommandPalette();
+      return true;
+    }
 
     // Atalho: F11 (Alternar Tela Cheia)
     if (event.logicalKey == LogicalKeyboardKey.f11) {
       _toggleFullScreen();
       return true;
     }
-
-    final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
     // Atalho: Ctrl + F (Focar busca no estoque)
     if (isCtrl && event.logicalKey == LogicalKeyboardKey.keyF) {
@@ -982,6 +1170,68 @@ class _DashboardViewState extends State<DashboardView> {
                             ),
                             const SizedBox(width: 8),
                           ],
+
+                          // Botão de Command Palette (Ctrl+K)
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: _openCommandPalette,
+                              child: Container(
+                                height: 34,
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.search,
+                                      size: 15,
+                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                    ),
+                                    if (screenWidth >= 920) ...[
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Buscar comandos...',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                    ] else ...[
+                                      const SizedBox(width: 4),
+                                    ],
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Ctrl + K',
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'monospace',
+                                          color: isDark ? Colors.white70 : const Color(0xFF334155),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
 
                           // Botão de Tela Cheia (F11)
                           IconButton(

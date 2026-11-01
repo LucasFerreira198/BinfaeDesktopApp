@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import '../models/item.dart';
@@ -7,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../widgets/item_detail_dialog.dart';
 import '../widgets/movement_dialog.dart';
 import '../widgets/item_form_dialog.dart';
+import '../widgets/desktop_item_inspector_pane.dart';
 
 class StockView extends StatefulWidget {
   final FocusNode? searchFocusNode;
@@ -21,6 +23,9 @@ class StockView extends StatefulWidget {
 class _StockViewState extends State<StockView> {
   final TextEditingController _searchController = TextEditingController();
   late FocusNode _focusNode;
+  final FocusNode _keyboardFocusNode = FocusNode();
+  ItemModel? _selectedItem;
+  bool _isInspectorOpen = false;
 
   @override
   void initState() {
@@ -34,7 +39,60 @@ class _StockViewState extends State<StockView> {
     if (widget.searchFocusNode == null) {
       _focusNode.dispose();
     }
+    _keyboardFocusNode.dispose();
     super.dispose();
+  }
+
+  KeyEventResult _handleTableKey(KeyEvent event, List<ItemModel> items, double screenWidth) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (items.isEmpty) return KeyEventResult.ignored;
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      int currentIndex = _selectedItem == null ? -1 : items.indexWhere((i) => i.id == _selectedItem!.id);
+      int nextIndex = (currentIndex + 1).clamp(0, items.length - 1);
+      setState(() {
+        _selectedItem = items[nextIndex];
+        if (screenWidth >= 1150) {
+          _isInspectorOpen = true;
+        }
+      });
+      return KeyEventResult.handled;
+    } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      int currentIndex = _selectedItem == null ? 0 : items.indexWhere((i) => i.id == _selectedItem!.id);
+      int prevIndex = (currentIndex - 1).clamp(0, items.length - 1);
+      setState(() {
+        _selectedItem = items[prevIndex];
+        if (screenWidth >= 1150) {
+          _isInspectorOpen = true;
+        }
+      });
+      return KeyEventResult.handled;
+    } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_isInspectorOpen) {
+        setState(() {
+          _isInspectorOpen = false;
+        });
+        return KeyEventResult.handled;
+      }
+    } else if (event.logicalKey == LogicalKeyboardKey.enter) {
+      if (_selectedItem != null) {
+        if (screenWidth < 1150) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ItemDetailDialog(
+              item: _selectedItem!,
+              onNavigateView: widget.onNavigate,
+            ),
+          );
+        } else {
+          setState(() {
+            _isInspectorOpen = true;
+          });
+        }
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -290,148 +348,225 @@ class _StockViewState extends State<StockView> {
 
           const SizedBox(height: 14),
 
-          // 3. TABELA DE ESTOQUE MODERNA (ESTILO LOGISTICS PRO)
+          // 3. TABELA DE ESTOQUE MODERNA COM SUPORTE A MASTER-DETAIL SPLIT PANE
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                const minTableWidth = 880.0;
-                final tableWidth = math.max(minTableWidth, constraints.maxWidth);
-                return Scrollbar(
-                  thumbVisibility: constraints.maxWidth < minTableWidth,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: tableWidth,
-                      child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                ),
-              ),
-              child: Column(
-                children: [
-                  // Cabeçalho da Tabela
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 48, child: Text('FOTO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 14),
-                        const Expanded(flex: 4, child: Text('NOME DO MATERIAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 110, child: Text('BMP / PATRIMÔNIO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 120, child: Text('CATEGORIA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 130, child: Text('QUANTIDADE / NÍVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const Expanded(flex: 3, child: Text('LOCALIZAÇÃO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 110, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        const SizedBox(width: 125, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                      ],
-                    ),
-                  ),
+            child: Focus(
+              focusNode: _keyboardFocusNode,
+              onKeyEvent: (node, event) => _handleTableKey(event, items, MediaQuery.of(context).size.width),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bool showSplitPane = constraints.maxWidth >= 1100 && _isInspectorOpen && _selectedItem != null;
 
-                  // Lista de Linhas
-                  Expanded(
-                    child: items.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
-                                const SizedBox(height: 12),
-                                const Text('Nenhum material localizado no acervo.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                const SizedBox(height: 4),
-                                const Text('Tente buscar por outro termo ou limpe os filtros.', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                              ],
-                            ),
-                          )
-                        : ListView.separated(
-                            itemCount: items.length,
-                            separatorBuilder: (_, __) => Divider(
-                              height: 1,
-                              color: isDark ? const Color(0xFF1E2838) : const Color(0xFFF1F5F9),
-                            ),
-                            itemBuilder: (context, index) {
-                              final item = items[index];
-                              return _LogisticsProRow(
-                                item: item,
-                                isDark: isDark,
-                                onNavigate: widget.onNavigate,
-                              );
+                  if (showSplitPane) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: _buildTableCard(items, isDark, stock, true),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: 380,
+                          child: DesktopItemInspectorPane(
+                            item: _selectedItem!,
+                            isDark: isDark,
+                            onClose: () {
+                              setState(() {
+                                _isInspectorOpen = false;
+                              });
                             },
+                            onOpenFullDialog: () async {
+                              final res = await showDialog(
+                                context: context,
+                                builder: (ctx) => ItemDetailDialog(
+                                  item: _selectedItem!,
+                                  onNavigateView: widget.onNavigate,
+                                ),
+                              );
+                              if (res == 'NAVIGATE_TO_MAINTENANCE') {
+                                widget.onNavigate?.call(3);
+                              }
+                            },
+                            onNavigate: widget.onNavigate,
                           ),
-                  ),
-
-                  // Rodapé de Paginação
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(16),
-                        bottomRight: Radius.circular(16),
-                      ),
-                      border: Border(
-                        top: BorderSide(
-                          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Mostrando ${items.length} de ${stock.allItems.length} materiais cadastrados',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Text('Página 1 de 1', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_left, size: 18),
-                              onPressed: null,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right, size: 18),
-                              onPressed: null,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
                         ),
                       ],
-                    ),
-                  ),
-                ],
+                    );
+                  }
+
+                  return _buildTableCard(items, isDark, stock, false);
+                },
               ),
-            ),
-                    ),
-                  ),
-                );
-              },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTableCard(List<ItemModel> items, bool isDark, StockProvider stock, bool isSplit) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final minTableWidth = isSplit ? 650.0 : 880.0;
+        final tableWidth = math.max(minTableWidth, constraints.maxWidth);
+        return Scrollbar(
+          thumbVisibility: constraints.maxWidth < minTableWidth,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: tableWidth,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF151D2A) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Cabeçalho da Tabela
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 48, child: Text('FOTO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 14),
+                          const Expanded(flex: 4, child: Text('NOME DO MATERIAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 110, child: Text('BMP / PATRIMÔNIO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 120, child: Text('CATEGORIA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 130, child: Text('QUANTIDADE / NÍVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const Expanded(flex: 3, child: Text('LOCALIZAÇÃO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 110, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                          const SizedBox(width: 125, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
+                        ],
+                      ),
+                    ),
+
+                    // Lista de Linhas
+                    Expanded(
+                      child: items.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
+                                  const SizedBox(height: 12),
+                                  const Text('Nenhum material localizado no acervo.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  const SizedBox(height: 4),
+                                  const Text('Tente buscar por outro termo ou limpe os filtros.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              itemCount: items.length,
+                              separatorBuilder: (_, __) => Divider(
+                                height: 1,
+                                color: isDark ? const Color(0xFF1E2838) : const Color(0xFFF1F5F9),
+                              ),
+                              itemBuilder: (context, index) {
+                                final item = items[index];
+                                final isSelected = _selectedItem?.id == item.id;
+                                return _LogisticsProRow(
+                                  item: item,
+                                  isDark: isDark,
+                                  isSelected: isSelected,
+                                  onTap: () {
+                                    _keyboardFocusNode.requestFocus();
+                                    final screenW = MediaQuery.of(context).size.width;
+                                    if (screenW >= 1100) {
+                                      setState(() {
+                                        _selectedItem = item;
+                                        _isInspectorOpen = true;
+                                      });
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => ItemDetailDialog(
+                                          item: item,
+                                          onNavigateView: widget.onNavigate,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  onInspect: () {
+                                    setState(() {
+                                      _selectedItem = item;
+                                      _isInspectorOpen = true;
+                                    });
+                                  },
+                                  onNavigate: widget.onNavigate,
+                                );
+                              },
+                            ),
+                    ),
+
+                    // Rodapé de Paginação
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                        border: Border(
+                          top: BorderSide(
+                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Mostrando ${items.length} de ${stock.allItems.length} materiais cadastrados',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Text('Página 1 de 1', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.chevron_left, size: 18),
+                                onPressed: null,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.chevron_right, size: 18),
+                                onPressed: null,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -470,11 +605,17 @@ class _StockViewState extends State<StockView> {
 class _LogisticsProRow extends StatefulWidget {
   final ItemModel item;
   final bool isDark;
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final VoidCallback? onInspect;
   final void Function(int targetIndex)? onNavigate;
 
   const _LogisticsProRow({
     required this.item,
     required this.isDark,
+    this.isSelected = false,
+    this.onTap,
+    this.onInspect,
     this.onNavigate,
   });
 
@@ -529,7 +670,7 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: () async {
+        onTap: widget.onTap ?? () async {
           final res = await showDialog(
             context: context,
             builder: (ctx) => ItemDetailDialog(
@@ -541,12 +682,131 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
             widget.onNavigate?.call(3);
           }
         },
+        onSecondaryTapDown: (details) async {
+          final position = details.globalPosition;
+          final selected = await showMenu<String>(
+            context: context,
+            position: RelativeRect.fromLTRB(
+              position.dx,
+              position.dy,
+              position.dx + 1,
+              position.dy + 1,
+            ),
+            color: isDark ? const Color(0xFF151D2A) : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
+            ),
+            items: [
+              PopupMenuItem(
+                value: 'inspect',
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, size: 17, color: AppColors.cyan),
+                    const SizedBox(width: 10),
+                    const Text('Inspecionar Material'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'copy_bmp',
+                child: Row(
+                  children: [
+                    const Icon(Icons.copy, size: 17),
+                    const SizedBox(width: 10),
+                    Text(item.bmp != null ? 'Copiar BMP (${item.bmp})' : 'Copiar Código'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'move',
+                child: Row(
+                  children: [
+                    const Icon(Icons.swap_horiz, size: 17),
+                    const SizedBox(width: 10),
+                    const Text('Transferir / Movimentar'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    const Icon(Icons.edit_outlined, size: 17),
+                    const SizedBox(width: 10),
+                    const Text('Editar Material'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'full_detail',
+                child: Row(
+                  children: [
+                    const Icon(Icons.open_in_new, size: 17),
+                    const SizedBox(width: 10),
+                    const Text('Detalhes Completos & QR'),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          if (!mounted) return;
+
+          if (selected == 'inspect') {
+            widget.onInspect?.call();
+          } else if (selected == 'copy_bmp') {
+            final textToCopy = item.bmp ?? item.codigoInterno ?? item.nome;
+            Clipboard.setData(ClipboardData(text: textToCopy));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: AppColors.cyanDark,
+                content: Text('Copiado para área de transferência: $textToCopy'),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          } else if (selected == 'move') {
+            showDialog(
+              context: context,
+              builder: (ctx) => MovementDialog(item: item),
+            );
+          } else if (selected == 'edit') {
+            showDialog(
+              context: context,
+              builder: (ctx) => ItemFormDialog(item: item),
+            );
+          } else if (selected == 'full_detail') {
+            final res = await showDialog(
+              context: context,
+              builder: (ctx) => ItemDetailDialog(
+                item: item,
+                onNavigateView: widget.onNavigate,
+              ),
+            );
+            if (res == 'NAVIGATE_TO_MAINTENANCE') {
+              widget.onNavigate?.call(3);
+            }
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: _isHovered
-              ? (isDark ? const Color(0xFF1B2438) : const Color(0xFFF8FAFC))
-              : Colors.transparent,
+          decoration: BoxDecoration(
+            color: widget.isSelected
+                ? (isDark ? AppColors.cyan.withOpacity(0.14) : const Color(0xFFE0F2FE))
+                : (_isHovered
+                    ? (isDark ? const Color(0xFF1B2438) : const Color(0xFFF8FAFC))
+                    : Colors.transparent),
+            border: widget.isSelected
+                ? const Border(
+                    left: BorderSide(
+                      color: AppColors.cyan,
+                      width: 4,
+                    ),
+                  )
+                : null,
+          ),
           child: Row(
             children: [
               // Miniatura do Material

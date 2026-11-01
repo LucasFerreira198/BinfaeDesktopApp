@@ -1097,7 +1097,66 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                 : 'O militar de serviço deve descrever aqui alterações, rondas ou recados para o próximo plantão:',
             style: TextStyle(fontSize: 12, color: Colors.grey[400]),
           ),
-          const SizedBox(height: 12),
+          if (!isLancado) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.auto_awesome, size: 14, color: AppColors.cyan),
+                const SizedBox(width: 6),
+                Text(
+                  'Sugestões de Ocorrências Frequentes:',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                'Sem alterações durante o quarto de serviço.',
+                'Realizada ronda técnica no CPD e sala dos servidores.',
+                'Climatização e no-breaks operando normalmente.',
+                'Reinício preventivo de switches e links sem interrupção.',
+                'Passagem de serviço realizada sem pendências.',
+              ].map((sugestao) {
+                return InkWell(
+                  onTap: () {
+                    final currentText = _ocorrenciasCtrl.text.trim();
+                    if (currentText.isEmpty) {
+                      _ocorrenciasCtrl.text = sugestao;
+                    } else {
+                      _ocorrenciasCtrl.text = '$currentText\n• $sugestao';
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                      ),
+                    ),
+                    child: Text(
+                      sugestao,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 4),
           Expanded(
             child: TextField(
               controller: _ocorrenciasCtrl,

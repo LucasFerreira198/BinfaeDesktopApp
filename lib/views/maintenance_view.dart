@@ -725,6 +725,15 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
     final reportController = TextEditingController(text: 'Reparo efetuado e testado na bancada técnica.');
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final quickDiagnoses = [
+      'Substituição de componentes e teste na bancada.',
+      'Limpeza interna, pasta térmica e desoxidação.',
+      'Reinstalação do SO e drivers homologados.',
+      'Substituição de fonte de alimentação queimada.',
+      'Troca de cabos/conectores e validação.',
+      'Equipamento 100% operacional sem anomalias.',
+    ];
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -738,7 +747,7 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
           ],
         ),
         content: SizedBox(
-          width: 480,
+          width: 520,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -752,7 +761,57 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                 'O material será movido para a aba "Consertados / Falta Devolver" para que o responsável realize a entrega.',
                 style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.auto_awesome, size: 14, color: Color(0xFF10B981)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Sugestões Rápidas de Diagnóstico:',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: quickDiagnoses.map((diag) {
+                  return InkWell(
+                    onTap: () {
+                      if (reportController.text.isEmpty ||
+                          reportController.text == 'Reparo efetuado e testado na bancada técnica.') {
+                        reportController.text = diag;
+                      } else {
+                        reportController.text = '${reportController.text.trim()} $diag';
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                        ),
+                      ),
+                      child: Text(
+                        diag,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: reportController,
                 maxLines: 3,
