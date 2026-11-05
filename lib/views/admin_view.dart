@@ -37,6 +37,8 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   final TextEditingController _smtpUserCtrl = TextEditingController();
   final TextEditingController _smtpPasswordCtrl = TextEditingController();
   final TextEditingController _smtpFromCtrl = TextEditingController();
+  final TextEditingController _militarySearchCtrl = TextEditingController();
+  String _militarySearchQuery = '';
   bool _obscureSmtpPassword = true;
 
   final List<String> _postosGraduacoes = [
@@ -83,6 +85,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     _smtpUserCtrl.dispose();
     _smtpPasswordCtrl.dispose();
     _smtpFromCtrl.dispose();
+    _militarySearchCtrl.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -1949,6 +1952,17 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   }
 
   Widget _buildMilitariesTab(bool isDark) {
+    final filtered = _militaries.where((m) {
+      if (_militarySearchQuery.isEmpty) return true;
+      final q = _militarySearchQuery.toLowerCase();
+      final g = m.nomeGuerra.toLowerCase();
+      final c = m.nomeCompleto.toLowerCase();
+      final s = m.saram.toString();
+      final sec = (m.secao ?? '').toLowerCase();
+      final p = (m.postoGraduacao ?? '').toLowerCase();
+      return g.contains(q) || c.contains(q) || s.contains(q) || sec.contains(q) || p.contains(q);
+    }).toList();
+
     return Column(
       children: [
         Row(
@@ -1957,7 +1971,9 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
             Row(
               children: [
                 Text(
-                  '${_militaries.length} militares no efetivo',
+                  _militarySearchQuery.isEmpty
+                      ? '${_militaries.length} militares no efetivo'
+                      : '${filtered.length} de ${_militaries.length} militares',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                 ),
                 const SizedBox(width: 6),
@@ -1970,6 +1986,33 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
             ),
             Row(
               children: [
+                SizedBox(
+                  width: 250,
+                  height: 38,
+                  child: TextField(
+                    controller: _militarySearchCtrl,
+                    style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar guerra, nome, SARAM...',
+                      hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
+                      prefixIcon: const Icon(Icons.search, size: 16),
+                      suffixIcon: _militarySearchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, size: 16),
+                              onPressed: () {
+                                _militarySearchCtrl.clear();
+                                setState(() => _militarySearchQuery = '');
+                              },
+                            )
+                          : null,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onChanged: (val) => setState(() => _militarySearchQuery = val.trim()),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: _openImportExcelDialog,
                   style: OutlinedButton.styleFrom(
@@ -2044,11 +2087,30 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: ListView.separated(
-                          itemCount: _militaries.length,
-                          separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
-                          itemBuilder: (context, index) {
-                            final m = _militaries[index];
+                        child: filtered.isEmpty
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(32),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.person_search_rounded, size: 48, color: isDark ? Colors.white24 : Colors.grey[400]),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        _militarySearchQuery.isEmpty
+                                            ? 'Nenhum militar cadastrado'
+                                            : 'Nenhum militar encontrado para "${_militarySearchQuery}"',
+                                        style: TextStyle(fontSize: 14, color: isDark ? Colors.white60 : Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                itemCount: filtered.length,
+                                separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
+                                itemBuilder: (context, index) {
+                                  final m = filtered[index];
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                               child: Row(
