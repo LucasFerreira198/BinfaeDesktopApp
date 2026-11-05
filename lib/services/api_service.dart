@@ -1021,6 +1021,46 @@ class ApiService {
     }
   }
 
+  /// Importa militares a partir de arquivo Excel (.xlsx, .xls) ou CSV.
+  /// Identifica automaticamente os militares já cadastrados para não repetir (não duplicar).
+  Future<Map<String, dynamic>> importMilitaryExcel({
+    List<int>? bytes,
+    String? filePath,
+    String fileName = 'militares.xlsx',
+    bool dryRun = false,
+  }) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/military/import-excel?dry_run=$dryRun');
+    final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(_headers(false));
+
+    if (bytes != null && bytes.isNotEmpty) {
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: fileName,
+      ));
+    } else if (filePath != null && filePath.isNotEmpty) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        filePath,
+        filename: fileName,
+      ));
+    } else {
+      throw Exception('Nenhum arquivo ou dado fornecido para importação.');
+    }
+
+    final streamedResponse = await _client.send(request).timeout(requestTimeout);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao importar planilha de militares (${response.statusCode})'));
+    }
+
+    return jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+  }
+
+
   // --- Verificação de Versão / Auto-Updater ---
   Future<Map<String, dynamic>?> checkLatestRelease() async {
     try {

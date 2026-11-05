@@ -7,8 +7,10 @@ import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/image_picker_helper.dart';
+import '../utils/excel_picker_helper.dart';
 import '../widgets/avatar_editor_dialog.dart';
 import '../widgets/user_avatar.dart';
+import '../widgets/import_military_dialog.dart';
 
 class AdminView extends StatefulWidget {
   const AdminView({super.key});
@@ -1379,6 +1381,36 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     }
   }
 
+  // --- Diálogo: Importar Militares via Planilha Excel ---
+  Future<void> _openImportExcelDialog() async {
+    try {
+      final picked = await ExcelPickerHelper.pickExcelFile();
+      if (picked == null) return;
+
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ImportMilitaryDialog(
+          file: picked,
+          onImportSuccess: () {
+            _loadMilitaries();
+            _loadUsers();
+          },
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Erro ao selecionar planilha: $e'),
+          ),
+        );
+      }
+    }
+  }
+
   // --- Diálogo: Cadastrar / Editar Militar ---
   void _openMilitaryDialog([MilitaryModel? military]) {
     final saramController = TextEditingController(text: military != null ? military.saram.toString() : '');
@@ -1936,15 +1968,32 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 ),
               ],
             ),
-            ElevatedButton.icon(
-              onPressed: () => _openMilitaryDialog(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              icon: const Icon(Icons.person_add_alt, size: 18),
-              label: const Text('Cadastrar Militar', style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _openImportExcelDialog,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+                    side: BorderSide(color: isDark ? AppColors.primaryLight : AppColors.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  ),
+                  icon: const Icon(Icons.upload_file_rounded, size: 18),
+                  label: const Text('Importar Planilha Excel', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: () => _openMilitaryDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  ),
+                  icon: const Icon(Icons.person_add_alt, size: 18),
+                  label: const Text('Cadastrar Militar', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
           ],
         ),
