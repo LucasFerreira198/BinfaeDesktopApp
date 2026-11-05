@@ -120,6 +120,26 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     }
   }
 
+  int _getRankWeight(String? posto) {
+    if (posto == null || posto.isEmpty) return 99;
+    final p = posto.trim().toUpperCase();
+    if (p.startsWith('TC') || p.startsWith('TEN CEL') || p.startsWith('TEN-CEL')) return 2;
+    if (p.startsWith('MAJ') || p.startsWith('MJ')) return 3;
+    if (p.startsWith('CAP') || p.startsWith('CP')) return 4;
+    if (p.startsWith('1T') || p.startsWith('1TEN') || p.startsWith('1º TEN')) return 5;
+    if (p.startsWith('2T') || p.startsWith('2TEN') || p.startsWith('2º TEN')) return 6;
+    if (p.startsWith('ASP')) return 7;
+    if (p.startsWith('SO')) return 8;
+    if (p.startsWith('1S') || p.startsWith('1SGT') || p.startsWith('1º SGT')) return 9;
+    if (p.startsWith('2S') || p.startsWith('2SGT') || p.startsWith('2º SGT')) return 10;
+    if (p.startsWith('3S') || p.startsWith('3SGT') || p.startsWith('3º SGT')) return 11;
+    if (p.startsWith('CB')) return 12;
+    if (p.startsWith('S1')) return 13;
+    if (p.startsWith('S2')) return 14;
+    if (p.startsWith('TM') || p.startsWith('T1') || p.startsWith('T2')) return 15;
+    return 99;
+  }
+
   Future<void> _loadMilitaries() async {
     setState(() {
       _isLoadingMilitaries = true;
@@ -128,6 +148,12 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     try {
       final api = Provider.of<ApiService>(context, listen: false);
       final list = await api.listMilitaries();
+      list.sort((a, b) {
+        final wa = _getRankWeight(a.postoGraduacao);
+        final wb = _getRankWeight(b.postoGraduacao);
+        if (wa != wb) return wa.compareTo(wb);
+        return (a.id ?? a.saram).compareTo(b.id ?? b.saram);
+      });
       if (mounted) {
         setState(() {
           _militaries = list;
