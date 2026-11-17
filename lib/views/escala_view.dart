@@ -148,6 +148,425 @@ class _EscalaViewState extends State<EscalaView> {
     }
   }
 
+  Future<void> _abrirModalTrocaServico([EscalaDiaModel? diaPreSelecionado]) async {
+    if (_escala == null || _militaresTI.isEmpty) return;
+
+    final diasComEscala = _escala!.dias.where((d) => d.militarSvId != null || d.militarExpd1Id != null || d.militarExpd2Id != null).toList();
+    if (diasComEscala.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nenhum dia da escala possui militar escalado ainda.'), backgroundColor: Colors.amber),
+      );
+      return;
+    }
+
+    EscalaDiaModel selectedDia = diaPreSelecionado ?? diasComEscala.first;
+    String tipoServico = selectedDia.militarSvId != null ? 'SOBREAVISO' : (selectedDia.militarExpd1Id != null ? 'EXPEDIENTE_1' : 'EXPEDIENTE_2');
+
+    int? getSolicitanteId(EscalaDiaModel dia, String tipo) {
+      if (tipo == 'SOBREAVISO') return dia.militarSvId;
+      if (tipo == 'EXPEDIENTE_1') return dia.militarExpd1Id;
+      if (tipo == 'EXPEDIENTE_2') return dia.militarExpd2Id;
+      return null;
+    }
+
+    int? solicitanteId = getSolicitanteId(selectedDia, tipoServico);
+    int? substitutoId;
+    final motivoCtrl = TextEditingController();
+    bool isSubmitting = false;
+
+    await showDialog(
+      context: context,
+      builder: (dCtx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+
+          final substitutosDisponiveis = _militaresTI.where((m) => m['id'] != solicitanteId).toList();
+          if (substitutoId != null && !substitutosDisponiveis.any((m) => m['id'] == substitutoId)) {
+            substitutoId = null;
+          }
+
+          final solicitanteMap = _militaresTI.firstWhere((m) => m['id'] == solicitanteId, orElse: () => {});
+          final solicitanteNome = solicitanteMap.isNotEmpty
+              ? '${solicitanteMap['posto_graduacao'] ?? ''} ${solicitanteMap['nome_guerra'] ?? ''} (SARAM: ${solicitanteMap['saram'] ?? ''})'
+              : (solicitanteId != null ? 'Militar #$solicitanteId' : 'Nenhum militar escalado nesta função');
+
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.swap_horiz_rounded, color: Colors.orange, size: 24),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Registrar Solicitação de Troca de Serviço', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('Conforme Portaria nº 142/DIRM-GL • Base Aérea do Galeão', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: 520,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Data da Escala', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<EscalaDiaModel>(
+                                    value: selectedDia,
+                                    isExpanded: true,
+                                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                    items: _escala!.dias.map((d) {
+                                      return DropdownMenuItem<EscalaDiaModel>(
+                                        value: d,
+                                        child: Text(
+                                          'Dia ${d.diaMes.toString().padLeft(2, '0')} (${d.diaSemana})',
+                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (novoDia) {
+                                      if (novoDia != null) {
+                                        setModalState(() {
+                                          selectedDia = novoDia;
+                                          solicitanteId = getSolicitanteId(selectedDia, tipoServico);
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Função Escalada', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: tipoServico,
+                                    isExpanded: true,
+                                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                    items: const [
+                                      DropdownMenuItem(value: 'SOBREAVISO', child: Text('Sobreaviso (24h)', style: TextStyle(fontSize: 13))),
+                                      DropdownMenuItem(value: 'EXPEDIENTE_1', child: Text('Expediente 1 (EXPD)', style: TextStyle(fontSize: 13))),
+                                      DropdownMenuItem(value: 'EXPEDIENTE_2', child: Text('Expediente 2 (EXPD)', style: TextStyle(fontSize: 13))),
+                                    ],
+                                    onChanged: (novoTipo) {
+                                      if (novoTipo != null) {
+                                        setModalState(() {
+                                          tipoServico = novoTipo;
+                                          solicitanteId = getSolicitanteId(selectedDia, tipoServico);
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    const Text('Militar Solicitante (Titular Escalado)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.person_pin_rounded, size: 18, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              solicitanteNome,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: solicitanteId == null ? Colors.red : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text('Militar Substituto', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: substitutoId,
+                          isExpanded: true,
+                          hint: const Text('Selecione o militar que assumirá o serviço...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                          items: substitutosDisponiveis.map((m) {
+                            return DropdownMenuItem<int>(
+                              value: m['id'] as int,
+                              child: Text(
+                                '${m['posto_graduacao']} ${m['nome_guerra']} (SARAM: ${m['saram']})',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (id) {
+                            setModalState(() => substitutoId = id);
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text('Motivo Operacional / Justificativa', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 4),
+                    TextField(
+                      controller: motivoCtrl,
+                      maxLines: 3,
+                      style: const TextStyle(fontSize: 13),
+                      decoration: InputDecoration(
+                        hintText: 'Ex.: Comparecimento à Inspeção de Saúde Periódica no CEMAL (Convocação DIRSA nº 88/24)...',
+                        hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSubmitting ? null : () => Navigator.pop(dCtx),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                icon: isSubmitting
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.send_rounded, size: 18),
+                label: const Text('Encaminhar para Homologação', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: isSubmitting
+                    ? null
+                    : () async {
+                        if (selectedDia.id == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Dia da escala inválido.'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+                        if (solicitanteId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Não há militar escalado na função selecionada para este dia.'), backgroundColor: Colors.red),
+                          );
+                          return;
+                        }
+                        if (substitutoId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Por favor, selecione o militar substituto.'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+                        if (motivoCtrl.text.trim().length < 3) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Informe a justificativa operacional (mínimo 3 caracteres).'), backgroundColor: Colors.orange),
+                          );
+                          return;
+                        }
+
+                        setModalState(() => isSubmitting = true);
+                        try {
+                          await _api.solicitarTrocaServico(
+                            diaId: selectedDia.id!,
+                            solicitanteId: solicitanteId!,
+                            substitutoId: substitutoId!,
+                            tipoServico: tipoServico,
+                            motivo: motivoCtrl.text.trim(),
+                          );
+                          if (dCtx.mounted) Navigator.pop(dCtx);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Solicitação de troca enviada com sucesso! Aguardando homologação da Chefia.'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            _carregarDados();
+                          }
+                        } catch (e) {
+                          setModalState(() => isSubmitting = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erro ao solicitar troca: $e'), backgroundColor: Colors.red),
+                            );
+                          }
+                        }
+                      },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _homologarTroca(EscalaTrocaModel troca) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Homologar Troca de Serviço'),
+        content: Text(
+          'Confirma a homologação da troca para ${DateFormat('dd/MM/yyyy').format(troca.dataEscala)}?\n\n'
+          '• Titular: ${troca.militarSolicitantePosto ?? ''} ${troca.militarSolicitanteGuerra ?? ''}\n'
+          '• Substituto: ${troca.militarSubstitutoPosto ?? ''} ${troca.militarSubstitutoGuerra ?? ''}\n'
+          '• Função: ${troca.tipoServico}\n\n'
+          'A escala do mês e o relatório diário correspondente serão atualizados imediatamente.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Confirmar Homologação'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      await _api.homologarTroca(troca.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Troca homologada com sucesso! Escala atualizada.'), backgroundColor: Colors.green),
+        );
+        _carregarDados();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao homologar troca: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _recusarTroca(EscalaTrocaModel troca) async {
+    final justificativaCtrl = TextEditingController();
+
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Recusar Solicitação de Troca'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Informe a justificativa formal da recusa da troca referente ao dia ${DateFormat('dd/MM/yyyy').format(troca.dataEscala)}:'),
+            const SizedBox(height: 10),
+            TextField(
+              controller: justificativaCtrl,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Justificativa do indeferimento...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () {
+              if (justificativaCtrl.text.trim().length < 3) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Informe uma justificativa válida.'), backgroundColor: Colors.orange),
+                );
+                return;
+              }
+              Navigator.pop(ctx, true);
+            },
+            child: const Text('Confirmar Recusa'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      await _api.recusarTroca(troca.id, justificativa: justificativaCtrl.text.trim());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Solicitação de troca recusada.'), backgroundColor: Colors.orange),
+        );
+        _carregarDados();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao recusar troca: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   Future<void> _openOrdenarAntiguidadeDialog() async {
     List<Map<String, dynamic>> listaOrdenada = List.from(_militaresTI);
     bool isSavingOrdem = false;
@@ -406,6 +825,16 @@ class _EscalaViewState extends State<EscalaView> {
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF59E0B),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+                  label: const Text('Troca de Serviço'),
+                  onPressed: _escala == null ? null : () => _abrirModalTrocaServico(),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626), foregroundColor: Colors.white),
                   icon: const Icon(Icons.picture_as_pdf_rounded, size: 18),
                   label: const Text('Exportar PDF (1 Página)'),
@@ -460,10 +889,20 @@ class _EscalaViewState extends State<EscalaView> {
                               child: _buildTabelaDias(isDark, isAdmin),
                             ),
                             const SizedBox(width: 16),
-                            // QUADRO ESTATÍSTICO (DIREITA)
+                            // QUADRO ESTATÍSTICO & TROCAS PENDENTES (DIREITA)
                             Expanded(
                               flex: 35,
-                              child: _buildQuadroEstatistico(isDark),
+                              child: Column(
+                                children: [
+                                  if (_escala!.trocasPendentes.isNotEmpty) ...[
+                                    _buildCardTrocasPendentes(isDark, isAdmin),
+                                    const SizedBox(height: 14),
+                                  ],
+                                  Expanded(
+                                    child: _buildQuadroEstatistico(isDark),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -495,12 +934,14 @@ class _EscalaViewState extends State<EscalaView> {
             child: const Row(
               children: [
                 SizedBox(width: 85, child: Text('DATA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                SizedBox(width: 110, child: Text('DIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                SizedBox(width: 100, child: Text('DIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                 Expanded(flex: 3, child: Text('SERVIÇO (SV)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                 SizedBox(width: 8),
                 Expanded(flex: 3, child: Text('EXPD 1', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                 SizedBox(width: 8),
                 Expanded(flex: 3, child: Text('EXPD 2', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                SizedBox(width: 8),
+                SizedBox(width: 50, child: Text('TROCA', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
               ],
             ),
           ),
@@ -607,6 +1048,44 @@ class _EscalaViewState extends State<EscalaView> {
                                 },
                               ),
                       ),
+                      const SizedBox(width: 8),
+                      // Indicador de Troca / Permuta
+                      SizedBox(
+                        width: 50,
+                        child: d.trocaPendente
+                            ? Tooltip(
+                                message: 'Solicitação de troca pendente de homologação',
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade700,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text('PEND', textAlign: TextAlign.center, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),
+                              )
+                            : (d.trocaHomologada
+                                ? Tooltip(
+                                    message: 'Permuta homologada pela Chefia',
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.teal.shade700,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text('PERM', textAlign: TextAlign.center, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    ),
+                                  )
+                                : (d.militarSvId != null || d.militarExpd1Id != null || d.militarExpd2Id != null)
+                                    ? IconButton(
+                                        icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+                                        tooltip: 'Solicitar troca para este dia',
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        onPressed: () => _abrirModalTrocaServico(d),
+                                      )
+                                    : const SizedBox.shrink()),
+                      ),
                     ],
                   ),
                 );
@@ -662,6 +1141,166 @@ class _EscalaViewState extends State<EscalaView> {
           ],
           onChanged: enabled ? onChanged : null,
         ),
+      ),
+    );
+  }
+
+  Widget _buildCardTrocasPendentes(bool isDark, bool isAdmin) {
+    final trocas = _escala!.trocasPendentes;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.shade700.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.notification_important_rounded, color: Colors.amber, size: 18),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Solicitação de Troca Pendente',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${trocas.length} PENDENTE${trocas.length > 1 ? 'S' : ''}',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...trocas.map((troca) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Ref: ${DateFormat('dd/MM/yyyy').format(troca.dataEscala)} • ${troca.tipoServico}',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey),
+                      ),
+                      const Text('Aguardando Homologação', style: TextStyle(fontSize: 10, color: Colors.orange)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${troca.militarSolicitantePosto ?? ''} ${troca.militarSolicitanteGuerra ?? ''}',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.redAccent),
+                            ),
+                            Text('SARAM: ${troca.militarSolicitanteSaram ?? ''}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_rounded, size: 16, color: Colors.blue),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${troca.militarSubstitutoPosto ?? ''} ${troca.militarSubstitutoGuerra ?? ''}',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.teal),
+                            ),
+                            Text('SARAM: ${troca.militarSubstitutoSaram ?? ''}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (troca.motivo.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'Justificativa: "${troca.motivo}"',
+                        style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ],
+                  if (isAdmin) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              minimumSize: Size.zero,
+                            ),
+                            icon: const Icon(Icons.check_rounded, size: 15),
+                            label: const Text('Homologar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () => _homologarTroca(troca),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red),
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              minimumSize: Size.zero,
+                            ),
+                            icon: const Icon(Icons.close_rounded, size: 15),
+                            label: const Text('Recusar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () => _recusarTroca(troca),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

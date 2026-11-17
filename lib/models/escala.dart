@@ -1,3 +1,77 @@
+class EscalaTrocaModel {
+  final int id;
+  final int escalaId;
+  final int diaId;
+  final DateTime dataEscala;
+  final String tipoServico;
+  final int militarSolicitanteId;
+  final String? militarSolicitanteNome;
+  final String? militarSolicitantePosto;
+  final String? militarSolicitanteGuerra;
+  final int? militarSolicitanteSaram;
+  final int militarSubstitutoId;
+  final String? militarSubstitutoNome;
+  final String? militarSubstitutoPosto;
+  final String? militarSubstitutoGuerra;
+  final int? militarSubstitutoSaram;
+  final String motivo;
+  final String status;
+  final String? homologadoPorNome;
+  final DateTime? homologadoEm;
+  final String? justificativaRecusa;
+  final DateTime criadoEm;
+
+  EscalaTrocaModel({
+    required this.id,
+    required this.escalaId,
+    required this.diaId,
+    required this.dataEscala,
+    required this.tipoServico,
+    required this.militarSolicitanteId,
+    this.militarSolicitanteNome,
+    this.militarSolicitantePosto,
+    this.militarSolicitanteGuerra,
+    this.militarSolicitanteSaram,
+    required this.militarSubstitutoId,
+    this.militarSubstitutoNome,
+    this.militarSubstitutoPosto,
+    this.militarSubstitutoGuerra,
+    this.militarSubstitutoSaram,
+    required this.motivo,
+    required this.status,
+    this.homologadoPorNome,
+    this.homologadoEm,
+    this.justificativaRecusa,
+    required this.criadoEm,
+  });
+
+  factory EscalaTrocaModel.fromJson(Map<String, dynamic> json) {
+    return EscalaTrocaModel(
+      id: json['id'] as int? ?? 0,
+      escalaId: json['escala_id'] as int? ?? 0,
+      diaId: json['dia_id'] as int? ?? 0,
+      dataEscala: DateTime.tryParse(json['data_escala']?.toString() ?? '') ?? DateTime.now(),
+      tipoServico: json['tipo_servico'] as String? ?? 'SOBREAVISO',
+      militarSolicitanteId: json['militar_solicitante_id'] as int? ?? 0,
+      militarSolicitanteNome: json['militar_solicitante_nome'] as String?,
+      militarSolicitantePosto: json['militar_solicitante_posto'] as String?,
+      militarSolicitanteGuerra: json['militar_solicitante_guerra'] as String?,
+      militarSolicitanteSaram: json['militar_solicitante_saram'] as int?,
+      militarSubstitutoId: json['militar_substituto_id'] as int? ?? 0,
+      militarSubstitutoNome: json['militar_substituto_nome'] as String?,
+      militarSubstitutoPosto: json['militar_substituto_posto'] as String?,
+      militarSubstitutoGuerra: json['militar_substituto_guerra'] as String?,
+      militarSubstitutoSaram: json['militar_substituto_saram'] as int?,
+      motivo: json['motivo'] as String? ?? '',
+      status: json['status'] as String? ?? 'PENDENTE',
+      homologadoPorNome: json['homologado_por_nome'] as String?,
+      homologadoEm: json['homologado_em'] != null ? DateTime.tryParse(json['homologado_em'].toString()) : null,
+      justificativaRecusa: json['justificativa_recusa'] as String?,
+      criadoEm: DateTime.tryParse(json['criado_em']?.toString() ?? '') ?? DateTime.now(),
+    );
+  }
+}
+
 class EscalaDiaModel {
   final int? id;
   final DateTime data;
@@ -20,6 +94,9 @@ class EscalaDiaModel {
   String? militarExpd2Nome;
   String? militarExpd2Posto;
   String? militarExpd2Guerra;
+  bool trocaPendente;
+  bool trocaHomologada;
+  List<EscalaTrocaModel> trocas;
 
   EscalaDiaModel({
     this.id,
@@ -43,6 +120,9 @@ class EscalaDiaModel {
     this.militarExpd2Nome,
     this.militarExpd2Posto,
     this.militarExpd2Guerra,
+    this.trocaPendente = false,
+    this.trocaHomologada = false,
+    this.trocas = const [],
   });
 
   factory EscalaDiaModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +148,12 @@ class EscalaDiaModel {
       militarExpd2Nome: json['militar_expd2_nome'] as String?,
       militarExpd2Posto: json['militar_expd2_posto'] as String?,
       militarExpd2Guerra: json['militar_expd2_guerra'] as String?,
+      trocaPendente: json['troca_pendente'] as bool? ?? false,
+      trocaHomologada: json['troca_homologada'] as bool? ?? false,
+      trocas: (json['trocas'] as List?)
+              ?.map((t) => EscalaTrocaModel.fromJson(t as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -133,6 +219,9 @@ class EscalaMensalModel {
   final String? observacoes;
   final List<EscalaDiaModel> dias;
   final List<EstatisticaMilitarModel> estatisticas;
+  final int totalTrocasMes;
+  final int totalTrocasPendentes;
+  final List<EscalaTrocaModel> trocasPendentes;
 
   EscalaMensalModel({
     this.id,
@@ -142,6 +231,9 @@ class EscalaMensalModel {
     this.observacoes,
     required this.dias,
     required this.estatisticas,
+    this.totalTrocasMes = 0,
+    this.totalTrocasPendentes = 0,
+    this.trocasPendentes = const [],
   });
 
   factory EscalaMensalModel.fromJson(Map<String, dynamic> json) {
@@ -157,6 +249,12 @@ class EscalaMensalModel {
           [],
       estatisticas: (json['estatisticas'] as List?)
               ?.map((e) => EstatisticaMilitarModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      totalTrocasMes: json['total_trocas_mes'] as int? ?? 0,
+      totalTrocasPendentes: json['total_trocas_pendentes'] as int? ?? 0,
+      trocasPendentes: (json['trocas_pendentes'] as List?)
+              ?.map((t) => EscalaTrocaModel.fromJson(t as Map<String, dynamic>))
               .toList() ??
           [],
     );

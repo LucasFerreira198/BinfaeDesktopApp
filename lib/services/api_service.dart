@@ -1432,6 +1432,82 @@ class ApiService {
     return list.cast<Map<String, dynamic>>();
   }
 
+  Future<EscalaTrocaModel> solicitarTrocaServico({
+    required int diaId,
+    required int solicitanteId,
+    required int substitutoId,
+    required String motivo,
+    String tipoServico = 'SOBREAVISO',
+  }) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/trocas');
+    final response = await _post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'dia_id': diaId,
+        'militar_solicitante_id': solicitanteId,
+        'militar_substituto_id': substitutoId,
+        'tipo_servico': tipoServico,
+        'motivo': motivo.trim(),
+      }),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(_extractError(response, 'Falha ao solicitar troca de serviço'));
+    }
+    return EscalaTrocaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<List<EscalaTrocaModel>> listTrocasPendentes() async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/trocas/pendentes');
+    final response = await _get(uri, headers: _headers());
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => EscalaTrocaModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<List<EscalaTrocaModel>> listTrocasMes(int ano, int mes) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes/trocas');
+    final response = await _get(uri, headers: _headers());
+    if (response.statusCode != 200) return [];
+    final List list = jsonDecode(utf8.decode(response.bodyBytes));
+    return list.map((json) => EscalaTrocaModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<EscalaTrocaModel> homologarTroca(int trocaId, {String? observacao}) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/trocas/$trocaId/homologar');
+    final response = await _post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        if (observacao != null && observacao.trim().isNotEmpty) 'observacao': observacao.trim(),
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao homologar troca de serviço'));
+    }
+    return EscalaTrocaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<EscalaTrocaModel> recusarTroca(int trocaId, {required String justificativa}) async {
+    await _ensureAuth();
+    final uri = Uri.parse('$_baseUrl/escalas/trocas/$trocaId/recusar');
+    final response = await _post(
+      uri,
+      headers: _headers(),
+      body: jsonEncode({
+        'justificativa': justificativa.trim(),
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_extractError(response, 'Falha ao recusar troca de serviço'));
+    }
+    return EscalaTrocaModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+  }
+
   // ================= RELATÓRIO DIÁRIO (24 HORAS) =================
   Future<RelatorioDiarioModel> getRelatorioHoje() async {
     await _ensureAuth();
