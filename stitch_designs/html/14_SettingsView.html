@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-tertiary":"#003827","on-primary-container":"#00285d","on-secondary":"#002f65","outline-variant":"#414754","secondary-container":"#0066cc","on-background":"#dbe1ff","surface-container-lowest":"#050d25","on-tertiary-fixed":"#002116","surface-dim":"#0a122a","tertiary-container":"#00a47a","surface-container":"#171e37","surface-bright":"#313852","on-secondary-fixed":"#001b3e","tertiary-fixed":"#54fdc4","on-error-container":"#ffdad6","background":"#0a122a","secondary-fixed-dim":"#aac7ff","surface-container-low":"#131a33","on-surface-variant":"#c2c6d6","tertiary-fixed-dim":"#27e0a9","on-surface":"#dbe1ff","on-tertiary-container":"#003122","surface-container-high":"#212942","on-secondary-container":"#dfe8ff","primary-fixed-dim":"#adc6ff","primary":"#adc6ff","surface":"#0a122a","primary-container":"#4c8eff","on-primary-fixed":"#001a41","surface-variant":"#2c344d","error":"#ffb4ab","on-error":"#690005","on-primary-fixed-variant":"#004494","inverse-on-surface":"#282f49","secondary-fixed":"#d7e3ff","inverse-primary":"#005ac2","surface-container-highest":"#2c344d","tertiary":"#27e0a9","surface-tint":"#adc6ff","on-secondary-fixed-variant":"#00458e","primary-fixed":"#d8e2ff","error-container":"#93000a","on-primary":"#002e69","inverse-surface":"#dbe1ff","secondary":"#aac7ff","on-tertiary-fixed-variant":"#00513b","outline":"#8c909f"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"0.75rem","space-xl":"1.5rem","margin":"1rem","space-xs":"0.25rem","gutter":"0.75rem","gutter-desktop":"1rem","margin-desktop":"1.5rem","space-lg":"1rem","space-sm":"0.5rem"},"fontFamily":{"telemetry-data":["JetBrains Mono"],"code-md":["JetBrains Mono"],"display-lg":["Inter"],"label-tactical":["JetBrains Mono"],"headline-md":["Inter"],"code-sm":["JetBrains Mono"],"body-md":["Inter"],"body-lg":["Inter"],"headline-lg":["Inter"],"headline-sm":["Inter"],"body-sm":["Inter"]},"fontSize":{"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}]}}}}</script></head><body class="bg-background font-body-md text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-xl z-50 shadow-[0_1px_8px_rgba(0,0,0,0.5)]"><div class="h-16 w-full px-gutter-desktop flex items-center justify-between"><div class="flex items-center gap-space-md"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-on-surface font-bold">BINFAE-GL <span class="text-primary">// ALA 11 - C&amp;TI FORÇA AÉREA</span></span><div class="flex items-center gap-space-sm mt-0.5"><span class="inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded bg-surface-container-high font-label-tactical text-label-tactical text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>SISTEMA TÁTICO - 12 NÓS ATIVOS</span><span class="inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded bg-surface-container font-label-tactical text-label-tactical text-on-surface-variant"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>API ONLINE (28MS)</span></div></div></div><div class="hidden xl:flex items-center gap-space-lg"><div class="flex items-center gap-space-md px-space-md py-space-xs bg-surface-container-low rounded"><div class="flex flex-col items-end"><span class="font-label-tactical text-label-tactical text-outline">HORA LOCAL</span><span class="font-telemetry-data text-telemetry-data text-primary-fixed">BRT: 14:32:08</span></div><div class="h-6 w-px bg-surface-variant"></div><div class="flex flex-col items-end"><span class="font-label-tactical text-label-tactical text-outline">OPERAÇÃO ZULU</span><span class="font-telemetry-data text-telemetry-data text-tertiary-fixed-dim">ZULU: 17:32:08Z</span></div></div><div class="flex items-center gap-space-sm px-space-md py-1.5 bg-surface-container-low rounded text-on-surface-variant font-code-sm text-code-sm min-w-[220px]"><span class="material-symbols-outlined text-base text-outline">search</span><span class="flex-1 text-outline">Pesquisa tática global...</span><kbd class="px-1.5 py-0.5 bg-surface-container-highest rounded text-on-surface font-code-sm text-code-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-space-md pl-space-md"><div class="flex flex-col text-right"><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">2º Sgt Silva</span><span class="font-label-tactical text-label-tactical text-primary">SARAM: 6842910</span></div><div class="h-9 w-9 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-primary text-xl">shield_person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-7 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between py-space-md overflow-y-auto"><div class="px-space-md flex flex-col gap-space-xs"><div class="px-space-sm py-space-xs mb-space-xs"><span class="font-label-tactical text-label-tactical uppercase text-outline tracking-widest">Módulos Operacionais</span></div><nav class="flex flex-col gap-1" data-active-classes="bg-secondary-container text-on-secondary-container font-semibold shadow-[0_0_12px_rgba(0,102,204,0.4)]"><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="dashboard" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">dashboard</span><span class="font-body-md text-body-md">Dashboard</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="materiais-e-estoque" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">inventory_2</span><span class="font-body-md text-body-md">Materiais e Estoque</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="cautelas-e-missoes" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">assignment</span><span class="font-body-md text-body-md">Cautelas e Missões</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="manutencao" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">build</span><span class="font-body-md text-body-md">Manutenção</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="pendencias-e-metas" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">pending_actions</span><span class="font-body-md text-body-md">Pendências e Metas</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="escala-de-sobreaviso" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">calendar_month</span><span class="font-body-md text-body-md">Escala de Sobreaviso</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="relatorio-diario-24h" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">description</span><span class="font-body-md text-body-md">Relatório Diário (24h)</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="locais-fisicos" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">share_location</span><span class="font-body-md text-body-md">Locais Físicos</span></div><span class="font-label-tactical text-label-tactical px-1.5 py-0.5 rounded bg-surface-container text-tertiary-fixed-dim uppercase">Árvore</span></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="grupos-e-subgrupos" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">account_tree</span><span class="font-body-md text-body-md">Grupos e Subgrupos</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="historico-geral" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">history</span><span class="font-body-md text-body-md">Histórico Geral</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="painel-administrativo" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">admin_panel_settings</span><span class="font-body-md text-body-md">Painel Administrativo</span></div></a><a class="flex items-center justify-between px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all group" data-path="configuracoes" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-lg text-outline-variant group-hover:text-primary">settings</span><span class="font-body-md text-body-md">Configurações</span></div></a></nav></div><div class="px-space-md"><div class="p-space-sm bg-surface-container-low rounded flex items-center justify-between"><span class="font-label-tactical text-label-tactical text-outline">ESTAÇÃO-BMP #8821-B</span><span class="w-2 h-2 rounded-full bg-tertiary"></span></div></div></aside><div class="pl-64"><main class="w-full min-h-[calc(100vh-5.75rem)] pt-16 pb-10 px-gutter-desktop bg-background"><div class="flex flex-col w-full gap-space-lg">
+<!-- TOP HEADER / ACTION BAR -->
+<section class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md p-space-md bg-surface-container-low rounded-xl shadow-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center shrink-0 shadow-sm text-primary">
+<span class="material-symbols-outlined text-3xl">terminal</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface uppercase truncate">
+            CONFIGURAÇÕES DO SISTEMA // PARÂMETROS OPERACIONAIS &amp; INFRAESTRUTURA TÁTICA
+          </span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest font-label-tactical text-label-tactical text-tertiary">
+            DEFCON 4 // PROD-STABLE
+          </span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-code-sm text-code-sm truncate">
+<span>Diretriz Técnica EMAER nº 142/DIRM-GL</span>
+<span class="text-outline-variant">/</span>
+<span>Nível de Prontidão C&amp;TI Ala 11</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary-fixed-dim">Homologação ICP-Militar v4.8</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="flex items-center gap-space-sm shrink-0 flex-wrap">
+<button class="group flex items-center gap-1.5 px-space-md py-2 bg-surface-container hover:bg-surface-container-high rounded font-code-sm text-code-sm text-on-surface-variant hover:text-on-surface transition-all shadow-sm" type="button">
+<span class="material-symbols-outlined text-base text-outline-variant group-hover:text-primary">restore</span>
+<span>Restaurar Padrões Táticos</span>
+<kbd class="px-1.5 py-0.5 bg-surface-container-highest rounded text-outline font-label-tactical text-[10px]">Alt+R</kbd>
+</button>
+<button class="group flex items-center gap-1.5 px-space-md py-2 bg-surface-container hover:bg-surface-container-high rounded font-code-sm text-code-sm text-tertiary hover:text-tertiary-fixed transition-all shadow-sm" type="button">
+<span class="material-symbols-outlined text-base animate-pulse">sensors</span>
+<span>Testar Conexões &amp; Telemetria</span>
+<kbd class="px-1.5 py-0.5 bg-surface-container-highest rounded text-outline font-label-tactical text-[10px]">F6</kbd>
+</button>
+<button class="group flex items-center gap-2 px-space-md py-2 bg-primary hover:bg-primary-container text-on-primary rounded font-headline-sm text-headline-sm font-semibold transition-all shadow-[0_0_16px_rgba(76,142,255,0.45)]" type="button">
+<span class="material-symbols-outlined text-base">save</span>
+<span>Salvar Alterações</span>
+<kbd class="px-1.5 py-0.5 bg-on-primary-container text-on-surface font-label-tactical text-[10px] rounded">Ctrl+S</kbd>
+</button>
+</div>
+</section>
+<!-- TACTICAL HORIZONTAL TABS -->
+<nav class="flex items-center gap-1.5 p-1 bg-surface-container-lowest rounded-lg overflow-x-auto shadow-sm">
+<button class="flex items-center gap-2 px-space-md py-2 rounded bg-surface-container text-primary font-code-md text-code-md font-semibold shrink-0 shadow-sm" type="button">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="material-symbols-outlined text-base">storage</span>
+<span>1. Banco Local &amp; SQLite WAL</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-tertiary font-label-tactical text-[10px]">ATIVO</span>
+</button>
+<button class="flex items-center gap-2 px-space-md py-2 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-code-md text-code-md shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline">schedule</span>
+<span>2. Servidores NTP &amp; Sincronismo COMAER</span>
+</button>
+<button class="flex items-center gap-2 px-space-md py-2 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-code-md text-code-md shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline">hub</span>
+<span>3. Proxy Seguro, Redes &amp; Portas</span>
+</button>
+<button class="flex items-center gap-2 px-space-md py-2 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-code-md text-code-md shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline">verified_user</span>
+<span>4. Criptografia &amp; Tokens Físicos</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[10px]">FIDO2</span>
+</button>
+<button class="flex items-center gap-2 px-space-md py-2 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-code-md text-code-md shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline">tune</span>
+<span>5. Interface, HUD &amp; Modo Noturno</span>
+</button>
+</nav>
+<!-- 2-COLUMN MAIN TACTICAL WORKBENCH -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg items-start">
+<!-- COLUMN 1 -->
+<div class="flex flex-col gap-space-lg">
+<!-- CARD 1: SQLITE WAL ENGINE -->
+<section class="flex flex-col bg-surface-container-low rounded-xl p-space-md shadow-md gap-space-md">
+<!-- Card Header -->
+<div class="flex items-center justify-between pb-2 bg-surface-container-lowest/40 -mx-space-md -mt-space-md p-space-md rounded-t-xl">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-primary text-xl">database</span>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface truncate">
+                Mecanismo SQLite WAL (Write-Ahead Logging)
+              </span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">
+                SUBSISTEMA CRÍTICO DE ARMAZENAMENTO TRANSAACIONAL
+              </span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical">
+            WAL ENGINE v3.45.1
+          </span>
+</div>
+<!-- Path Input -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Caminho do Arquivo de Base Local</label>
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high font-label-tactical text-[10px] text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+              ENCRIPTADO AES-256-XTS
+            </span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex-1 flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded shadow-inner">
+<span class="material-symbols-outlined text-outline text-sm">folder_open</span>
+<input class="w-full bg-transparent font-code-sm text-code-sm text-on-surface focus:outline-none select-all" readonly="" type="text" value="/var/fab/binfae/database/binfae_operational_v4.db"/>
+</div>
+<button class="px-3 py-2 rounded bg-surface-container hover:bg-surface-container-high font-code-sm text-code-sm text-primary transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-base">search</span>
+<span>Procurar</span>
+</button>
+</div>
+</div>
+<!-- WAL Checkpoint & Frequency -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Frequência de Checkpoint WAL</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-code-sm text-code-sm px-3 py-2 rounded focus:outline-none">
+<option selected="">Passivo / Contínuo (1000 páginas)</option>
+<option>Forçado (TRUNCATE periódico)</option>
+<option>Crítico em Lote (RESTART)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Intervalo Checkpoint</label>
+<span class="font-telemetry-data text-telemetry-data text-primary">1.000 ms</span>
+</div>
+<input class="w-full accent-primary bg-surface-container-lowest h-2 rounded cursor-pointer" max="5000" min="100" step="100" type="range" value="1000"/>
+<div class="flex justify-between text-outline font-label-tactical text-[9px]">
+<span>100ms (Alta CPU)</span>
+<span>Padrão 1000ms</span>
+<span>5000ms</span>
+</div>
+</div>
+</div>
+<!-- WAL Live Telemetry Box -->
+<div class="p-space-sm bg-surface-container rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">Status Dinâmico do Arquivo .wal</span>
+<button class="flex items-center gap-1 px-2 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-tertiary font-label-tactical text-label-tactical transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">refresh</span>
+<span>Checkpoint Manual [Alt+C]</span>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center pt-1">
+<div class="flex flex-col p-2 bg-surface-container-lowest rounded">
+<span class="font-label-tactical text-[10px] text-outline">TAMANHO ATUAL</span>
+<span class="font-telemetry-data text-telemetry-data text-on-surface">4.8 MB</span>
+</div>
+<div class="flex flex-col p-2 bg-surface-container-lowest rounded">
+<span class="font-label-tactical text-[10px] text-outline">FRAGMENTAÇÃO</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary">0.2%</span>
+</div>
+<div class="flex flex-col p-2 bg-surface-container-lowest rounded">
+<span class="font-label-tactical text-[10px] text-outline">PÁGINAS PENDENTES</span>
+<span class="font-telemetry-data text-telemetry-data text-primary">142 / 1000</span>
+</div>
+</div>
+<!-- Progress Visualizer for WAL Buffer -->
+<div class="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden mt-1">
+<div class="bg-primary h-full w-[14.2%] transition-all"></div>
+</div>
+</div>
+<!-- Synchronous Mode Radio Grid -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Modo de Sincronismo (PRAGMA synchronous)</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<label class="flex items-center gap-2 p-2 rounded bg-surface-container-high/40 hover:bg-surface-container-high cursor-pointer transition-colors">
+<input checked="" class="accent-primary" name="sync_mode" type="radio" value="normal"/>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">NORMAL</span>
+<span class="font-label-tactical text-[9px] text-tertiary">Ideal para WAL</span>
+</div>
+</label>
+<label class="flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high cursor-pointer transition-colors">
+<input class="accent-primary" name="sync_mode" type="radio" value="full"/>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">FULL</span>
+<span class="font-label-tactical text-[9px] text-outline">Máxima Durab.</span>
+</div>
+</label>
+<label class="flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high cursor-pointer transition-colors">
+<input class="accent-primary" name="sync_mode" type="radio" value="off"/>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">OFF</span>
+<span class="font-label-tactical text-[9px] text-error">Inseguro</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Shared Memory / MMAP Info -->
+<div class="flex items-center justify-between p-space-sm bg-surface-container-lowest rounded font-code-sm text-code-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base">memory</span>
+<span>Cache em Memória Compartilhada (MMAP):</span>
+</div>
+<div class="flex items-center gap-2 font-telemetry-data text-telemetry-data text-primary">
+<span>64 MB</span>
+<span class="text-outline font-label-tactical text-[10px]">(mmap_size: 268435456 bytes)</span>
+</div>
+</div>
+</section>
+<!-- CARD 2: NTP COMAER -->
+<section class="flex flex-col bg-surface-container-low rounded-xl p-space-md shadow-md gap-space-md">
+<!-- Header -->
+<div class="flex items-center justify-between pb-2 bg-surface-container-lowest/40 -mx-space-md -mt-space-md p-space-md rounded-t-xl">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-tertiary text-xl">acute</span>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface truncate">
+                Servidores de Tempo Oficial Militar (NTP Estrato 1)
+              </span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">
+                SINCRONISMO ATÔMICO COMANDO DA AERONÁUTICA
+              </span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/20 text-tertiary font-label-tactical text-label-tactical flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+            LOCKED
+          </span>
+</div>
+<!-- Servers List -->
+<div class="flex flex-col gap-2">
+<!-- Primary NTP -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-ping"></span>
+<div class="flex flex-col">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">ntp.fab.mil.br</span>
+<span class="font-label-tactical text-[10px] text-outline">PRIMÁRIO // ESTRATO 1 COMAER (CESIUM-133)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex flex-col text-right">
+<span class="font-label-tactical text-[9px] text-outline">DRIFT / DELTA</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary">&lt; 0.8ms</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-tertiary font-label-tactical text-label-tactical">ATIVO</span>
+</div>
+</div>
+<!-- Contingency NTP -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex items-center gap-2.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<div class="flex flex-col">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">a.st1.ntp.br</span>
+<span class="font-label-tactical text-[10px] text-outline">SECUNDÁRIO // CONTINGÊNCIA ON/NIC.BR</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex flex-col text-right">
+<span class="font-label-tactical text-[9px] text-outline">ESTADO</span>
+<span class="font-code-sm text-code-sm text-primary">SINCRONIZADO</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-label-tactical text-label-tactical">STANDBY</span>
+</div>
+</div>
+</div>
+<!-- NTP Settings Footer -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex flex-col">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">Intervalo de Re-sincronismo</span>
+<span class="font-code-sm text-code-sm text-on-surface">A cada 15 minutos (Alerta se deriva &gt; 5ms)</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-primary font-code-sm text-code-sm font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-base">sync</span>
+<span>Forçar Sincronização Imediata [F7]</span>
+</button>
+</div>
+</section>
+</div>
+<!-- COLUMN 2 -->
+<div class="flex flex-col gap-space-lg">
+<!-- CARD 3: PROXY & C&TI TUNNEL -->
+<section class="flex flex-col bg-surface-container-low rounded-xl p-space-md shadow-md gap-space-md">
+<!-- Header -->
+<div class="flex items-center justify-between pb-2 bg-surface-container-lowest/40 -mx-space-md -mt-space-md p-space-md rounded-t-xl">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-xl">vpn_lock</span>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface truncate">
+                Proxy Militar &amp; Túnel C&amp;TI Ala 11
+              </span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">
+                ROTEAMENTO ENCLAVE TÁTICO &amp; CONTROLE PERIMETRAL
+              </span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary-fixed font-label-tactical text-label-tactical">
+            PORTA SEGURA
+          </span>
+</div>
+<!-- Gateway Address Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Endereço do Gateway Central &amp; Porta</label>
+<div class="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded">
+<span class="font-telemetry-data text-telemetry-data text-primary">10.22.40.1:8443</span>
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high font-label-tactical text-[10px] text-tertiary">
+<span class="material-symbols-outlined text-xs">lock</span>
+              WireGuard Tático // AES-256-GCM
+            </span>
+</div>
+</div>
+<!-- Bypass Rules Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Bypass para Rede Local C&amp;TI (Sem Proxy)</label>
+<div class="bg-surface-container-lowest px-3 py-2 rounded">
+<input class="w-full bg-transparent font-code-sm text-code-sm text-on-surface focus:outline-none" type="text" value="10.22.*.*, localhost, 127.0.0.1, 10.14.0.0/16"/>
+</div>
+</div>
+<!-- Timeout and Retries -->
+<div class="grid grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<span class="font-label-tactical text-label-tactical uppercase text-outline">Timeout API REST</span>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">3000 ms</span>
+<span class="font-label-tactical text-[10px] text-outline">Exp. Retry 3x</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-tactical text-label-tactical uppercase text-outline">Heartbeat Operacional</span>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container">
+<span class="font-telemetry-data text-telemetry-data text-tertiary">60 s</span>
+<span class="font-label-tactical text-[10px] text-outline">KeepAlive</span>
+</div>
+</div>
+</div>
+<!-- TLS Certificate Status Strip -->
+<div class="p-space-sm bg-surface-container rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-lg">verified</span>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">Certificado de Terminal TLS</span>
+<span class="font-label-tactical text-[10px] text-outline">ALA11-TERM-04.fab.mil.br // Autoridade Certificadora Mil-ICP</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-tactical text-label-tactical text-tertiary">VÁLIDO</span>
+<span class="font-label-tactical text-[10px] text-outline">Expira em 280 dias</span>
+</div>
+</div>
+</section>
+<!-- CARD 4: FORENSIC SECURITY & 2FA -->
+<section class="flex flex-col bg-surface-container-low rounded-xl p-space-md shadow-md gap-space-md">
+<!-- Header -->
+<div class="flex items-center justify-between pb-2 bg-surface-container-lowest/40 -mx-space-md -mt-space-md p-space-md rounded-t-xl">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-primary-fixed-dim text-xl">security</span>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface truncate">
+                Segurança Forense &amp; Dispositivos 2FA
+              </span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">
+                CRITÉRIOS DE AUDITORIA NÍVEL 4 &amp; COMPLIANCE
+              </span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-tertiary font-label-tactical text-label-tactical">
+            ICP-FAB CERT
+          </span>
+</div>
+<!-- Toggle Switch 1: FIDO2 -->
+<div class="flex items-center justify-between p-2.5 bg-surface-container rounded-lg">
+<div class="flex flex-col max-w-[80%]">
+<span class="font-code-md text-code-md font-semibold text-on-surface">Política de Autenticação FIDO2 / YubiKey</span>
+<span class="font-body-sm text-body-sm text-outline">Exigir toque físico no token em operações sensíveis N3/N4 (cautelas e descarte).</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle Switch 2: Digital Signatures -->
+<div class="flex items-center justify-between p-2.5 bg-surface-container rounded-lg">
+<div class="flex flex-col max-w-[80%]">
+<span class="font-code-md text-code-md font-semibold text-on-surface">Assinatura Automática em Cautelas &amp; Livro de Parte</span>
+<span class="font-body-sm text-body-sm text-outline">Gerar carimbo de tempo ICP-Brasil militar em cada movimentação de carga bélica/C&amp;TI.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Session Inactivity Timeout Selector -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Timeout de Sessão por Inatividade</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-code-sm text-code-sm px-3 py-2 rounded focus:outline-none">
+<option selected="">5 minutos (Diretriz EMAER)</option>
+<option>10 minutos (Vigilância Estendida)</option>
+<option>15 minutos (Apenas Sala de Guerra)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical uppercase text-on-surface-variant">Nível de Logs Forenses</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-code-sm text-code-sm px-3 py-2 rounded focus:outline-none">
+<option selected="">VERBOSE / TRILHA COMPLETA (Auditoria N4)</option>
+<option>INFO / OPERACIONAL (Padrão)</option>
+<option>WARN / CRÍTICO APENAS</option>
+</select>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- TACTICAL INFRASTRUCTURE STATUS & TELEMETRY FOOTER -->
+<section class="flex flex-col lg:flex-row items-center justify-between p-space-md bg-surface-container-low rounded-xl gap-space-md shadow-md mt-space-sm">
+<div class="flex items-center gap-space-md flex-wrap">
+<!-- Backup info -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-base">cloud_done</span>
+<div class="flex flex-col">
+<span class="font-label-tactical text-[10px] text-outline uppercase">ÚLTIMO BACKUP AUTOMÁTICO</span>
+<span class="font-code-sm text-code-sm text-on-surface">Hoje às 14:00 <span class="text-tertiary-fixed-dim font-telemetry-data">(sha256:7f9b8c2d...)</span></span>
+</div>
+</div>
+<div class="h-8 w-px bg-surface-variant hidden md:block"></div>
+<!-- Mode info -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-base">gavel</span>
+<div class="flex flex-col">
+<span class="font-label-tactical text-[10px] text-outline uppercase">MODO DE OPERAÇÃO</span>
+<span class="font-code-sm text-code-sm text-primary-fixed-dim">HOMOLOGADO &amp; ASSINADO DIGITALMENTE</span>
+</div>
+</div>
+<div class="h-8 w-px bg-surface-variant hidden md:block"></div>
+<!-- 2FA Status -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-base animate-pulse">key</span>
+<div class="flex flex-col">
+<span class="font-label-tactical text-[10px] text-outline uppercase">DISPOSITIVO 2FA DETECTADO</span>
+<span class="font-code-sm text-code-sm text-on-surface">YubiKey 5 NFC <span class="text-tertiary font-label-tactical">[Slot 1 OK]</span></span>
+</div>
+</div>
+</div>
+<!-- Export & Import Controls -->
+<div class="flex items-center gap-space-sm shrink-0">
+<button class="group flex items-center gap-1.5 px-space-md py-2 bg-surface-container hover:bg-surface-container-high rounded font-code-sm text-code-sm text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline-variant group-hover:text-primary">file_download</span>
+<span>Exportar Snapshot</span>
+<kbd class="px-1.5 py-0.5 bg-surface-container-highest rounded text-outline font-label-tactical text-[10px]">Ctrl+E</kbd>
+</button>
+<button class="group flex items-center gap-1.5 px-space-md py-2 bg-surface-container hover:bg-surface-container-high rounded font-code-sm text-code-sm text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-outline-variant group-hover:text-primary">file_upload</span>
+<span>Importar Configurações</span>
+<kbd class="px-1.5 py-0.5 bg-surface-container-highest rounded text-outline font-label-tactical text-[10px]">Ctrl+I</kbd>
+</button>
+</div>
+</section>
+</div>
+<script>
+  // Tactical micro-interactions for shortcut listeners
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      const saveBtn = document.querySelector('button span.material-symbols-outlined:first-child');
+      if (saveBtn) {
+        saveBtn.parentElement.classList.add('ring-2', 'ring-tertiary');
+        setTimeout(() => {
+          saveBtn.parentElement.classList.remove('ring-2', 'ring-tertiary');
+        }, 600);
+      }
+    }
+  });
+</script></main></div><footer class="fixed bottom-0 left-0 right-0 h-7 bg-surface-container-lowest z-50 flex items-center justify-between px-gutter-desktop shadow-[0_-1px_6px_rgba(0,0,0,0.4)]"><div class="flex items-center gap-space-md font-code-sm text-code-sm text-outline"><span class="flex items-center gap-1.5 text-tertiary-fixed-dim"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>SQLITE WAL: SYNC ATIVO (0.1s atrás)</span><span class="text-outline-variant">|</span><span>HASH AUDITORIA: <span class="text-on-surface font-telemetry-data">SHA256:8f4a...e912</span> (HOMOLOGADO)</span><span class="text-outline-variant">|</span><span class="text-primary-fixed">PRONTIDÃO: DEFCON 4 // NORMAL</span></div><div class="flex items-center gap-space-md font-code-sm text-code-sm text-outline"><div class="flex items-center gap-1"><kbd class="px-1 bg-surface-container-high rounded text-on-surface-variant">Ctrl+F</kbd><span>Filtrar</span></div><div class="flex items-center gap-1"><kbd class="px-1 bg-surface-container-high rounded text-on-surface-variant">Ctrl+S</kbd><span>Salvar</span></div><div class="flex items-center gap-1"><kbd class="px-1 bg-surface-container-high rounded text-on-surface-variant">F5</kbd><span>Atualizar</span></div><div class="flex items-center gap-1"><kbd class="px-1 bg-surface-container-high rounded text-on-surface-variant">Esc</kbd><span>Fechar</span></div></div></footer></body></html>

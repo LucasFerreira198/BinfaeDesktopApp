@@ -1,0 +1,805 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#adc6ff","on-error-container":"#ffdad6","on-secondary-container":"#dfe8ff","on-tertiary":"#003827","on-primary-fixed-variant":"#004494","tertiary":"#27e0a9","secondary-container":"#0066cc","secondary":"#aac7ff","on-surface-variant":"#c2c6d6","on-tertiary-fixed":"#002116","on-primary-container":"#00285d","surface-container-highest":"#2c344d","on-background":"#dbe1ff","outline-variant":"#414754","outline":"#8c909f","inverse-surface":"#dbe1ff","secondary-fixed":"#d7e3ff","surface-container-high":"#212942","on-tertiary-fixed-variant":"#00513b","on-secondary-fixed-variant":"#00458e","surface-container":"#171e37","surface":"#0a122a","on-secondary-fixed":"#001b3e","surface-container-lowest":"#050d25","secondary-fixed-dim":"#aac7ff","on-primary":"#002e69","surface-container-low":"#131a33","surface-bright":"#313852","primary-fixed-dim":"#adc6ff","on-secondary":"#002f65","primary-fixed":"#d8e2ff","surface-variant":"#2c344d","error":"#ffb4ab","tertiary-fixed-dim":"#27e0a9","tertiary-fixed":"#54fdc4","primary-container":"#4c8eff","surface-tint":"#adc6ff","tertiary-container":"#00a47a","error-container":"#93000a","inverse-primary":"#005ac2","on-error":"#690005","on-tertiary-container":"#003122","inverse-on-surface":"#282f49","surface-dim":"#0a122a","background":"#0a122a","on-primary-fixed":"#001a41","on-surface":"#dbe1ff"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-lg":"1rem","gutter-desktop":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"0.75rem","space-xl":"1.5rem","space-md":"0.75rem","margin-desktop":"1.5rem"},fontFamily:{"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"body-md":["Inter"],"headline-lg":["Inter"],"code-md":["JetBrains Mono"],"telemetry-data":["JetBrains Mono"],"headline-sm":["Inter"],"headline-md":["Inter"],"body-lg":["Inter"],"display-lg":["Inter"],"label-tactical":["JetBrains Mono"]},fontSize:{"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen selection:bg-secondary-container selection:text-on-secondary-container"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-50 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full h-full px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-shrink-0"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-label-tactical text-label-tactical text-primary uppercase">BINFAE-GL // ALA 11 - C&amp;TI FORÇA AÉREA</span><span class="inline-flex items-center px-space-xs py-0.5 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase tracking-wider">SISTEMA TÁTICO - 12 NÓS ATIVOS</span></div></div></div><div class="hidden xl:flex items-center gap-space-lg flex-1 max-w-2xl justify-center"><div class="flex items-center gap-space-sm px-space-sm py-1 bg-surface-container-low rounded-DEFAULT"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-code-sm text-code-sm text-tertiary tracking-wide uppercase">API ONLINE (28ms)</span></div><div class="flex items-center gap-space-md font-telemetry-data text-telemetry-data"><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">BRT:</span><span class="text-on-surface">14:32:08</span></div><div class="w-px h-3.5 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ZULU:</span><span class="text-primary">17:32:08Z</span></div></div><div class="relative flex-1 max-w-xs"><div class="flex items-center bg-surface-container-low rounded-DEFAULT px-space-sm py-1 gap-space-xs"><span class="material-symbols-outlined text-outline text-base">search</span><input class="bg-transparent w-full text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" placeholder="Busca tática de grupos e ativos..." readonly="" type="text"><kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high rounded-DEFAULT text-outline font-medium">Ctrl+K</kbd></div></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-1.5 rounded-DEFAULT"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"><span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-low"></span></div><div class="flex flex-col text-left"><span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">2º Sgt Silva</span><span class="font-code-sm text-code-sm text-outline leading-none">SARAM: 6842910</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-10 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col py-space-sm"><div class="px-space-md py-space-xs mb-space-xs"><span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">OPERAÇÃO &amp; LOGÍSTICA</span></div><nav class="flex flex-col gap-0.5 px-space-xs" data-active-classes="bg-secondary-container text-on-secondary-container font-semibold shadow-inner"><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">dashboard</span>Dashboard</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">inventory_2</span>Materiais e Estoque</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">assignment</span>Cautelas e Missões</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="manutencao" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">build</span>Manutenção</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">checklist</span>Pendências e Metas</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">calendar_month</span>Escala de Sobreaviso</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="relatorio-diario" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">description</span>Relatório Diário (24h)</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="locais-fisicos" href="#"><span class="flex items-center"><span class="material-symbols-outlined mr-space-sm text-lg">account_tree</span>Locais Físicos</span><span class="px-1.5 py-0.5 bg-surface-container text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase">Árvore</span></a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">folder_special</span>Grupos e Subgrupos</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="historico-geral" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">history</span>Histórico Geral</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT bg-secondary-container text-on-secondary-container font-semibold shadow-inner transition-colors font-body-md text-body-md" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">admin_panel_settings</span>Painel Administrativo</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="configuracoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">settings</span>Configurações</a></nav></div><div class="p-space-sm bg-surface-container-low mx-space-xs mb-space-sm rounded-DEFAULT"><div class="flex items-center justify-between"><span class="flex items-center gap-space-xs font-code-sm text-code-sm text-primary"><span class="material-symbols-outlined text-sm">vpn_key</span>SARAM LINK</span><span class="font-label-tactical text-label-tactical text-tertiary uppercase">ENCRIPTADO</span></div></div></aside><div class="pl-64"><main class="w-full min-h-screen pt-16 pb-10 px-gutter-desktop bg-surface"><div class="flex flex-col w-full">
+<!-- SCRIPT PARA ATIVAÇÃO DO ITEM NA SIDEBAR DO SHELL -->
+<script>
+    (function activateSidebar() {
+      const applyActive = () => {
+        const links = document.querySelectorAll('aside nav a');
+        links.forEach(link => {
+          if (link.getAttribute('data-path') === 'painel-administrativo') {
+            link.className = 'flex items-center px-space-sm py-1.5 rounded-DEFAULT bg-secondary-container text-on-secondary-container font-semibold shadow-inner transition-colors font-body-md text-body-md';
+          } else {
+            link.className = 'flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md';
+          }
+        });
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyActive);
+      } else {
+        applyActive();
+      }
+    })();
+  </script>
+<!-- BANNER / CABEÇALHO TÁTICO MILITAR (GOVERNANÇA E CONTROLE DE ACESSO) -->
+<section class="relative bg-surface-container-lowest p-space-lg rounded-DEFAULT mb-space-md shadow-md overflow-hidden">
+<!-- Overlay sutil de radar aeroespacial e brilho tático -->
+<div class="absolute -right-20 -top-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+<div class="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-primary/10 via-transparent to-transparent pointer-events-none"></div>
+<div class="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-space-lg">
+<!-- Bloco de Identificação Institucional com Gládio Alado FAB -->
+<div class="flex items-start gap-space-md">
+<div class="p-space-sm bg-surface-container-high rounded-DEFAULT flex items-center justify-center flex-shrink-0 shadow-sm">
+<img alt="Gládio Alado FAB - BINFAE-GL" class="w-12 h-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE2FUvzd6ZEo8p03WPiW_rWYmuemhfZ4Ga1ytLO-PHqoyjUggNF89o6XdRwh6VDeWsT-i1lRRH8IojRJZFvmo38WbY5qcb-jeUqtYh52gpc1cqK-Zm65h_Cej8lBmc7oXTQDC2x573YmCbo_lJJy2zwGAc3XwbOCReghQPg8uxLqS7qxOdBIz3UOoTK1yH-6FE-OXfVWYJ76wA_GAgKfbF4STYNSup-tYp4MFjZKVISM4aKUHsIzt9DA">
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm flex-wrap mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider">COMANDO DA AERONÁUTICA // ALA 11</span>
+<span class="text-outline font-label-tactical text-label-tactical">•</span>
+<span class="font-label-tactical text-label-tactical text-secondary-fixed uppercase">SUBDIVISÃO DE C&amp;TI / BINFAE-GL</span>
+<span class="px-space-xs py-0.5 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase tracking-wider">DIRETRIZ EMAER N4</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold flex items-center gap-space-sm">
+            PAINEL ADMINISTRATIVO <span class="text-outline font-normal">//</span> GOVERNANÇA, CONTROLE DE ACESSO &amp; GESTÃO DE OPERADORES
+          </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            Portaria nº 142/DIRM-GL • Diretriz EMAER de Cibersegurança &amp; Controle de Privilégios Táticos Nível 4 (RBAC/ABAC)
+          </p>
+<!-- Badges de Auditoria e Certificação Militar -->
+<div class="flex items-center gap-space-xs flex-wrap mt-space-sm">
+<span class="inline-flex items-center gap-1 px-space-sm py-0.5 bg-surface-container text-tertiary font-code-sm text-code-sm rounded-DEFAULT">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+              AUTORIDADE CERTIFICADORA ICP-MILITAR ATIVA
+            </span>
+<span class="inline-flex items-center gap-1 px-space-sm py-0.5 bg-surface-container text-primary font-code-sm text-code-sm rounded-DEFAULT">
+<span class="material-symbols-outlined text-xs">shield</span>
+              DEFCON 4 // OPERAÇÃO NORMAL
+            </span>
+<span class="inline-flex items-center gap-1 px-space-sm py-0.5 bg-surface-container text-on-surface-variant font-code-sm text-code-sm rounded-DEFAULT">
+<span class="material-symbols-outlined text-xs">lock</span>
+              BANCO LOCAL WAL ENCRIPTADO AES-256
+            </span>
+</div>
+</div>
+</div>
+<!-- Botões de Ação Rápida de Governança -->
+<div class="flex items-center gap-space-sm flex-wrap xl:justify-end flex-shrink-0">
+<button class="px-space-md py-2 bg-primary text-on-primary hover:bg-primary/90 font-label-tactical text-label-tactical uppercase tracking-wider rounded-DEFAULT shadow flex items-center gap-space-xs transition-colors" type="button" id="btn-open-modal-operador">
+<span class="material-symbols-outlined text-base">person_add</span>
+          + NOVO OPERADOR MILITAR <kbd class="px-1 py-0.2 bg-on-primary/20 text-on-primary font-code-sm text-code-sm rounded-DEFAULT">Ctrl+N</kbd>
+</button>
+<button class="px-space-md py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest font-label-tactical text-label-tactical uppercase tracking-wider rounded-DEFAULT shadow-sm flex items-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base">verified_user</span>
+          AUDITAR PERMISSÕES <kbd class="px-1 py-0.2 bg-surface-container-lowest text-outline font-code-sm text-code-sm rounded-DEFAULT">Ctrl+Shift+A</kbd>
+</button>
+<button class="px-space-md py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest font-label-tactical text-label-tactical uppercase tracking-wider rounded-DEFAULT shadow-sm flex items-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base">file_download</span>
+          EXPORTAR MATRIZ <kbd class="px-1 py-0.2 bg-surface-container-lowest text-outline font-code-sm text-code-sm rounded-DEFAULT">Ctrl+E</kbd>
+</button>
+<button class="px-space-md py-2 bg-surface-container-low text-tertiary hover:bg-surface-container font-label-tactical text-label-tactical uppercase tracking-wider rounded-DEFAULT shadow-sm flex items-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base animate-spin text-sm">sync</span>
+          SYNC COMAER LDAP
+        </button>
+</div>
+</div>
+</section>
+<!-- PAINEL DE INDICADORES TÁTICOS (KPIS ADMINISTRATIVOS) -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-md">
+<!-- KPI 1: Operadores Cadastrados -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">OPERADORES MILITARES</span>
+<span class="material-symbols-outlined text-primary text-xl">group</span>
+</div>
+<div class="flex items-baseline gap-space-sm mb-space-xs">
+<span class="font-telemetry-data text-display-lg text-primary font-bold">48</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">EFETIVO TOTAL</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-space-xs">
+<span class="text-tertiary">12 em serviço ativo hoje</span>
+<span class="text-outline">04 Admins N4</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-DEFAULT mt-space-xs overflow-hidden">
+<div class="bg-primary h-full rounded-DEFAULT" style="width: 78%;"></div>
+</div>
+</div>
+<!-- KPI 2: Sessões Conectadas em Tempo Real -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">SESSÕES EM TEMPO REAL</span>
+<span class="flex items-center gap-1 font-code-sm text-code-sm text-tertiary">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> AO VIVO
+        </span>
+</div>
+<div class="flex items-baseline gap-space-sm mb-space-xs">
+<span class="font-telemetry-data text-display-lg text-tertiary font-bold">08</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">TERMINAIS ATIVOS</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-space-xs">
+<span class="text-outline">Latência da Rede C&amp;TI:</span>
+<span class="text-tertiary font-semibold">14ms [CRIPTO OK]</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-DEFAULT mt-space-xs overflow-hidden">
+<div class="bg-tertiary h-full rounded-DEFAULT" style="width: 42%;"></div>
+</div>
+</div>
+<!-- KPI 3: Tentativas de Violação / Bloqueios -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">VIOLAÇÕES DE ACESSO (30D)</span>
+<span class="material-symbols-outlined text-tertiary text-xl">gpp_good</span>
+</div>
+<div class="flex items-baseline gap-space-sm mb-space-xs">
+<span class="font-telemetry-data text-display-lg text-on-surface font-bold">00</span>
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase">INTRUSÕES DETECTADAS</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-space-xs">
+<span class="text-outline">Integridade de Senhas:</span>
+<span class="text-tertiary font-semibold">100% CONFORME EMAER</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-DEFAULT mt-space-xs overflow-hidden">
+<div class="bg-tertiary h-full rounded-DEFAULT" style="width: 100%;"></div>
+</div>
+</div>
+<!-- KPI 4: Certificados Digitais ICP-FAB -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">CERTIFICADOS ICP-FAB</span>
+<span class="material-symbols-outlined text-secondary-fixed text-xl">badge</span>
+</div>
+<div class="flex items-baseline gap-space-sm mb-space-xs">
+<span class="font-telemetry-data text-display-lg text-secondary font-bold">46</span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase">VÁLIDOS / ATIVOS</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-space-xs">
+<span class="text-secondary-fixed font-semibold">02 expirando em &lt; 15 dias</span>
+<span class="text-outline uppercase text-[10px]">RENOVAÇÃO PEND.</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-DEFAULT mt-space-xs overflow-hidden flex">
+<div class="bg-tertiary h-full" style="width: 95%;"></div>
+<div class="bg-secondary-container h-full" style="width: 5%;"></div>
+</div>
+</div>
+</section>
+<!-- NAVEGAÇÃO DE ABAS TÁTICAS DO MÓDULO -->
+<section class="flex items-center justify-between bg-surface-container-lowest px-space-md rounded-DEFAULT mb-space-md shadow-sm overflow-x-auto">
+<div class="flex items-center gap-space-xs py-space-xs">
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-DEFAULT bg-secondary-container text-on-secondary-container font-label-tactical text-label-tactical uppercase tracking-wider shadow-inner" type="button">
+<span class="material-symbols-outlined text-base">manage_accounts</span>
+        Operadores e Credenciais
+      </button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+<span class="material-symbols-outlined text-base">admin_panel_settings</span>
+        Matriz de Perfis &amp; Privilégios (RBAC)
+      </button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+<span class="material-symbols-outlined text-base">security</span>
+        Políticas de Segurança &amp; Tokens 2FA
+      </button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+<span class="material-symbols-outlined text-base">lan</span>
+        Sincronização LDAP / COMAER
+      </button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+<span class="material-symbols-outlined text-base">key</span>
+        Chaves Criptográficas &amp; Licenciamento
+      </button>
+</div>
+<div class="hidden lg:flex items-center gap-space-sm py-space-xs text-outline font-code-sm text-code-sm">
+<span>FILTRO ATIVO: TODOS OS SETORES</span>
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+</div>
+</section>
+<!-- CORPO PRINCIPAL: DUAS COLUNAS INTEGRANDO TABELA DE OPERADORES + INSPEÇÃO DE PRIVILÉGIOS -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-md mb-space-md items-start">
+<!-- COLUNA ESQUERDA: LISTAGEM DE OPERADORES MILITARES (8 COLUNAS XL) -->
+<div class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- Barra de Filtros e Busca Rápida -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col lg:flex-row gap-space-sm items-center justify-between">
+<div class="relative flex-1 w-full">
+<div class="flex items-center bg-surface-container-low rounded-DEFAULT px-space-sm py-1.5 gap-space-xs">
+<span class="material-symbols-outlined text-outline text-lg">search</span>
+<input class="bg-transparent w-full text-on-surface placeholder:text-outline font-code-sm text-code-sm focus:outline-none" placeholder="Filtrar por Nome de Guerra, Posto ou SARAM (ex: 6842910, Silva, Cavalcanti)..." type="text">
+<kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high rounded-DEFAULT text-outline">Ctrl+F</kbd>
+</div>
+</div>
+<div class="flex items-center gap-space-xs w-full lg:w-auto flex-wrap">
+<!-- Filtro Nível -->
+<div class="flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-DEFAULT">
+<span class="material-symbols-outlined text-outline text-base mr-1">tune</span>
+<select class="bg-transparent text-on-surface font-label-tactical text-label-tactical uppercase focus:outline-none cursor-pointer">
+<option class="bg-surface-container-high" value="all">Nível de Acesso: Todos</option>
+<option class="bg-surface-container-high" value="n4">N4 - Administrador Pleno</option>
+<option class="bg-surface-container-high" value="n3">N3 - Gestor Tático C&amp;TI</option>
+<option class="bg-surface-container-high" value="n2">N2 - Operador Avançado</option>
+<option class="bg-surface-container-high" value="n1">N1 - Operador Padrão</option>
+</select>
+</div>
+<!-- Filtro Situação -->
+<div class="flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-DEFAULT">
+<span class="material-symbols-outlined text-outline text-base mr-1">filter_list</span>
+<select class="bg-transparent text-on-surface font-label-tactical text-label-tactical uppercase focus:outline-none cursor-pointer">
+<option class="bg-surface-container-high" value="all">Situação: Todos</option>
+<option class="bg-surface-container-high" value="active">Em Serviço Ativo</option>
+<option class="bg-surface-container-high" value="leave">Sobreaviso / Férias</option>
+<option class="bg-surface-container-high" value="blocked">Bloqueado Temporário</option>
+</select>
+</div>
+<button class="px-space-sm py-1.5 bg-surface-container-high text-on-surface hover:bg-surface-container-highest rounded-DEFAULT text-outline hover:text-on-surface flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-base">refresh</span>
+</button>
+</div>
+</div>
+<!-- Tabela Tática Densa de Operadores -->
+<div class="bg-surface-container-lowest rounded-DEFAULT shadow-sm overflow-hidden flex flex-col">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider">MATRIZ OPERACIONAL DE OPERADORES REGISTRADOS</span>
+<span class="px-1.5 py-0.5 bg-surface-container text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">6 DE 48 EXIBIDOS</span>
+</div>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-outline">
+<span>ORDENAÇÃO: SARAM DESC</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="bg-surface-container/60 text-outline font-label-tactical text-label-tactical uppercase tracking-wider">
+<th class="py-space-sm px-space-md">Posto / Guerra / SARAM</th>
+<th class="py-space-sm px-space-md">Função Tática / Seção</th>
+<th class="py-space-sm px-space-md">Nível de Acesso</th>
+<th class="py-space-sm px-space-md">Autenticação &amp; 2FA</th>
+<th class="py-space-sm px-space-md">Último Acesso / IP</th>
+<th class="py-space-sm px-space-md">Status</th>
+<th class="py-space-sm px-space-md text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- MILITAR 1: 1º Ten Cavalcanti (N4 Admin Pleno) -->
+<tr class="hover:bg-surface-container/40 transition-colors group">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
+                      1T
+                    </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">1º Ten Cavalcanti</span>
+<span class="font-code-sm text-code-sm text-outline">SARAM: 5412980</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Chefe Seção C&amp;TI</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // C&amp;TI-1</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-error-container/30 text-error font-code-sm text-code-sm rounded-DEFAULT uppercase font-semibold">
+                    N4 - ADMIN PLENO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">security_update_good</span>
+                    ICP-FAB // YUBIKEY
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-on-surface">Hoje 13:40</span>
+<div class="text-outline text-[10px]">10.22.40.05</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-tertiary uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ATIVO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Inspecionar / Editar" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-tertiary transition-colors" title="Resetar Token 2FA" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- MILITAR 2: 2º Sgt Silva (SELECIONADO NO INSPETOR) -->
+<tr class="bg-secondary-container/20 hover:bg-secondary-container/30 transition-colors">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-secondary/20 text-secondary flex items-center justify-center font-bold text-xs">
+                        2S
+                      </div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-tertiary ring-1 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-primary flex items-center gap-1">
+                        2º Sgt Silva
+                        <span class="text-[9px] px-1 py-0.2 bg-primary text-on-primary font-code-sm rounded-DEFAULT uppercase">EM FOCO</span>
+</span>
+<span class="font-code-sm text-code-sm text-primary">SARAM: 6842910</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Encarregado TI &amp; Redes</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // INFRA-REDES</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-primary-container/30 text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase font-semibold">
+                    N3 - GESTOR TÁTICO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">token</span>
+                    TOKEN YUBIKEY 5 NFC
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-tertiary font-semibold">Sessão Atual</span>
+<div class="text-outline text-[10px]">10.22.40.12 (ESTAÇÃO-02)</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-tertiary uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> CONECTADO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-primary text-on-primary font-code-sm" title="Foco no Inspetor" type="button">
+<span class="material-symbols-outlined text-base">pin_drop</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Auditar Acesso" type="button">
+<span class="material-symbols-outlined text-base">history_toggle_off</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- MILITAR 3: 3º Sgt Ribeiro -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-xs">
+                      3S
+                    </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">3º Sgt Ribeiro</span>
+<span class="font-code-sm text-code-sm text-outline">SARAM: 7102934</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Suporte Rádio P25 &amp; Cripto</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // COMUNICAÇÕES</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-primary-container/30 text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase font-semibold">
+                    N3 - GESTOR TÁTICO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">vpn_key</span>
+                    SMARTCARD ICP-BRASIL
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-on-surface">Hoje 11:22</span>
+<div class="text-outline text-[10px]">10.22.40.18</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-tertiary uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ATIVO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-tertiary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- MILITAR 4: 3º Sgt Rocha -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-xs">
+                      3S
+                    </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">3º Sgt Rocha</span>
+<span class="font-code-sm text-code-sm text-outline">SARAM: 6992140</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Manutenção Bancada &amp; Racks</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // SUPORTE TÉCNICO</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-surface-container-highest text-secondary-fixed font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                    N2 - OPERADOR AVANÇADO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-outline font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">key</span>
+                    OTP APLICATIVO FAB
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-on-surface">Ontem 17:50</span>
+<div class="text-outline text-[10px]">10.22.40.45</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-outline uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> SOBREAVISO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-tertiary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- MILITAR 5: Cb Santos -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-xs">
+                      CB
+                    </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">Cb Santos</span>
+<span class="font-code-sm text-code-sm text-outline">SARAM: 8129032</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Expediente &amp; Almoxarifado</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // ALMOX-TI</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-surface-container-highest text-secondary-fixed font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                    N2 - OPERADOR PADRÃO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">security_update_good</span>
+                    OTP APLICATIVO FAB
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-on-surface">Hoje 09:15</span>
+<div class="text-outline text-[10px]">10.22.40.33</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-tertiary uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ATIVO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-tertiary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- MILITAR 6: S1 Ferreira -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-xs">
+                      S1
+                    </div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">S1 Ferreira</span>
+<span class="font-code-sm text-code-sm text-outline">SARAM: 8345129</span>
+</div>
+</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Suporte Nível 1 &amp; Cautelas</span>
+<div class="text-[11px] text-outline font-code-sm">BINFAE-GL // BALCÃO TI</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center px-space-xs py-0.5 bg-surface-container-high text-outline font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                    N1 - CONSULTA / BÁSICO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md">
+<div class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-sm">security_update_good</span>
+                    TOKEN YUBIKEY SECURITY
+                  </div>
+</td>
+<td class="py-space-sm px-space-md font-code-sm text-code-sm">
+<span class="text-on-surface">Hoje 14:10</span>
+<div class="text-outline text-[10px]">10.22.40.50</div>
+</td>
+<td class="py-space-sm px-space-md">
+<span class="inline-flex items-center gap-1 font-label-tactical text-label-tactical text-tertiary uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> ATIVO
+                  </span>
+</td>
+<td class="py-space-sm px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+<button class="p-1 rounded-DEFAULT bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-tertiary transition-colors" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Paginação Tática e Informação de Registros -->
+<div class="p-space-sm bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-sm font-code-sm text-code-sm">
+<div class="text-outline">
+            Mostrando 1 a 6 de 48 operadores homologados no Diretório Militar
+          </div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 bg-surface-container-high text-outline rounded-DEFAULT hover:text-on-surface disabled:opacity-50" disabled="" type="button">
+              ANTERIOR
+            </button>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-DEFAULT font-bold">1</span>
+<button class="px-2 py-1 bg-surface-container-high text-on-surface-variant rounded-DEFAULT hover:text-on-surface" type="button">2</button>
+<button class="px-2 py-1 bg-surface-container-high text-on-surface-variant rounded-DEFAULT hover:text-on-surface" type="button">3</button>
+<button class="px-2 py-1 bg-surface-container-high text-on-surface-variant rounded-DEFAULT hover:text-on-surface" type="button">
+              PRÓXIMO
+            </button>
+</div>
+</div>
+</div>
+<!-- PAINEL AUXILIAR: LOG DE EVENTOS DE AUDITORIA ADMINISTRATIVA (ÚLTIMAS AÇÕES) -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-lg">history_edu</span>
+<span class="font-label-tactical text-label-tactical text-on-surface uppercase tracking-wider">LOG DE AUDITORIA FORENSE &amp; MODIFICAÇÃO DE PRIVILÉGIOS (ÚLTIMAS 24H)</span>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary">HASH LINK: CONFORME SHA-256</span>
+</div>
+<div class="space-y-space-xs font-code-sm text-code-sm">
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<div class="flex items-center gap-space-sm">
+<span class="text-outline">14:12:05Z</span>
+<span class="text-primary font-semibold">1º Ten Cavalcanti (5412980)</span>
+<span class="text-on-surface-variant">Concedeu acesso CPD Bastidores ao operador</span>
+<span class="text-tertiary">2º Sgt Silva</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary rounded-DEFAULT uppercase text-[10px]">SUCESSO</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<div class="flex items-center gap-space-sm">
+<span class="text-outline">13:28:44Z</span>
+<span class="text-secondary font-semibold">SISTEMA LDAP</span>
+<span class="text-on-surface-variant">Sincronização agendada com servidor COMAER-DIRM finalizada</span>
+<span class="text-outline">(12 nós reconciliados)</span>
+</div>
+<span class="px-1.5 py-0.2 bg-surface-container-highest text-secondary-fixed rounded-DEFAULT uppercase text-[10px]">SYNC OK</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<div class="flex items-center gap-space-sm">
+<span class="text-outline">11:05:19Z</span>
+<span class="text-primary font-semibold">2º Sgt Silva (6842910)</span>
+<span class="text-on-surface-variant">Emitiu chave OTP de contingência para</span>
+<span class="text-on-surface">Cb Santos (8129032)</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary rounded-DEFAULT uppercase text-[10px]">REGISTRADO</span>
+</div>
+</div>
+</div>
+</div>
+<!-- COLUNA DIREITA: INSPEÇÃO DETALHADA DO OPERADOR SELECIONADO (4 COLUNAS XL) -->
+<div class="xl:col-span-4 flex flex-col gap-space-md">
+<!-- Card Principal do Inspetor Tático: Ficha do Militar em Foco -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-md flex flex-col">
+<div class="flex items-center justify-between pb-space-sm mb-space-sm bg-surface-container-low -mx-space-md -mt-space-md p-space-md rounded-t-DEFAULT">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-xl">contact_emergency</span>
+<span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider">FICHA CADASTRAL &amp; PRIVILÉGIOS EM FOCO</span>
+</div>
+<span class="px-1.5 py-0.5 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+            REGULAR
+          </span>
+</div>
+<!-- Perfil e Foto do Militar Selecionado -->
+<div class="flex items-start gap-space-md mb-space-md">
+<div class="relative">
+<img alt="2º Sgt Silva - Perfil Militar" class="w-16 h-16 rounded-DEFAULT object-cover shadow" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m">
+<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">2º Sgt Silva</span>
+<span class="px-1.5 py-0.2 bg-primary-container/30 text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase font-bold">N3 GESTOR</span>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary font-semibold">SARAM: 6842910</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Encarregado TI, Redes &amp; Ciberdefesa</span>
+<span class="font-code-sm text-code-sm text-outline mt-0.5">Seção: BINFAE-GL / TI-REDES</span>
+</div>
+</div>
+<!-- Metadados de Credenciamento e Telemetria de Segurança -->
+<div class="grid grid-cols-2 gap-space-xs mb-space-md font-code-sm text-code-sm">
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex flex-col">
+<span class="text-outline uppercase text-[10px]">TOKEN HARDWARE</span>
+<span class="text-on-surface font-semibold truncate">YubiKey 5 NFC (ID #9812)</span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex flex-col">
+<span class="text-outline uppercase text-[10px]">CERTIFICADO ICP-FAB</span>
+<span class="text-tertiary font-semibold truncate">Válido até 18/Nov/2026</span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex flex-col">
+<span class="text-outline uppercase text-[10px]">SESSÃO EM ANDAMENTO</span>
+<span class="text-on-surface truncate">14:05 (Há 27 min)</span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex flex-col">
+<span class="text-outline uppercase text-[10px]">ESTAÇÃO / IP FÍSICO</span>
+<span class="text-primary truncate">ESTAÇÃO-02 [10.22.40.12]</span>
+</div>
+</div>
+<!-- Matriz Detalhada de Alçadas e Permissões do Militar -->
+<div class="mb-space-md">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">MATRIZ DE ALÇADAS &amp; PRIVILÉGIOS (RBAC)</span>
+<span class="font-code-sm text-code-sm text-tertiary">5 AUTORIZADAS</span>
+</div>
+<div class="space-y-space-xs font-body-sm text-body-sm">
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">assignment_turned_in</span>
+<span class="text-on-surface">Homologar Cautelas Táticas</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                CONCEDIDO (N3)
+              </span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">calendar_clock</span>
+<span class="text-on-surface">Modificar Escala de Sobreaviso</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                CONCEDIDO
+              </span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">domain_verification</span>
+<span class="text-on-surface">Acesso Físico aos Bastidores (CPD)</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                BIOMETRIA OK
+              </span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">enhanced_encryption</span>
+<span class="text-on-surface">Gestão de Chaves KVL P25 Cripto</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                AUTORIZADO
+              </span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">policy</span>
+<span class="text-on-surface">Auditoria Forense SQLite &amp; WAL</span>
+</div>
+<span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                AUTORIZADO
+              </span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded-DEFAULT flex items-center justify-between opacity-60">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-outline text-base">person_remove</span>
+<span class="text-outline">Excluir Operador do Diretório</span>
+</div>
+<span class="px-1.5 py-0.2 bg-surface-container-highest text-outline font-code-sm text-code-sm rounded-DEFAULT uppercase">
+                EXCLUSIVO N4
+              </span>
+</div>
+</div>
+</div>
+<!-- Ações Táticas Rápidas para o Operador em Foco -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<button class="w-full py-2 bg-primary text-on-primary hover:bg-primary/90 rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider flex items-center justify-center gap-space-xs shadow transition-colors" type="button">
+<span class="material-symbols-outlined text-base">pin</span>
+            GERAR NOVO TOKEN TEMPORÁRIO 2FA
+          </button>
+<div class="grid grid-cols-2 gap-space-xs">
+<button class="py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base">rule_settings</span>
+              EDITAR ALÇADAS
+            </button>
+<button class="py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base">print</span>
+              FICHA MILITAR [Ctrl+P]
+            </button>
+</div>
+<button class="w-full py-2 bg-surface-container-low text-error hover:bg-error-container/20 rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-base">power_settings_new</span>
+            REVOGAR SESSÃO REMOTA ATIVA
+          </button>
+</div>
+</div>
+<!-- Card Secundário: Políticas Ativas do Núcleo de Segurança C&TI -->
+<div class="bg-surface-container-lowest p-space-md rounded-DEFAULT shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-lg">verified</span>
+<span class="font-label-tactical text-label-tactical text-on-surface uppercase tracking-wider">DIRETRIZES DE SEGURANÇA VIGENTES</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">EMAER-SEC</span>
+</div>
+<ul class="space-y-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<li class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<span>Expiração Obrigatória de Senha:</span>
+<span class="text-on-surface font-semibold">60 dias</span>
+</li>
+<li class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<span>Complexidade Mínima de Chave:</span>
+<span class="text-on-surface font-semibold">14 caracteres (Hex/Alpha)</span>
+</li>
+<li class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<span>Bloqueio por Inatividade de Tela:</span>
+<span class="text-tertiary font-semibold">5 minutos</span>
+</li>
+<li class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-DEFAULT">
+<span>Tentativas Incorretas Bloqueio:</span>
+<span class="text-error font-semibold">03 tentativas</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- RODAPÉ TÁTICO LOCAL: BARRA DE ATALHOS E STATUS OPERACIONAL -->
+<section class="bg-surface-container-lowest p-space-sm rounded-DEFAULT shadow-sm flex flex-col lg:flex-row items-center justify-between gap-space-sm font-code-sm text-code-sm">
+<div class="flex items-center gap-space-md flex-wrap text-outline">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>REPLICAÇÃO SQLITE WAL:</span>
+<span class="text-tertiary">0.1s ATRÁS (ESTÁVEL)</span>
+</div>
+<div class="w-px h-3 bg-surface-container-highest hidden sm:block"></div>
+<div class="flex items-center gap-1">
+<span>HASH DO MÓDULO:</span>
+<span class="text-on-surface">d98e10b42...a90f [ÍNTEGRO]</span>
+</div>
+<div class="w-px h-3 bg-surface-container-highest hidden sm:block"></div>
+<div class="flex items-center gap-1">
+<span>ESTADO TÁTICO:</span>
+<span class="text-primary font-bold">DEFCON 4 // NORMAL</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical">[Ctrl+N] NOVO MILITAR</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical">[Ctrl+F] FILTRAR SARAM</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical">[Ctrl+Shift+A] AUDITAR</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical">[F5] RECARREGAR DIRETÓRIO</span>
+</div>
+</section>
+</div></main></div><footer class="fixed bottom-0 left-0 right-0 h-10 bg-surface-container-lowest z-50 flex items-center justify-between px-gutter-desktop shadow-[0_-1px_4px_rgba(0,0,0,0.06)]"><div class="flex items-center gap-space-md font-code-sm text-code-sm"><div class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="text-outline font-label-tactical text-label-tactical uppercase">SQLITE WAL:</span><span class="text-tertiary">SYNC ACTIVE</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">SHA-256:</span><span class="text-on-surface font-code-sm text-code-sm">a9f4c3...81e2 [INTEGRITY OK]</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ESTADO:</span><span class="px-1.5 py-0.2 bg-surface-container text-primary rounded-DEFAULT font-label-tactical text-label-tactical uppercase">DEFCON 4 // NORMAL</span></div></div><div class="flex items-center gap-space-md text-outline font-code-sm text-code-sm"><div class="hidden md:flex items-center gap-space-sm"><span>[F1] AJUDA</span><span>[F2] TERMINAL</span><span>[F5] SINCRONIZAR</span><span>[ESC] CANCELAR</span></div><div class="flex items-center gap-space-xs text-on-surface-variant"><span class="material-symbols-outlined text-sm text-tertiary">verified_user</span><span>ALA 11 SECURE CHANNEL</span></div></div></footer>
+
+<div id="modal-novo-operador" class="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-surface-container-lowest/80 backdrop-blur-xl"><div class="relative w-full max-w-2xl bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"><div class="flex items-center justify-between p-space-md bg-surface-container border-b border-outline-variant"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-DEFAULT bg-primary/20 text-primary flex items-center justify-center flex-shrink-0 shadow-inner"><span class="material-symbols-outlined text-2xl">person_add</span></div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><h2 class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight uppercase">Cadastrar Novo Operador Militar</h2><span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase font-semibold">MODO HOMOLOGAÇÃO</span><span class="px-1.5 py-0.2 bg-surface-container-highest text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase">AES-256</span></div><span class="font-code-sm text-code-sm text-on-surface-variant">DIRETRIZ EMAER N4 // PORTARIA Nº 142/DIRM-GL // RBAC NIVELAMENTO</span></div></div><button id="btn-close-modal-x" type="button" class="p-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded-DEFAULT transition-colors" title="Fechar [ESC]"><span class="material-symbols-outlined text-xl">close</span></button></div><div class="p-space-md overflow-y-auto space-y-space-md flex-1"><div class="bg-surface-container-lowest p-space-md rounded-DEFAULT border border-outline-variant/40"><div class="flex items-center justify-between pb-space-xs mb-space-sm border-b border-outline-variant/30"><span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-base">badge</span> SEÇÃO 1: DADOS MILITARES &amp; IDENTIFICAÇÃO</span><span class="font-code-sm text-code-sm text-outline">CAMPO OBRIGATÓRIO</span></div><div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm font-code-sm text-code-sm"><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">SARAM (7 Dígitos)</label><input type="text" class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary" placeholder="Ex: 6842910" maxlength="7" value="7294811"></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Posto / Graduação</label><select class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary cursor-pointer"><option>1º Tenente (1T)</option><option>2º Tenente (2T)</option><option selected="">1º Sargento (1S)</option><option>2º Sargento (2S)</option><option>3º Sargento (3S)</option><option>Cabo (CB)</option><option>Soldado (S1/S2)</option></select></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Nome Completo</label><input type="text" class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary" placeholder="Nome completo do militar" value="Marcos Vinicius de Souza"></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Nome de Guerra</label><input type="text" class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary" placeholder="Ex: M. Souza" value="M. Souza"></div><div><div class="flex items-center justify-between mb-0.5"><label class="font-label-tactical text-label-tactical text-outline uppercase">Usuário / Login do Sistema</label><span class="flex items-center gap-1 font-code-sm text-[10px] text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>SQLITE WAL SYNC</span></div><div class="flex items-center bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 focus-within:border-primary"><span class="text-primary font-code-sm mr-1">@</span><input type="text" class="bg-transparent flex-1 text-on-surface focus:outline-none font-code-sm" placeholder="ex: msouza.fab" value="msouza.fab"><div class="flex items-center gap-1.5 flex-shrink-0 ml-1"><span class="inline-flex items-center gap-1 px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary font-code-sm text-[10px] rounded-DEFAULT uppercase font-semibold"><span class="material-symbols-outlined text-xs">check_circle</span> DISPONÍVEL</span><button type="button" title="Revalidar no Índice SQLite WAL [F2]" class="p-0.5 hover:bg-surface-container text-outline hover:text-tertiary rounded-DEFAULT transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-sm">sync</span></button></div></div><div class="flex items-center justify-between mt-1 text-[11px] font-code-sm"><span class="text-tertiary flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-tertiary"></span>WAL 0.1ms: 0 colisões em 48 operadores</span><span class="text-outline">Índice local verificado [F2]</span></div></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Efetivo / Quadro Militar</label><select class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary cursor-pointer"><option selected="">Quadro de Suboficiais e Sargentos (QSS)</option><option>Efetivo Pronto (Permanente)</option><option>Efetivo da Unidade (BINFAE-GL)</option><option>Quadro de Oficiais Convocados (QOCON)</option><option>Quadro Complementar de Oficiais (QCOA)</option><option>Efetivo Variável (Soldados EV)</option></select></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">CPF</label><input type="text" class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary" placeholder="000.000.000-00" value="104.382.917-40"></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Seção / Subdivisão C&amp;TI</label><select class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary cursor-pointer"><option selected="">BINFAE-GL // C&amp;TI-1 REDES</option><option>BINFAE-GL // C&amp;TI-2 TELECOM &amp; CRIPTO</option><option>BINFAE-GL // SUPORTE TÉCNICO &amp; BANCADA</option><option>BINFAE-GL // ALMOX-TI &amp; CAUTELAS</option><option>BINFAE-GL // SALA DE GUERRA &amp; CIBER</option></select></div></div></div><div class="bg-surface-container-lowest p-space-md rounded-DEFAULT border border-outline-variant/40"><div class="flex items-center justify-between pb-space-xs mb-space-sm border-b border-outline-variant/30"><span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-base">admin_panel_settings</span> SEÇÃO 2: MATRIZ DE ALÇADAS &amp; NÍVEL DE ACESSO (RBAC)</span><span class="font-code-sm text-code-sm text-tertiary">CONFORME PATENTE</span></div><div class="mb-space-sm"><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-1.5">Selecione o Nível de Privilégio:</label><div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs"><label class="p-space-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT cursor-pointer flex flex-col gap-0.5 hover:border-primary transition-colors"><div class="flex items-center gap-1"><input type="radio" name="nivel_acesso" value="n1" class="accent-primary"><span class="font-code-sm text-code-sm font-bold text-on-surface">N1</span></div><span class="text-[10px] text-outline leading-tight">Consulta Básica / Balcão</span></label><label class="p-space-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT cursor-pointer flex flex-col gap-0.5 hover:border-primary transition-colors"><div class="flex items-center gap-1"><input type="radio" name="nivel_acesso" value="n2" class="accent-primary"><span class="font-code-sm text-code-sm font-bold text-secondary-fixed">N2</span></div><span class="text-[10px] text-outline leading-tight">Operador Padrão / Cautelas</span></label><label class="p-space-xs bg-secondary-container/20 border border-primary rounded-DEFAULT cursor-pointer flex flex-col gap-0.5"><div class="flex items-center gap-1"><input type="radio" name="nivel_acesso" value="n3" checked="" class="accent-primary"><span class="font-code-sm text-code-sm font-bold text-primary">N3</span></div><span class="text-[10px] text-primary leading-tight">Gestor Tático / Sargento+</span></label><label class="p-space-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT cursor-pointer flex flex-col gap-0.5 hover:border-primary transition-colors"><div class="flex items-center gap-1"><input type="radio" name="nivel_acesso" value="n4" class="accent-primary"><span class="font-code-sm text-code-sm font-bold text-error">N4</span></div><span class="text-[10px] text-outline leading-tight">Admin Pleno / Oficial</span></label></div></div><div><span class="block font-label-tactical text-label-tactical text-outline uppercase mb-1">Privilégios Específicos Adicionais:</span><div class="grid grid-cols-1 md:grid-cols-2 gap-space-xs font-body-sm text-body-sm"><label class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-DEFAULT cursor-pointer hover:bg-surface-container"><input type="checkbox" checked="" class="accent-tertiary"><span class="text-on-surface">Homologar Cautelas Táticas</span></label><label class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-DEFAULT cursor-pointer hover:bg-surface-container"><input type="checkbox" checked="" class="accent-tertiary"><span class="text-on-surface">Acesso Físico aos Bastidores (CPD)</span></label><label class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-DEFAULT cursor-pointer hover:bg-surface-container"><input type="checkbox" class="accent-tertiary"><span class="text-on-surface">Gestão de Chaves KVL P25 Cripto</span></label><label class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-DEFAULT cursor-pointer hover:bg-surface-container"><input type="checkbox" class="accent-tertiary"><span class="text-on-surface">Auditoria Forense SQLite &amp; WAL</span></label></div></div></div><div class="bg-surface-container-lowest p-space-md rounded-DEFAULT border border-outline-variant/40"><div class="flex items-center justify-between pb-space-xs mb-space-sm border-b border-outline-variant/30"><span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-base">vpn_key</span> SEÇÃO 3: AUTENTICAÇÃO E CREDENCIAIS 2FA</span><span class="font-code-sm text-code-sm text-tertiary">ICP-FAB ATIVO</span></div><div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm font-code-sm text-code-sm"><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Mecanismo de 2FA Obrigatório</label><select class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary cursor-pointer"><option selected="">YubiKey 5 NFC / FIDO2 Hardware</option><option>Smartcard ICP-Brasil / FAB Militar</option><option>OTP Aplicativo FAB Mobile</option></select></div><div><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Nº de Série do Token / ID Hardware</label><input type="text" class="w-full bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-on-surface focus:outline-none focus:border-primary font-code-sm" placeholder="Ex: YUBI-98124-GL" value="YUBI-54219-ALA11"></div><div class="md:col-span-2"><label class="block font-label-tactical text-label-tactical text-outline uppercase mb-0.5">Senha Inicial Provisória (Mínimo 14 caracteres)</label><div class="flex items-center gap-space-xs"><input type="text" class="flex-1 bg-surface-container-low border border-outline-variant rounded-DEFAULT px-space-sm py-1.5 text-tertiary font-code-sm font-semibold focus:outline-none focus:border-primary" value="Fab@Binfae2024#Aero"><button type="button" class="px-space-sm py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical uppercase">Gerar Aleatória</button></div><div class="flex items-center justify-between mt-1 text-[11px]"><span class="text-tertiary font-medium">Complexidade EMAER: Válida (18 Caracteres / Hex+Alfa+Especial)</span><span class="text-outline">Troca obrigatória no 1º logon</span></div></div></div></div></div><div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm p-space-md bg-surface-container border-t border-outline-variant"><div class="flex items-center gap-1.5 text-outline font-code-sm text-code-sm"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span>Preenchimento Obrigatório dos Requisitos EMAER</span></div><div class="flex items-center gap-space-xs w-full sm:w-auto justify-end"><button id="btn-close-modal-cancel" type="button" class="px-space-md py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider transition-colors">Cancelar [ESC]</button><button type="button" class="px-space-md py-2 bg-surface-container-low text-tertiary hover:bg-surface-container rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider transition-colors">Gerar Token Provisório</button><button id="btn-confirm-modal" type="button" class="px-space-md py-2 bg-primary hover:bg-primary/90 text-on-primary rounded-DEFAULT font-label-tactical text-label-tactical uppercase tracking-wider font-bold shadow transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-base">how_to_reg</span> Cadastrar &amp; Homologar Operador</button></div></div></div></div><script>(function setupModalOperador() { const modal = document.getElementById('modal-novo-operador'); const btnOpen = document.getElementById('btn-open-modal-operador'); const btnCloseX = document.getElementById('btn-close-modal-x'); const btnCloseCancel = document.getElementById('btn-close-modal-cancel'); const btnConfirm = document.getElementById('btn-confirm-modal'); const openModal = () => { if (modal) modal.classList.remove('hidden'); }; const closeModal = () => { if (modal) modal.classList.add('hidden'); }; if (btnOpen) btnOpen.addEventListener('click', openModal); if (btnCloseX) btnCloseX.addEventListener('click', closeModal); if (btnCloseCancel) btnCloseCancel.addEventListener('click', closeModal); if (btnConfirm) btnConfirm.addEventListener('click', closeModal); if (modal) { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }); } document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); if ((e.ctrlKey || e.metaKey) && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); openModal(); } }); })();</script></body></html>

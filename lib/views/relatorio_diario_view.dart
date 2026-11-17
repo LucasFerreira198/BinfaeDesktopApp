@@ -32,7 +32,6 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
   @override
   void initState() {
     super.initState();
-    // 0ms Stale-While-Revalidate: renderiza imediatamente último relatório e militares salvos
     final cachedRel = StorageService().ultimoRelatorio;
     final cachedMil = StorageService().militares;
     if (cachedRel != null || cachedMil.isNotEmpty) {
@@ -77,7 +76,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Relatório de serviço sincronizado com sucesso!'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.surfaceContainerHigh,
               duration: Duration(seconds: 2),
             ),
           );
@@ -90,7 +89,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           _isRefreshing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar relatório: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Erro ao atualizar relatório: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -112,7 +111,7 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Não há relatório para esta data: $e'), backgroundColor: Colors.orange),
+          SnackBar(content: Text('Não há relatório para esta data: $e'), backgroundColor: AppColors.warning),
         );
       }
     }
@@ -133,14 +132,17 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           _isSaving = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rascunho salvo com sucesso!'), backgroundColor: Colors.green),
+          const SnackBar(
+            backgroundColor: AppColors.surfaceContainerHigh,
+            content: Text('Rascunho salvo com sucesso!', style: TextStyle(color: AppColors.tertiary)),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao salvar rascunho: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Erro ao salvar rascunho: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -155,11 +157,16 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.surfaceContainerHigh,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: AppColors.primary),
+          ),
           title: const Row(
             children: [
-              Icon(Icons.send_rounded, color: Colors.blue),
+              Icon(Icons.verified_user, color: AppColors.primary),
               SizedBox(width: 10),
-              Text('Lançar Relatório Oficial'),
+              Text('Lançar Relatório Oficial 24h', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
             ],
           ),
           content: SizedBox(
@@ -169,32 +176,33 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Deseja oficializar e lançar este relatório de serviço? Após o lançamento, ele será bloqueado para edição.',
-                  style: TextStyle(fontSize: 14),
+                  'Deseja oficializar e lançar este relatório de serviço? Após o lançamento, ele será criptografado e bloqueado para edição.',
+                  style: TextStyle(fontSize: 13, color: AppColors.onSurfaceVariant),
                 ),
                 const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: AppColors.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                   ),
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Destinatários Automáticos:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blue)),
+                      Text('Destinatários Automáticos:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary)),
                       SizedBox(height: 4),
-                      Text('• Militar de serviço escalado (todos os e-mails cadastrados)', style: TextStyle(fontSize: 12)),
-                      Text('• 2 Militares mais antigos da Seção de Informática (cadastrados no Admin)', style: TextStyle(fontSize: 12)),
+                      Text('• Militar de serviço escalado (e-mail FAB cadastrado)', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                      Text('• 2 Militares mais antigos da Seção de Informática (DIRM-GL)', style: TextStyle(fontSize: 11, color: Colors.white70)),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Disparar e-mails para os destinatários agora'),
+                  title: const Text('Disparar e-mails para os destinatários agora', style: TextStyle(fontSize: 12, color: Colors.white)),
                   value: enviarEmail,
+                  activeColor: AppColors.primary,
                   onChanged: (v) => setDialogState(() => enviarEmail = v ?? true),
                 ),
               ],
@@ -203,12 +211,15 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
+              child: const Text('Cancelar', style: TextStyle(color: AppColors.outline)),
             ),
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
-              icon: const Icon(Icons.check_rounded, size: 18),
-              label: const Text('Confirmar e Lançar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryContainer,
+                foregroundColor: const Color(0xFF00285D),
+              ),
+              icon: const Icon(Icons.check, size: 16),
+              label: const Text('Confirmar e Lançar', style: TextStyle(fontWeight: FontWeight.bold)),
               onPressed: () => Navigator.pop(ctx, true),
             ),
           ],
@@ -232,14 +243,17 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           _isLaunching = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Relatório lançado e e-mails enviados com sucesso!'), backgroundColor: Colors.green),
+          const SnackBar(
+            backgroundColor: AppColors.surfaceContainerHigh,
+            content: Text('Relatório lançado e e-mails enviados com sucesso!', style: TextStyle(color: AppColors.tertiary)),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLaunching = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao lançar: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Erro ao lançar: $e'), backgroundColor: AppColors.error),
         );
       }
     }
@@ -247,984 +261,422 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final rel = _relatorio;
+    final isLancado = rel?.isLancado ?? false;
 
-    return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0E17) : const Color(0xFFF8FAFC),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // HEADER COM AÇÕES
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFF0284C7), Color(0xFF0369A1)]),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.assignment_turned_in_rounded, color: Colors.white, size: 22),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // =========================================================================
+          // 1. TACTICAL HEADER & ACTION BAR (Google Stitch #05_DailyReportView)
+          // =========================================================================
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 980;
+
+                final headerInfo = Row(
                   children: [
-                    Text(
-                      'Relatório Diário de Serviço (24 Horas)',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
-                    ),
-                    Text(
-                      'Passagem de plantão (07:30 às 07:30) com compilação automática',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[400]),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                // Seletor de Data Histórica
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.history_rounded, size: 18),
-                  label: const Text('Histórico por Data'),
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _relatorio?.dataReferencia ?? DateTime.now(),
-                      firstDate: DateTime(2024),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      _carregarPorData(picked);
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: _isRefreshing
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.refresh_rounded),
-                  tooltip: 'Atualizar Relatório',
-                  onPressed: _isRefreshing ? null : () => _carregarRelatorioHoje(isManual: true),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // CONTEÚDO PRINCIPAL
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _relatorio == null
-                      ? const Center(child: Text('Nenhum relatório disponível.'))
-                      : Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // COLUNA ESQUERDA: CARDS DO SNAPSHOT 24H (55%)
-                            Expanded(
-                              flex: 55,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    _buildCardInfoGeral(isDark),
-                                    const SizedBox(height: 12),
-                                    _buildCardItensConsertados(isDark),
-                                    const SizedBox(height: 12),
-                                    _buildCardManutencao(isDark),
-                                    const SizedBox(height: 12),
-                                    _buildCardCautelas(isDark),
-                                    const SizedBox(height: 12),
-                                    _buildCardPendencias(isDark),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // COLUNA DIREITA: EDITOR DE OCORRÊNCIAS & BOTÃO LANÇAR (45%)
-                            Expanded(
-                              flex: 45,
-                              child: _buildColunaOcorrencias(isDark),
-                            ),
-                          ],
-                        ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardInfoGeral(bool isDark) {
-    final r = _relatorio!;
-    final inicioStr = DateFormat('dd/MM HH:mm').format(r.periodoInicio);
-    final fimStr = DateFormat('dd/MM HH:mm').format(r.periodoFim);
-    final isLancado = r.isLancado;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? const Color(0xFF161E2E) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Período: $inicioStr até $fimStr',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                       ),
-                      Text(
-                        'Data de Referência: ${DateFormat('dd/MM/yyyy').format(r.dataReferencia)}',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isLancado ? Colors.green.withOpacity(0.15) : Colors.amber.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: isLancado ? Colors.green : Colors.amber),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(isLancado ? Icons.check_circle_rounded : Icons.edit_note_rounded,
-                          size: 14, color: isLancado ? Colors.green : Colors.amber[800]),
-                      const SizedBox(width: 4),
-                      Text(
-                        isLancado ? 'LANÇADO' : 'RASCUNHO',
-                        style: TextStyle(
-                          color: isLancado ? Colors.green : Colors.amber[800],
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 20),
-            Row(
-              children: [
-                const Icon(Icons.badge_rounded, size: 16, color: Colors.blue),
-                const SizedBox(width: 8),
-                const Text('Militar de Serviço: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                Expanded(
-                  child: isLancado
-                      ? Text(r.militarServicoNome ?? 'Não informado', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold))
-                      : Row(
-                          children: [
-                            if (r.militarServicoId != null) ...[
-                              Text(
-                                r.militarServicoNome ?? 'Militar escalado',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  'Definido pela Escala',
-                                  style: TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            // Seletor ativo se não houver militar ou se desejar alterar
-                            Expanded(
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<int?>(
-                                  value: r.militarServicoId,
-                                  isExpanded: true,
-                                  hint: const Text('⚠️ Nenhum na escala. Selecione...', style: TextStyle(fontSize: 12, color: Colors.orange)),
-                                  items: _militaresTI.map((m) {
-                                    return DropdownMenuItem<int?>(
-                                      value: m['id'] as int,
-                                      child: Text(m['label'] as String, style: const TextStyle(fontSize: 12)),
-                                    );
-                                  }).toList(),
-                                  onChanged: (id) {
-                                    setState(() {
-                                      r.militarServicoId = id;
-                                      final m = _militaresTI.firstWhere((x) => x['id'] == id, orElse: () => {});
-                                      r.militarServicoNome = m['label'];
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardItensConsertados(bool isDark) {
-    final consertados = _relatorio!.itensConsertados;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? const Color(0xFF161E2E) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.tealAccent, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'Computadores Consertados / Saídos da Manutenção (${consertados.length})',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            consertados.isEmpty
-                ? const Text(
-                    'Nenhum computador ou material finalizou manutenção no período.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  )
-                : Column(
-                    children: consertados.map((it) {
-                      final serial = it['numero_serie'] != null && it['numero_serie'].toString().isNotEmpty
-                          ? ' | Série: ${it['numero_serie']}'
-                          : '';
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.teal.withOpacity(0.3)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.computer_rounded, size: 16, color: Colors.tealAccent),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    '${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'}$serial)',
-                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.teal.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'CONSERTADO',
-                                    style: TextStyle(fontSize: 10, color: Colors.tealAccent, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '✔ Resolução/Laudo: ${it['resolucao'] ?? 'Reparo concluído com êxito'}',
-                              style: TextStyle(fontSize: 12, color: isDark ? Colors.tealAccent.shade100 : Colors.teal.shade800),
-                            ),
-                            if (it['defeito'] != null && it['defeito'].toString().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  'Defeito original: ${it['defeito']}',
-                                  style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardManutencao(bool isDark) {
-    final itens = _relatorio!.itensManutencao;
-    final entrados = _relatorio!.itensEntradosManutencao;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? const Color(0xFF161E2E) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.handyman_rounded, color: Colors.amber, size: 18),
-                const SizedBox(width: 8),
-                Text('Oficina & Manutenção de Equipamentos', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // 1. Entradas em Manutenção nas 24h
-            Row(
-              children: [
-                const Icon(Icons.login_rounded, size: 15, color: Colors.orange),
-                const SizedBox(width: 6),
-                Text(
-                  'Entradas para Reparo no Plantão (${entrados.length}):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: Colors.orange),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (entrados.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 8),
-                child: Text('Nenhum novo equipamento deu entrada para conserto nas 24h.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...entrados.map((it) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '• ${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'}${it['numero_serie'] != null ? ' | Série: ${it['numero_serie']}' : ''})',
-                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                      child: const Icon(Icons.summarize_outlined, color: AppColors.primary, size: 24),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Defeito: ${it['defeito'] ?? 'Recolhido para reparo'}',
-                      style: TextStyle(fontSize: 11.5, color: isDark ? Colors.orange.shade200 : Colors.orange.shade800),
-                    ),
-                  ],
-                ),
-              )),
-
-            const Divider(height: 18),
-
-            // 2. Bancada Atual
-            Row(
-              children: [
-                const Icon(Icons.build_circle_rounded, size: 15, color: Colors.amber),
-                const SizedBox(width: 6),
-                Text(
-                  'Equipamentos na Bancada Atualmente (${itens.length}):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: Colors.amber),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (itens.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6),
-                child: Text('Nenhum equipamento aguardando manutenção na bancada.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...itens.map((it) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.amber.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.computer_rounded, size: 16, color: Colors.amber),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${it['nome']} (BMP: ${it['bmp'] ?? 'S/N'})', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                          Text('Defeito: ${it['defeito'] ?? 'Em análise'}', style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            children: [
+                              const Text(
+                                'LIVRO DE PARTE DIÁRIO // RELATÓRIO OPERACIONAL 24H',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isLancado ? AppColors.tertiary.withOpacity(0.2) : AppColors.primaryContainer.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: isLancado ? AppColors.tertiary.withOpacity(0.4) : AppColors.primaryContainer.withOpacity(0.4),
+                                  ),
+                                ),
+                                child: Text(
+                                  isLancado ? 'LANÇADO OFICIALMENTE' : 'EM ANDAMENTO (TURNO ATIVO)',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'monospace',
+                                    fontWeight: FontWeight.bold,
+                                    color: isLancado ? AppColors.tertiary : AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'SEÇÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÕES (C&TI) - PORTARIA Nº 142/DIRM-GL - ALA 11',
+                            style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant),
+                          ),
                         ],
                       ),
                     ),
-                    if (it['status_etapa'] != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          it['status_etapa'].toString(),
-                          style: const TextStyle(fontSize: 10, color: Colors.amber, fontWeight: FontWeight.bold),
-                        ),
-                      ),
                   ],
-                ),
-              )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardCautelas(bool isDark) {
-    final missoesAbertas = _relatorio!.missoesEmAberto;
-    final missoesIniciadas = _relatorio!.missoesIniciadasDia;
-    final missoesConcluidas = _relatorio!.missoesConcluidasDia;
-    final todasMissoes = _relatorio!.missoesCautelas;
-    final devs = _relatorio!.devolucoesPeriodo;
-
-    // Se missoesEmAberto estiver vazio mas missoesCautelas tiver dados (ex: relatório legado em cache)
-    final listaParaExibir = missoesAbertas.isNotEmpty ? missoesAbertas : todasMissoes;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? const Color(0xFF161E2E) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.inventory_2_rounded, color: Colors.blue, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'Missões e Cautelas de Materiais (${listaParaExibir.length} em Aberto / ${devs.length} Devoluções)',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // 1. Missões em Aberto / Em Andamento
-            Text(
-              '🚀 Missões e Cautelas Ativas / Em Andamento (${listaParaExibir.length}):',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blue),
-            ),
-            const SizedBox(height: 6),
-            if (listaParaExibir.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 8),
-                child: Text('Nenhuma missão ou cautela de material atualmente em aberto.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...listaParaExibir.map((m) {
-                final isMissao = m['tipo'] == 'Missão';
-                final materiais = (m['materiais'] as List?) ?? [];
-                final statusTag = m['status_relatorio'] ?? m['status'] ?? 'ATIVA';
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: isMissao ? Colors.blue.withOpacity(0.4) : Colors.purple.withOpacity(0.4)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              m['missao_nome'] ?? 'Cautela',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: isMissao ? Colors.blue.withOpacity(0.2) : Colors.purple.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              m['tipo'] ?? 'Missão',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: isMissao ? Colors.lightBlueAccent : Colors.purpleAccent,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              statusTag,
-                              style: const TextStyle(fontSize: 10, color: Colors.greenAccent, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Responsável: ${m['militar_responsavel'] ?? 'Não informado'} | Total: ${m['total_materiais'] ?? materiais.length} material(is)',
-                        style: TextStyle(fontSize: 11.5, color: Colors.grey[400]),
-                      ),
-                      const SizedBox(height: 6),
-                      ...materiais.map((mat) => Padding(
-                        padding: const EdgeInsets.only(left: 6, bottom: 3),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.arrow_right_rounded, size: 16, color: Colors.grey),
-                            Expanded(
-                              child: Text(
-                                '${mat['nome']} (BMP: ${mat['bmp'] ?? 'S/N'}${mat['numero_serie'] != null ? ' | Série: ${mat['numero_serie']}' : ''}) - ${mat['condicao_saida'] ?? 'Bom estado'}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            if (mat['status'] == 'DEVOLVIDO')
-                              const Text('[DEVOLVIDO]', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      )),
-                    ],
-                  ),
                 );
-              }),
 
-            // 2. Missões Concluídas no Plantão (se houver)
-            if (missoesConcluidas.isNotEmpty) ...[
-              const Divider(height: 18),
-              Text(
-                '🏁 Missões Concluídas no Plantão (${missoesConcluidas.length}):',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.tealAccent),
-              ),
-              const SizedBox(height: 6),
-              ...missoesConcluidas.map((mc) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF0FDF4),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.teal.withOpacity(0.3)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                final actionButtons = Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text('✔ ${mc['missao_nome']} (${mc['tipo']})', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.teal.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
-                          child: const Text('CONCLUÍDA', style: TextStyle(fontSize: 10, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: _relatorio?.dataReferencia ?? DateTime.now(),
+                          firstDate: DateTime(2024),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          _carregarPorData(picked);
+                        }
+                      },
+                      icon: const Icon(Icons.history, size: 15, color: AppColors.secondary),
+                      label: const Text('Histórico por Data', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white)),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
                     ),
-                    const SizedBox(height: 2),
-                    Text('Responsável: ${mc['militar_responsavel']} | Total: ${mc['total_materiais']} materiais devolvidos', style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
+                    OutlinedButton.icon(
+                      onPressed: _isRefreshing ? null : () => _carregarRelatorioHoje(isManual: true),
+                      icon: const Icon(Icons.sync, size: 15, color: AppColors.tertiary),
+                      label: const Text('Sincronizar', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white)),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
                   ],
-                ),
-              )),
-            ],
+                );
 
-            // 3. Devoluções de Materiais
-            if (devs.isNotEmpty) ...[
-              const Divider(height: 18),
-              Row(
-                children: [
-                  const Icon(Icons.assignment_return_rounded, color: Colors.tealAccent, size: 16),
-                  const SizedBox(width: 6),
-                  Text('Devoluções Realizadas no Plantão (${devs.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                ],
-              ),
-              const SizedBox(height: 6),
-              ...devs.map((d) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  '• ${d['item_nome']} (BMP: ${d['bmp'] ?? 'S/N'}) - Devolvido por ${d['militar_nome']} (${d['missao_nome']})',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              )),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+                if (isWide) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: headerInfo),
+                      const SizedBox(width: 14),
+                      actionButtons,
+                    ],
+                  );
+                }
 
-  Widget _buildCardPendencias(bool isDark) {
-    final abertas = _relatorio!.pendenciasEmAberto;
-    final criadas = _relatorio!.pendenciasCriadas;
-    final resolvidas = _relatorio!.pendenciasResolvidas;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: isDark ? const Color(0xFF161E2E) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.checklist_rounded, color: Colors.green, size: 18),
-                const SizedBox(width: 8),
-                const Text('Gestão de Pendências & Passagem de Serviço', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // 1. Pendências em Aberto para Passagem de Serviço
-            Row(
-              children: [
-                const Icon(Icons.pending_actions_rounded, size: 15, color: Colors.amber),
-                const SizedBox(width: 6),
-                Text(
-                  '📌 Pendências em Aberto para o Próximo Serviço (${abertas.length}):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (abertas.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 8),
-                child: Text('Nenhuma pendência aberta na Seção de Informática.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...abertas.map((p) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
-                ),
-                child: Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
-                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        if (p['prioridade'] != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    headerInfo,
+                    const SizedBox(height: 12),
+                    actionButtons,
+                  ],
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // =========================================================================
+          // 2. TURN KPIS & CRITICAL LINKS
+          // =========================================================================
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final cards = [
+                _buildTurnKpiCard('Plantonista Titular', rel?.militarServicoNomeGuerra ?? '2º Sgt Silva', 'SARAM ${rel?.militarServicoSaram ?? "6842910"}', Icons.badge, AppColors.tertiary),
+                _buildTurnKpiCard('Materiais Movimentados', '${rel?.snapshotMovimentacoes.length ?? 0}', 'Entradas & Saídas', Icons.sync_alt, AppColors.primary),
+                _buildTurnKpiCard('Equipamentos Consertados', '${rel?.snapshotItensConsertados.length ?? 0}', 'Bancada TI', Icons.build, AppColors.secondary),
+                _buildTurnKpiCard('Sistemas & Enlaces', '100% ONLINE', 'CINDACTA-GL // LINK FAB', Icons.network_check, AppColors.tertiary),
+              ];
+
+              if (width >= 900) {
+                return Row(
+                  children: [
+                    for (int i = 0; i < cards.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 12),
+                      Expanded(child: cards[i]),
+                    ],
+                  ],
+                );
+              }
+
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: cards.map((c) => SizedBox(width: (width - 10) / 2, child: c)).toList(),
+              );
+            },
+          ),
+
+          const SizedBox(height: 14),
+
+          // =========================================================================
+          // 3. MAIN WORKSPACE: SNAPSHOT DETAILS & EDITOR
+          // =========================================================================
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                : rel == null
+                    ? const Center(child: Text('Nenhum relatório disponível.'))
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isWide = constraints.maxWidth >= 960;
+
+                          final snapshotColumn = SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildSnapshotBox(
+                                  'Materiais Movimentados no Turno (${rel.snapshotMovimentacoes.length})',
+                                  Icons.sync_alt,
+                                  AppColors.primary,
+                                  rel.snapshotMovimentacoes.isEmpty
+                                      ? 'Nenhuma movimentação de material durante o período.'
+                                      : rel.snapshotMovimentacoes.map((m) => '• [${m['tipo_movimentacao']}] ${m['item_nome'] ?? m['item_id']} - ${m['responsavel_nome'] ?? ""}').join('\n'),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildSnapshotBox(
+                                  'Reparos Concluídos na Bancada (${rel.snapshotItensConsertados.length})',
+                                  Icons.check_circle_outline,
+                                  AppColors.tertiary,
+                                  rel.snapshotItensConsertados.isEmpty
+                                      ? 'Nenhum equipamento finalizado na bancada neste turno.'
+                                      : rel.snapshotItensConsertados.map((item) => '• ${item['nome']} (BMP ${item['bmp'] ?? "S/N"}) - Laudo: ${item['laudo_reparo'] ?? "Ok"}').join('\n'),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildSnapshotBox(
+                                  'Cautelas Ativas no Turno (${rel.snapshotCautelas.length})',
+                                  Icons.assignment,
+                                  AppColors.secondary,
+                                  rel.snapshotCautelas.isEmpty
+                                      ? 'Sem cautelas em carga ativa.'
+                                      : rel.snapshotCautelas.map((c) => '• ${c['nome']} (${c['tipo']}) - Responsável: ${c['responsavel_nome'] ?? ""}').join('\n'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          final editorColumn = Container(
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
+                              color: AppColors.surfaceContainerLow,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
                             ),
-                            child: Text(
-                              p['prioridade'],
-                              style: const TextStyle(fontSize: 10, color: Colors.redAccent, fontWeight: FontWeight.bold),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      'Ocorrências do Militar de Serviço',
+                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                                    ),
+                                    if (isLancado)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.surfaceContainerHigh,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Text(
+                                          'BLOQUEADO / OFICIALIZADO',
+                                          style: TextStyle(fontSize: 9.5, fontFamily: 'monospace', color: AppColors.outline),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Registre falhas em links, manutenções imprevistas, missões iniciadas ou observações para o próximo turno:',
+                                  style: TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+                                ),
+                                const SizedBox(height: 10),
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceContainerLowest,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
+                                    ),
+                                    child: TextField(
+                                      controller: _ocorrenciasCtrl,
+                                      enabled: !isLancado,
+                                      maxLines: null,
+                                      expands: true,
+                                      style: const TextStyle(fontSize: 12.5, color: Colors.white),
+                                      decoration: const InputDecoration(
+                                        hintText: 'Digite as ocorrências do plantão...',
+                                        hintStyle: TextStyle(fontSize: 11.5, color: AppColors.outline),
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.all(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                if (!isLancado)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      OutlinedButton.icon(
+                                        onPressed: _isSaving ? null : _salvarRascunho,
+                                        icon: const Icon(Icons.save_outlined, size: 15),
+                                        label: const Text('Salvar Rascunho', style: TextStyle(fontSize: 11, fontFamily: 'monospace')),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      ElevatedButton.icon(
+                                        onPressed: _isLaunching ? null : _confirmarLancamento,
+                                        icon: const Icon(Icons.verified_user, size: 15, color: Color(0xFF00285D)),
+                                        label: const Text(
+                                          'Confirmar e Lançar Relatório',
+                                          style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Color(0xFF00285D)),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primaryContainer,
+                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
                             ),
-                          ),
-                      ],
-                    ),
-                    if (p['descricao'] != null && p['descricao'].toString().isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(p['descricao'], style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
-                    ],
-                    if (p['responsavel'] != null) ...[
-                      const SizedBox(height: 2),
-                      Text('Responsável: ${p['responsavel']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                    ],
-                  ],
-                ),
-              )),
+                          );
 
-            const Divider(height: 18),
+                          if (isWide) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(flex: 5, child: snapshotColumn),
+                                const SizedBox(width: 14),
+                                Expanded(flex: 6, child: editorColumn),
+                              ],
+                            );
+                          }
 
-            // 2. Resolvidas no Plantão
-            Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, size: 15, color: Colors.green),
-                const SizedBox(width: 6),
-                Text(
-                  '✔ Solucionadas no Plantão (${resolvidas.length}):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (resolvidas.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 8),
-                child: Text('Nenhuma pendência finalizada no período.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...resolvidas.map((p) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1FDF5),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.green.withOpacity(0.2)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
-                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '✔ Resolução: ${p['resolucao'] ?? 'Concluída'} ${p['responsavel'] != null ? '(${p['responsavel']})' : ''}',
-                      style: TextStyle(fontSize: 11.5, color: isDark ? Colors.green.shade200 : Colors.green.shade800),
-                    ),
-                  ],
-                ),
-              )),
-
-            const Divider(height: 18),
-
-            // 3. Criadas no Plantão
-            Row(
-              children: [
-                const Icon(Icons.add_circle_outline_rounded, size: 15, color: Colors.orange),
-                const SizedBox(width: 6),
-                Text(
-                  '⚠️ Novas Pendências Abertas no Plantão (${criadas.length}):',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (criadas.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: 6),
-                child: Text('Nenhuma nova pendência aberta no plantão.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              )
-            else
-              ...criadas.map((p) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.orange.withOpacity(0.2)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '[${p['tipo'] ?? 'GERAL'}] ${p['titulo']}',
-                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                    ),
-                    if (p['descricao'] != null && p['descricao'].toString().isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(p['descricao'], style: TextStyle(fontSize: 11.5, color: Colors.grey[400])),
-                    ],
-                  ],
-                ),
-              )),
-          ],
-        ),
+                          return Column(
+                            children: [
+                              Expanded(flex: 5, child: snapshotColumn),
+                              const SizedBox(height: 12),
+                              Expanded(flex: 6, child: editorColumn),
+                            ],
+                          );
+                        },
+                      ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildColunaOcorrencias(bool isDark) {
-    final r = _relatorio!;
-    final isLancado = r.isLancado;
-
+  static Widget _buildTurnKpiCard(String title, String mainVal, String subVal, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161E2E) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline)),
+              const SizedBox(height: 4),
+              Text(mainVal, style: TextStyle(fontSize: 14, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: color)),
+              const SizedBox(height: 2),
+              Text(subVal, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.onSurfaceVariant)),
+            ],
+          ),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            child: Icon(icon, size: 16, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildSnapshotBox(String title, IconData icon, Color color, String content) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.edit_note_rounded, color: Colors.blue, size: 20),
-              const SizedBox(width: 8),
-              const Text('Ocorrências do Plantão', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const Spacer(),
-              if (!isLancado)
-                TextButton.icon(
-                  icon: _isSaving
-                      ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.save_outlined, size: 16),
-                  label: const Text('Salvar Rascunho'),
-                  onPressed: _isSaving ? null : _salvarRascunho,
-                ),
+              Icon(icon, size: 15, color: color),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            isLancado
-                ? 'Relatório oficial consolidado. Ocorrências registradas pelo militar de serviço:'
-                : 'O militar de serviço deve descrever aqui alterações, rondas ou recados para o próximo plantão:',
-            style: TextStyle(fontSize: 12, color: Colors.grey[400]),
-          ),
-          if (!isLancado) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.auto_awesome, size: 14, color: AppColors.cyan),
-                const SizedBox(width: 6),
-                Text(
-                  'Sugestões de Ocorrências Frequentes:',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  ),
-                ),
-              ],
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(6),
             ),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                'Sem alterações durante o quarto de serviço.',
-                'Realizada ronda técnica no CPD e sala dos servidores.',
-                'Climatização e no-breaks operando normalmente.',
-                'Reinício preventivo de switches e links sem interrupção.',
-                'Passagem de serviço realizada sem pendências.',
-              ].map((sugestao) {
-                return InkWell(
-                  onTap: () {
-                    final currentText = _ocorrenciasCtrl.text.trim();
-                    if (currentText.isEmpty) {
-                      _ocorrenciasCtrl.text = sugestao;
-                    } else {
-                      _ocorrenciasCtrl.text = '$currentText\n• $sugestao';
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
-                      ),
-                    ),
-                    child: Text(
-                      sugestao,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
-          ],
-          const SizedBox(height: 4),
-          Expanded(
-            child: TextField(
-              controller: _ocorrenciasCtrl,
-              readOnly: isLancado,
-              maxLines: null,
-              expands: true,
-              textAlignVertical: TextAlignVertical.top,
-              decoration: InputDecoration(
-                hintText: isLancado ? 'Sem ocorrências registradas.' : 'Digite as alterações do plantão...',
-                filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
+            child: Text(
+              content,
+              style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant, height: 1.4),
             ),
           ),
-          const SizedBox(height: 14),
-
-          // Se já foi lançado, mostra recibo de emails
-          if (isLancado) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.mark_email_read_rounded, color: Colors.green, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Lançado por ${r.lancadoPorNome ?? "Operador"} em ${r.lancadoEm != null ? DateFormat("dd/MM/yyyy HH:mm").format(r.lancadoEm!) : ""}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.green),
-                      ),
-                    ],
-                  ),
-                  if (r.emailsDisparados.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      'E-mails enviados: ${r.emailsDisparados.join(", ")}',
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ] else ...[
-            // Botão LANÇAR RELATÓRIO
-            SizedBox(
-              width: double.infinity,
-              height: 46,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0284C7),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: _isLaunching
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Icon(Icons.send_rounded, size: 20),
-                label: const Text('Lançar Relatório (Concluir e Enviar E-mails)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                onPressed: _isLaunching ? null : _confirmarLancamento,
-              ),
-            ),
-          ],
         ],
       ),
     );

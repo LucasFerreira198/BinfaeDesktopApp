@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/escala_pdf_service.dart';
 import '../theme/app_theme.dart';
+import 'print_view.dart';
 
 class EscalaView extends StatefulWidget {
   final void Function(int targetIndex)? onNavigate;
@@ -832,6 +833,21 @@ class _EscalaViewState extends State<EscalaView> {
                   icon: const Icon(Icons.swap_horiz_rounded, size: 18),
                   label: const Text('Troca de Serviço'),
                   onPressed: _escala == null ? null : () => _abrirModalTrocaServico(),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E3A8A), foregroundColor: Colors.white),
+                  icon: const Icon(Icons.print_rounded, size: 18),
+                  label: const Text('Espelho A4'),
+                  onPressed: _escala == null
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PrintView(escala: _escala, ano: _ano, mes: _mes),
+                            ),
+                          );
+                        },
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(

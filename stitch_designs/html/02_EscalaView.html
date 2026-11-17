@@ -1,0 +1,838 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-dim": "#0a122a", "primary-fixed": "#d8e2ff", "primary-container": "#4c8eff", "on-secondary-fixed": "#001b3e", "surface-container-lowest": "#050d25", "on-error": "#690005", "on-primary-container": "#00285d", "primary-fixed-dim": "#adc6ff", "inverse-primary": "#005ac2", "error-container": "#93000a", "on-secondary-fixed-variant": "#00458e", "surface-bright": "#313852", "on-primary-fixed-variant": "#004494", "on-surface-variant": "#c2c6d6", "tertiary-fixed": "#54fdc4", "on-error-container": "#ffdad6", "surface-variant": "#2c344d", "secondary-fixed": "#d7e3ff", "secondary-container": "#0066cc", "on-tertiary-fixed-variant": "#00513b", "on-primary": "#002e69", "primary": "#adc6ff", "on-secondary": "#002f65", "on-tertiary-fixed": "#002116", "surface-container-low": "#131a33", "tertiary-container": "#00a47a", "outline-variant": "#414754", "error": "#ffb4ab", "surface-container-highest": "#2c344d", "surface-container-high": "#212942", "inverse-surface": "#dbe1ff", "inverse-on-surface": "#282f49", "on-secondary-container": "#dfe8ff", "on-tertiary-container": "#003122", "tertiary-fixed-dim": "#27e0a9", "on-background": "#dbe1ff", "surface-container": "#171e37", "secondary-fixed-dim": "#aac7ff", "surface-tint": "#adc6ff", "secondary": "#aac7ff", "on-primary-fixed": "#001a41", "outline": "#8c909f", "surface": "#0a122a", "tertiary": "#27e0a9", "on-surface": "#dbe1ff", "background": "#0a122a", "on-tertiary": "#003827" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "1.5rem", "space-md": "0.75rem", "gutter-desktop": "1rem", "margin-desktop": "1.5rem", "space-lg": "1rem", "margin": "1rem", "space-sm": "0.5rem", "gutter": "0.75rem", "space-xs": "0.25rem" }, "fontFamily": { "body-lg": ["Inter"], "headline-md": ["Inter"], "telemetry-data": ["JetBrains Mono"], "label-tactical": ["JetBrains Mono"], "body-md": ["Inter"], "code-sm": ["JetBrains Mono"], "body-sm": ["Inter"], "code-md": ["JetBrains Mono"], "headline-lg": ["Inter"], "headline-sm": ["Inter"], "display-lg": ["Inter"] }, "fontSize": { "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "telemetry-data": ["14px", { "lineHeight": "18px", "letterSpacing": "0.04em", "fontWeight": "600" }], "label-tactical": ["11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "700" }], "body-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "500" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "code-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } }</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-space-lg flex items-center gap-space-md bg-surface-container"><span class="material-symbols-outlined text-primary text-2xl">military_tech</span><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-primary tracking-wider uppercase truncate">BINFAE-GL</span><span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-widest">Ala 11 // C&amp;TI</span></div></div><div class="px-space-md py-space-sm bg-surface-container-lowest flex items-center justify-between"><span class="font-label-tactical text-label-tactical text-outline uppercase">Navegação Tática</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-tertiary">12 NÓS</span></div><nav class="flex-1 px-space-sm py-space-sm space-y-1 overflow-y-auto" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm"><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="dashboard" href="#"><span class="material-symbols-outlined text-xl">dashboard</span><span class="font-body-md text-body-md truncate">Dashboard</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined text-xl">inventory_2</span><span class="font-body-md text-body-md truncate">Materiais e Estoque</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined text-xl">fact_check</span><span class="font-body-md text-body-md truncate">Cautelas e Missões</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="manutencao" href="#"><span class="material-symbols-outlined text-xl">handyman</span><span class="font-body-md text-body-md truncate">Manutenção</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined text-xl">checklist_rtl</span><span class="font-body-md text-body-md truncate">Pendências e Metas</span></a><a aria-current="page" class="flex items-center gap-space-md px-space-md py-space-sm transition-all bg-primary-container text-on-primary-container font-headline-sm rounded-lg shadow-sm" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined text-xl">calendar_month</span><span class="font-body-md text-body-md truncate">Escala de Sobreaviso</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="relatorio-diario-24h" href="#"><span class="material-symbols-outlined text-xl">summarize</span><span class="font-body-md text-body-md truncate">Relatório Diário (24h)</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="locais-fisicos" href="#"><div class="flex items-center gap-space-md min-w-0"><span class="material-symbols-outlined text-xl">location_on</span><span class="font-body-md text-body-md truncate">Locais Físicos</span></div><span class="px-1.5 py-0.5 rounded bg-surface-container-highest font-code-sm text-code-sm text-secondary">Árvore</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined text-xl">category</span><span class="font-body-md text-body-md truncate">Grupos e Subgrupos</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="historico-geral" href="#"><span class="material-symbols-outlined text-xl">history</span><span class="font-body-md text-body-md truncate">Histórico Geral</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined text-xl">admin_panel_settings</span><span class="font-body-md text-body-md truncate">Painel Administrativo</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="configuracoes" href="#"><span class="material-symbols-outlined text-xl">settings</span><span class="font-body-md text-body-md truncate">Configurações</span></a></nav><div class="p-space-md bg-surface-container-lowest mt-auto"><div class="flex items-center justify-between font-label-tactical text-label-tactical text-outline mb-1"><span>SARAM LINK</span><span class="text-tertiary">ENCRIPTADO</span></div><div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full bg-tertiary w-full"></div></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-xl gap-space-lg"><div class="flex items-center gap-space-lg min-w-0"><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide truncate">BASE AÉREA DO GALEÃO // BINFAE-GL TI</span><span class="px-1.5 py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-primary">v2.4.0</span></div><span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-widest">SEÇÃO DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÕES</span></div><div class="h-8 w-px bg-outline-variant hidden xl:block"></div><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-1 rounded bg-surface-container-high"><span class="h-2 w-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-label-tactical text-label-tactical text-tertiary">API ONLINE</span><span class="font-code-sm text-code-sm text-on-surface-variant">(28ms)</span></div></div><div class="flex items-center gap-space-lg"><div class="hidden lg:flex items-center gap-space-md px-space-md py-1 rounded bg-surface-container-low"><div class="flex items-center gap-1.5"><span class="font-label-tactical text-label-tactical text-secondary">BRT:</span><span class="font-telemetry-data text-telemetry-data text-on-surface">14:32:08</span></div><span class="text-outline">|</span><div class="flex items-center gap-1.5"><span class="font-label-tactical text-label-tactical text-tertiary">ZULU:</span><span class="font-telemetry-data text-telemetry-data text-on-surface">17:32:08Z</span></div></div><div class="relative hidden md:flex items-center w-60 lg:w-72"><span class="material-symbols-outlined absolute left-space-sm text-outline text-lg pointer-events-none">search</span><input class="w-full pl-8 pr-12 py-1.5 bg-surface-container-lowest text-on-surface font-code-sm text-code-sm rounded placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Busca tática rápida..." type="text"><div class="absolute right-space-sm flex items-center"><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-outline shadow-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-space-md pl-space-sm bg-surface-container-low rounded-lg p-1.5"><div class="flex flex-col text-right hidden sm:flex"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">2º Sgt Silva</span><span class="font-code-sm text-code-sm text-secondary font-medium">SARAM 6842910</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"></div></div></header><main class="w-full pt-16 px-space-xl bg-surface min-h-screen"><div class="flex flex-col w-full pb-space-xl space-y-space-lg">
+<!-- 1. BARRA SUPERIOR DE CONTEXTO TÁTICO E COMANDOS -->
+<section class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md p-space-md bg-surface-container rounded-lg shadow-sm">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="px-2 py-0.5 rounded bg-primary text-on-primary font-label-tactical text-label-tactical uppercase tracking-wider">MOD-06</span>
+<h1 class="font-headline-md text-headline-md text-on-surface uppercase tracking-tight">
+          Escala de Sobreaviso <span class="text-primary font-normal">// Plantão de TI e Comunicações</span>
+</h1>
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-tertiary">EFETIVO DE SERVIÇO</span>
+</div>
+<div class="flex items-center gap-space-md mt-1 font-code-sm text-code-sm text-on-surface-variant flex-wrap">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-primary">apartment</span>
+          Base Aérea do Galeão // Ala 11
+        </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface">Mês de Referência: Outubro / 2024</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-tactical text-label-tactical text-secondary">PORTARIA Nº 142/DIRM-GL</span>
+</div>
+</div>
+<!-- Controles de Ação à Direita -->
+<div class="flex items-center gap-space-sm flex-wrap xl:justify-end">
+<!-- Seletor Mês/Ano -->
+<div class="flex items-center bg-surface-container-lowest rounded p-1 gap-1">
+<button class="w-7 h-7 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<span class="px-2 font-telemetry-data text-telemetry-data text-on-surface select-none">OUT 2024</span>
+<button class="w-7 h-7 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<button class="px-2 py-1 rounded bg-surface-container-high hover:bg-surface-variant text-primary font-label-tactical text-label-tactical uppercase transition-colors" type="button">
+          Hoje
+        </button>
+</div>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 rounded bg-surface-container-low hover:bg-surface-container-high text-on-surface font-code-sm text-code-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-tertiary">sync</span>
+<span>Sincronizar</span>
+<kbd class="px-1 py-0.2 rounded bg-surface-container-lowest text-outline font-label-tactical text-label-tactical">F5</kbd>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 rounded bg-surface-container-low hover:bg-surface-container-high text-on-surface font-code-sm text-code-sm transition-colors" onclick="document.getElementById('modal-troca').classList.toggle('hidden')" type="button">
+<span class="material-symbols-outlined text-base text-secondary">swap_horiz</span>
+<span>Troca de Serviço</span>
+<kbd class="px-1 py-0.2 rounded bg-surface-container-lowest text-outline font-label-tactical text-label-tactical">Alt+T</kbd>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 rounded bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container font-headline-sm text-headline-sm transition-all shadow-sm" onclick="window.print()" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+<span>Exportar Folha A4</span>
+<kbd class="px-1.5 py-0.5 rounded bg-on-primary/20 text-on-primary font-label-tactical text-label-tactical">Ctrl+P</kbd>
+</button>
+</div>
+</section>
+<!-- 2. CARDS DE STATUS RÁPIDO DO PLANTÃO (KPIs TÁTICOS) -->
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md"><!-- Card 1: Plantão Atual 24h -->
+<div class="relative overflow-hidden bg-surface-container rounded-lg p-space-md shadow-sm flex flex-col justify-between">
+<div class="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-tertiary/10 blur-xl pointer-events-none"></div>
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+Plantão 24h (Hoje • 18/Out)
+</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical uppercase">Sobreaviso</span>
+</div>
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center font-telemetry-data text-telemetry-data text-primary shrink-0">
+2S
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">2º Sgt Silva</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SARAM 6842910</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low/60 rounded p-2 flex flex-col gap-1 font-code-sm text-code-sm">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Turno Operacional:</span>
+<span class="text-on-surface font-telemetry-data text-telemetry-data">08:00h ➔ 08:00h (+24h)</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Ramal Funcional:</span>
+<span class="text-secondary font-telemetry-data text-telemetry-data">R. 2411 / (21) 98844-0129</span>
+</div>
+</div>
+</div>
+
+<!-- Card 2: Expediente Administrativo (EXPD - 2 Militares nos Dias Úteis) -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm flex flex-col justify-between border-l-2 border-primary">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-tactical text-label-tactical text-primary uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">groups</span>
+Expediente (EXPD • Dia Útil)
+</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-container/20 text-primary font-label-tactical text-label-tactical uppercase">08:00 - 16:30</span>
+</div>
+<div class="space-y-1.5 mb-2">
+<div class="flex items-center justify-between bg-surface-container-low/80 p-1.5 rounded">
+<div class="flex items-center gap-2 min-w-0">
+<span class="px-1 py-0.2 rounded bg-surface-container-highest text-secondary font-telemetry-data text-[10px]">CB</span>
+<span class="font-headline-sm text-body-sm text-on-surface truncate">Cb Santos</span>
+</div>
+<span class="font-code-sm text-[11px] text-on-surface-variant">Suporte / HW</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low/80 p-1.5 rounded">
+<div class="flex items-center gap-2 min-w-0">
+<span class="px-1 py-0.2 rounded bg-surface-container-highest text-secondary font-telemetry-data text-[10px]">S1</span>
+<span class="font-headline-sm text-body-sm text-on-surface truncate">S1 Ferreira</span>
+</div>
+<span class="font-code-sm text-[11px] text-on-surface-variant">Telecom / P25</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low/60 rounded p-1.5 flex items-center justify-between text-code-sm font-code-sm text-on-surface-variant">
+<span>Efetivo Presencial:</span>
+<span class="text-tertiary font-telemetry-data text-telemetry-data">2 Militares Ativos</span>
+</div>
+</div>
+
+<!-- Card 3: Sobreaviso de Retaguarda -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-tactical text-label-tactical text-secondary uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">shield</span>
+Retaguarda (Reserva 24h)
+</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-tactical text-label-tactical uppercase">Standby</span>
+</div>
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center font-telemetry-data text-telemetry-data text-secondary shrink-0">
+3S
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">3º Sgt Ribeiro</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SARAM 7129402</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low/60 rounded p-2 flex flex-col gap-1 font-code-sm text-code-sm">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Especialidade:</span>
+<span class="text-on-surface">Redes &amp; Cripto</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Acionamento:</span>
+<span class="text-tertiary font-telemetry-data text-telemetry-data">Prontidão 30 min</span>
+</div>
+</div>
+</div>
+
+<!-- Card 4: Cumprimento da Escala & Trocas -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-tertiary">verified</span>
+Prontidão Operacional
+</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary">100.0%</span>
+</div>
+<div class="flex items-center justify-between gap-4">
+<div>
+<span class="font-headline-lg text-headline-lg text-on-surface font-telemetry-data">31 / 31</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant block">22 Úteis (EXPD) + 9 FDS</span>
+</div>
+<div class="w-14 h-14 relative flex items-center justify-center shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<path class="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-tertiary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<span class="absolute font-label-tactical text-label-tactical text-tertiary">OK</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-code-sm font-code-sm text-on-surface-variant pt-2 bg-surface-container-low/40 rounded px-2 py-1">
+<span>Trocas no Mês:</span>
+<span class="text-error font-telemetry-data text-telemetry-data">1 Pendente / 3 Homol.</span>
+</div>
+</div></section>
+<!-- 3. LAYOUT PRINCIPAL (70% CALENDÁRIO / 30% DETALHES) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- COLUNA DA ESQUERDA: CALENDÁRIO MENSAL TÁTICO (8 COLS ~ 68%) -->
+<div class="xl:col-span-8 flex flex-col space-y-space-md">
+<!-- Barra de Filtros & Legenda -->
+<div class="p-space-md bg-surface-container rounded-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-md shadow-sm">
+<div class="flex items-center gap-1 bg-surface-container-lowest p-1 rounded">
+<button class="px-3 py-1 rounded bg-primary text-on-primary font-label-tactical text-label-tactical uppercase transition-colors" type="button">
+            Todos (31)
+          </button>
+<button class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-tactical text-label-tactical uppercase transition-colors" type="button">
+            Dias Úteis (22)
+          </button>
+<button class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-tactical text-label-tactical uppercase transition-colors" type="button">
+            Finais de Semana (9)
+          </button>
+</div>
+<!-- Legenda Tática -->
+<div class="flex items-center gap-space-md flex-wrap font-label-tactical text-label-tactical"><span class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest"></span>
+Cumprido
+</span>
+<span class="flex items-center gap-1.5 text-primary">
+<span class="w-2 h-2 rounded bg-primary/40 border border-primary"></span>
+EXPD (2 Militares - Dias Úteis)
+</span>
+<span class="flex items-center gap-1.5 text-tertiary">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
+Hoje (Plantão Ativo)
+</span>
+<span class="flex items-center gap-1.5 text-secondary">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+Fim de Semana (Sem EXPD)
+</span>
+<span class="flex items-center gap-1.5 text-error">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+Troca Pendente
+</span></div>
+</div>
+<!-- Grade Mensal -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm overflow-hidden flex flex-col">
+<!-- Dias da semana -->
+<div class="grid grid-cols-7 gap-2 mb-2 text-center font-label-tactical text-label-tactical uppercase text-on-surface-variant">
+<div class="py-1 bg-surface-container-lowest rounded">Seg</div>
+<div class="py-1 bg-surface-container-lowest rounded">Ter</div>
+<div class="py-1 bg-surface-container-lowest rounded">Qua</div>
+<div class="py-1 bg-surface-container-lowest rounded">Qui</div>
+<div class="py-1 bg-surface-container-lowest rounded">Sex</div>
+<div class="py-1 bg-surface-container-low text-secondary rounded">Sáb</div>
+<div class="py-1 bg-surface-container-low text-secondary rounded">Dom</div>
+</div>
+<!-- Células do Calendário (Outubro 2024: Dia 1 foi Terça-feira) -->
+<div class="grid grid-cols-7 gap-2"><!-- Espaçador Seg 30/Set -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest/40 opacity-30 flex flex-col justify-between">
+<span class="font-telemetry-data text-code-sm text-outline">30</span>
+<span class="font-code-sm text-code-sm text-outline">Setembro</span>
+</div>
+
+<!-- Dia 01 (Terça - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-on-surface font-bold">01</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant opacity-70">OK</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Redes</span>
+</div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary">
+<span class="font-bold">EXPD</span>
+<span class="truncate text-on-surface-variant">Cb Santos / S1 Ferr.</span>
+</div>
+</div>
+
+<!-- Dia 02 (Quarta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-on-surface font-bold">02</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant opacity-70">OK</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">2º Sgt Silva</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Infra TI</span>
+</div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary">
+<span class="font-bold">EXPD</span>
+<span class="truncate text-on-surface-variant">3S Rib. / Cb Santos</span>
+</div>
+</div>
+
+<!-- Dia 03 (Quinta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-on-surface font-bold">03</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant opacity-70">OK</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Cripto</span>
+</div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary">
+<span class="font-bold">EXPD</span>
+<span class="truncate text-on-surface-variant">2S Silva / S1 Ferr.</span>
+</div>
+</div>
+
+<!-- Dia 04 (Sexta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-on-surface font-bold">04</span>
+<span class="font-label-tactical text-label-tactical text-on-surface-variant opacity-70">OK</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Hardware</span>
+</div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary">
+<span class="font-bold">EXPD</span>
+<span class="truncate text-on-surface-variant">S1 Ferr. / 3S Rib.</span>
+</div>
+</div>
+
+<!-- Dia 05 (Sábado - Fim de Semana / Sem EXPD) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer border border-transparent hover:border-secondary/30">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-secondary font-bold">05</span>
+<span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">SÁB</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">S1 Ferreira</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Rádios P25</span>
+</div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">
+SEM EXPD
+</div>
+</div>
+
+<!-- Dia 06 (Domingo - Fim de Semana / Sem EXPD) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer border border-transparent hover:border-secondary/30">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-secondary font-bold">06</span>
+<span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">DOM</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">2º Sgt Silva</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Infra TI</span>
+</div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">
+SEM EXPD
+</div>
+</div>
+
+<!-- Semana 2 (07 a 13) -->
+<!-- Dia 07 (Segunda - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">07</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Chefe TI</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">Cb Santos / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 08 (Terça - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">08</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Suporte</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / 3S Rib.</span></div>
+</div>
+
+<!-- Dia 09 (Quarta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">09</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Redes</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">S1 Ferr. / Cb Santos</span></div>
+</div>
+
+<!-- Dia 10 (Quinta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">10</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">S1 Ferreira</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Telecom</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / Cb Santos</span></div>
+</div>
+
+<!-- Dia 11 (Sexta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">11</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">2º Sgt Silva</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Infra TI</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">3S Rib. / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 12 (Sábado - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-secondary font-bold">12</span><span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">SÁB</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Oficial Dia</span></div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Dia 13 (Domingo - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-secondary font-bold">13</span><span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">DOM</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Suporte</span></div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Semana 3 (14 a 20) -->
+<!-- Dia 14 (Segunda - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">14</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Redes</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / Cb Santos</span></div>
+</div>
+
+<!-- Dia 15 (Terça - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">15</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">S1 Ferreira</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Telecom</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">Cb Santos / 3S Rib.</span></div>
+</div>
+
+<!-- Dia 16 (Quarta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">16</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Chefe TI</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 17 (Quinta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">17</span><span class="font-label-tactical text-label-tactical text-outline">OK</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Suporte</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">3S Rib. / S1 Ferr.</span></div>
+</div>
+
+<!-- DIA 18 (HOJE - SEXTA - DESTAQUE MÁXIMO) -->
+<div class="min-h-[92px] p-2 rounded bg-primary-container/20 shadow-md flex flex-col justify-between relative cursor-pointer group border border-primary/40">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-headline-sm text-primary font-bold">18</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary text-on-tertiary font-label-tactical text-label-tactical uppercase tracking-wider animate-pulse">Hoje</span>
+</div>
+<div>
+<span class="font-headline-sm text-headline-sm text-primary-fixed block truncate font-bold">2º Sgt Silva</span>
+<span class="font-code-sm text-code-sm text-tertiary block font-semibold">24h Sobreaviso</span>
+</div>
+<div class="bg-primary-container/30 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary">
+<span class="font-bold">EXPD (2)</span>
+<span class="truncate text-on-surface font-semibold">Cb Santos + S1 Ferr.</span>
+</div>
+<div class="flex items-center justify-between font-label-tactical text-label-tactical text-on-surface-variant text-[10px]">
+<span>RES: 3S RIBEIRO</span>
+<span class="text-tertiary">ATIVO</span>
+</div>
+</div>
+
+<!-- Dia 19 (Sábado - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-secondary font-bold">19</span>
+<span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">SÁB</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Hardware</span>
+</div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Dia 20 (Domingo - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-secondary font-bold">20</span>
+<span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">DOM</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Cripto</span>
+</div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Semana 4 (21 a 27) -->
+<!-- Dia 21 (Segunda - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">21</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: TI</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">Cb Santos / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 22 (Terça - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">22</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">2º Sgt Silva</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Infra</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">3S Rib. / Cb Santos</span></div>
+</div>
+
+<!-- Dia 23 (Quarta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">23</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Redes</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 24 (Quinta - Dia Útil - Troca Pendente) -->
+<div class="min-h-[92px] p-2 rounded bg-error-container/20 hover:bg-error-container/30 transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-body-md text-error font-bold">24</span>
+<span class="px-1.5 py-0.5 rounded bg-error text-on-error font-label-tactical text-label-tactical uppercase">Troca</span>
+</div>
+<div>
+<span class="font-headline-sm text-body-sm text-on-surface block truncate font-medium">S1 Ferreira</span>
+<span class="font-code-sm text-[10px] text-error block">➔ Cb Santos (24h)</span>
+</div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / 3S Rib.</span></div>
+</div>
+
+<!-- Dia 25 (Sexta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">25</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Hardware</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">S1 Ferr. / 3S Rib.</span></div>
+</div>
+
+<!-- Dia 26 (Sábado - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-secondary font-bold">26</span><span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">SÁB</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">S1 Ferreira</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Telecom</span></div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Dia 27 (Domingo - Fim de Semana) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-secondary font-bold">27</span><span class="px-1 py-0.2 rounded bg-surface-container text-secondary font-label-tactical text-label-tactical">DOM</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">1º Ten Cavalcanti</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Oficial Dia</span></div>
+<div class="px-1 py-0.5 rounded bg-surface-container-low text-[9px] font-code-sm text-outline text-center">SEM EXPD</div>
+</div>
+
+<!-- Semana 5 (28 a 31) -->
+<!-- Dia 28 (Segunda - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">28</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">2º Sgt Silva</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Infra TI</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">Cb Santos / S1 Ferr.</span></div>
+</div>
+
+<!-- Dia 29 (Terça - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">29</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">3º Sgt Ribeiro</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Cripto</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / Cb Santos</span></div>
+</div>
+
+<!-- Dia 30 (Quarta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">30</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">Cb Santos</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Hardware</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">S1 Ferr. / 3S Rib.</span></div>
+</div>
+
+<!-- Dia 31 (Quinta - Dia Útil) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-low hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer">
+<div class="flex items-center justify-between"><span class="font-telemetry-data text-body-md text-on-surface font-bold">31</span><span class="font-label-tactical text-label-tactical text-outline">ESC</span></div>
+<div><span class="font-headline-sm text-body-sm text-on-surface block truncate">S1 Ferreira</span><span class="font-code-sm text-[10px] text-on-surface-variant block truncate">24h: Telecom</span></div>
+<div class="bg-surface-container-lowest/80 px-1 py-0.5 rounded flex items-center justify-between text-[9px] font-code-sm text-primary"><span class="font-bold">EXPD</span><span class="truncate text-on-surface-variant">2S Silva / Cb Santos</span></div>
+</div>
+
+<!-- Próximo mês (01 a 03 Nov) -->
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest/40 opacity-30 flex flex-col justify-between">
+<span class="font-telemetry-data text-code-sm text-outline">01</span>
+<span class="font-code-sm text-code-sm text-outline">Novembro</span>
+</div>
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest/40 opacity-30 flex flex-col justify-between">
+<span class="font-telemetry-data text-code-sm text-outline">02</span>
+<span class="font-code-sm text-code-sm text-outline">Novembro</span>
+</div>
+<div class="min-h-[92px] p-2 rounded bg-surface-container-lowest/40 opacity-30 flex flex-col justify-between">
+<span class="font-telemetry-data text-code-sm text-outline">03</span>
+<span class="font-code-sm text-code-sm text-outline">Novembro</span>
+</div></div>
+</div><section class="bg-surface-container rounded-lg p-space-md shadow-sm flex flex-col space-y-space-md border border-primary/20"><div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-2 border-b border-outline-variant/40"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-primary text-xl">analytics</span><div><h3 class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide flex items-center gap-2">Balanço de Efetivo &amp; Carga de Serviço<span class="px-1.5 py-0.2 rounded bg-primary-container/20 text-primary font-code-sm text-[10px]">OUT / 2024</span></h3><p class="font-code-sm text-code-sm text-on-surface-variant">Distribuição quinzenal e semanal de serviços (SV) e expedientes (EXPD) por militar escalado</p></div></div><div class="flex items-center gap-2 font-code-sm text-code-sm"><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-lowest"><span class="w-2 h-2 rounded-full bg-secondary-container"></span><span class="text-on-surface-variant font-label-tactical text-label-tactical">TOTAL SV:</span><span class="font-telemetry-data font-bold text-secondary">30</span></div><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-lowest"><span class="w-2 h-2 rounded-full bg-primary/40 border border-primary"></span><span class="text-on-surface-variant font-label-tactical text-label-tactical">TOTAL EXPD:</span><span class="font-telemetry-data font-bold text-primary">24</span></div></div></div><div class="overflow-x-auto"><table class="w-full text-left font-code-sm text-code-sm border-collapse"><thead class="bg-surface-container-lowest text-outline font-label-tactical text-label-tactical uppercase"><tr class="border-b border-outline-variant/30"><th class="py-2 px-3 tracking-wider">Militar da Escala</th><th class="py-2 px-2 text-center text-primary">EXPD</th><th class="py-2 px-2 text-center text-secondary-fixed bg-secondary-container/20 border-x border-secondary-container/40">SV (Total)</th><th class="py-2 px-2 text-center">Sem 1</th><th class="py-2 px-2 text-center">Sem 2</th><th class="py-2 px-2 text-center">Sem 3</th><th class="py-2 px-2 text-center">Sem 4</th><th class="py-2 px-2 text-center">Sem 5</th><th class="py-2 px-3 text-right">Status Tático</th></tr></thead><tbody class="divide-y divide-outline-variant/20 font-telemetry-data"><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">S2 ANSELMO</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">DISPENSADO</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors bg-surface-container-low/30"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 D. PAULA</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">4</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 MARIO</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">6</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors bg-surface-container-low/30"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 D. PEÇANHA</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">5</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 B. ROCHA</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">5</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors bg-surface-container-low/30"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 JOÃO FERREIRA</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">4</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/60 transition-colors"><td class="py-1.5 px-3 font-semibold text-on-surface flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>S2 JORGE</td><td class="py-1.5 px-2 text-center"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-primary font-bold">4</span></td><td class="py-1.5 px-2 text-center font-bold text-secondary-fixed text-sm bg-secondary-container/30 border-x border-secondary-container/60 shadow-sm">5</td><td class="py-1.5 px-2 text-center text-on-surface font-semibold">1</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-on-surface font-bold text-secondary">2</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-tactical text-[9px]">REGULAR</span></td></tr><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">CB G. CHAVES</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">RESERVA</span></td></tr><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">2T FIRMINO</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">OFICIAL</span></td></tr><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">CB C. CONCEIÇÃO</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">DISPENSADO</span></td></tr><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">S2 VIÇOSA</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">DISPENSADO</span></td></tr><tr class="hover:bg-surface-container-high/40 transition-colors opacity-70"><td class="py-1.5 px-3 font-medium text-on-surface">S2 JOÃO FERREIRA (Reserva)</td><td class="py-1.5 px-2 text-center text-on-surface-variant">0</td><td class="py-1.5 px-2 text-center font-bold text-secondary bg-secondary-container/10 border-x border-secondary-container/30">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-2 text-center text-outline">0</td><td class="py-1.5 px-3 text-right"><span class="px-1.5 py-0.2 rounded bg-surface-container text-outline font-label-tactical text-[9px]">RESERVA</span></td></tr></tbody><tfoot class="bg-surface-container-lowest font-label-tactical text-label-tactical font-bold border-t border-outline-variant"><tr class="text-on-surface"><td class="py-2 px-3 text-primary uppercase">Totais Consolidados</td><td class="py-2 px-2 text-center text-primary">24</td><td class="py-2 px-2 text-center text-secondary-fixed text-sm bg-secondary-container/40 border-x border-secondary-container">30</td><td class="py-2 px-2 text-center">7</td><td class="py-2 px-2 text-center">7</td><td class="py-2 px-2 text-center">7</td><td class="py-2 px-2 text-center">7</td><td class="py-2 px-2 text-center">2</td><td class="py-2 px-3 text-right text-tertiary">100% HOMOLOGADO</td></tr></tfoot></table></div></section>
+</div>
+<!-- COLUNA DA DIREITA: PAINEL DE DETALHES DO PLANTÃO & AÇÕES (4 COLS ~ 32%) -->
+<div class="xl:col-span-4 flex flex-col space-y-space-md">
+<!-- Detalhes do Dia Selecionado -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm space-y-space-md">
+<!-- Header do Card -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-wider">PLANTÃO SELECIONADO</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface uppercase font-bold">18 OUTUBRO 2024 // SEXTA</h2>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical">EM ANDAMENTO</span>
+</div>
+<!-- Militar Titular em Destaque -->
+<div class="p-space-md bg-surface-container-low rounded-lg flex items-center gap-space-md">
+<img class="w-14 h-14 rounded object-cover shadow-sm shrink-0" data-alt="Fotografia de perfil militar brasileiro fardado do 2º Sargento Silva da Força Aérea Brasileira em pose oficial de serviço no centro de comunicações e TI militar de alta segurança com fundo neutro escuro tático." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFHe8zIJPgaMSEzL7th72Q5EiCNZg2whSeBKzrlE3aZ8ZzWVsZxdo-jR3DDU33Yrp579747a5QDT7-XbEont2Mg7ndJ86N3ZiIaWSAEcnPYZUlwujDYzqaS2ewjGozxVIIiBswcUAWzGjb_LzUEwbUBUQLTBM_nEfElO2K8ugj2RFXQ4Mt5TPrl6U2-InOA2MxDDwm5OD2UDpmc2_ZX1bV_nw2CFIlU5BXD75akBii">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-on-surface truncate font-semibold">2º Sgt Silva</span>
+</div>
+<span class="font-code-sm text-code-sm text-secondary font-medium">SARAM 6842910</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Especialidade: Redes &amp; Telefonia Tática</span>
+</div>
+</div><!-- Seção Equipe de Expediente (EXPD) - 2 Militares nos Dias Úteis -->
+<div class="p-space-md bg-surface-container-low/80 rounded-lg border border-primary/20 space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-primary uppercase flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-base">badge</span>
+Equipe de Expediente (EXPD • Dia Útil)
+</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-container/20 text-primary font-code-sm text-[11px]">08:00 - 16:30</span>
+</div>
+<div class="grid grid-cols-1 gap-2 font-code-sm text-code-sm">
+<!-- Militar EXPD 1 -->
+<div class="p-2 bg-surface-container-lowest rounded flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-7 h-7 rounded bg-surface-container-highest flex items-center justify-center font-telemetry-data text-xs text-secondary shrink-0 font-bold">
+CB
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-body-sm text-on-surface truncate font-semibold">Cb Santos</span>
+<span class="text-[11px] text-on-surface-variant font-code-sm">SARAM 9021443 • Ramal 2415</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-tactical text-[10px]">SUPORTE / HW</span>
+</div>
+<!-- Militar EXPD 2 -->
+<div class="p-2 bg-surface-container-lowest rounded flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-7 h-7 rounded bg-surface-container-highest flex items-center justify-center font-telemetry-data text-xs text-secondary shrink-0 font-bold">
+S1
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-body-sm text-on-surface truncate font-semibold">S1 Ferreira</span>
+<span class="text-[11px] text-on-surface-variant font-code-sm">SARAM 8192031 • Ramal 2420</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-tactical text-[10px]">TELECOM / P25</span>
+</div>
+</div>
+</div>
+<!-- Métricas do Turno -->
+<div class="grid grid-cols-2 gap-space-sm font-code-sm text-code-sm">
+<div class="p-2 bg-surface-container-lowest rounded flex flex-col">
+<span class="font-label-tactical text-label-tactical text-outline">INÍCIO DO TURNO</span>
+<span class="text-on-surface font-telemetry-data text-telemetry-data">18/Out 08:00 BRT</span>
+</div>
+<div class="p-2 bg-surface-container-lowest rounded flex flex-col">
+<span class="font-label-tactical text-label-tactical text-outline">TÉRMINO PREVISTO</span>
+<span class="text-on-surface font-telemetry-data text-telemetry-data">19/Out 08:00 BRT</span>
+</div>
+<div class="p-2 bg-surface-container-lowest rounded flex flex-col">
+<span class="font-label-tactical text-label-tactical text-outline">TEMPO DECORRIDO</span>
+<span class="text-tertiary font-telemetry-data text-telemetry-data">06h 32m (27%)</span>
+</div>
+<div class="p-2 bg-surface-container-lowest rounded flex flex-col">
+<span class="font-label-tactical text-label-tactical text-outline">CONTATO EMERGENCIAL</span>
+<span class="text-secondary font-telemetry-data text-telemetry-data">Ramal 2411</span>
+</div>
+</div>
+<!-- Equipamentos Cautelados de Sobreaviso -->
+<div class="space-y-2">
+<span class="font-label-tactical text-label-tactical text-outline uppercase block">Material Cautelado // Carga do Plantão</span>
+<div class="space-y-1.5 font-code-sm text-code-sm">
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">smartphone</span>
+<span class="text-on-surface">Smartphone Criptografado</span>
+</div>
+<span class="font-telemetry-data text-label-tactical text-secondary">BMP-882109</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">vpn_key</span>
+<span class="text-on-surface">Token VPN COMAER / Nível 3</span>
+</div>
+<span class="font-telemetry-data text-label-tactical text-tertiary">ATIVO</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">radio</span>
+<span class="text-on-surface">Motorola APX 8000 P25 (Ala-11)</span>
+</div>
+<span class="font-telemetry-data text-label-tactical text-secondary">CH-02 TÁTICO</span>
+</div>
+</div>
+</div>
+<!-- Histórico de Acionamentos no Turno -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">Acionamentos Registrados</span>
+<span class="font-label-tactical text-label-tactical text-tertiary">1 OCORRÊNCIA</span>
+</div>
+<div class="p-2.5 bg-surface-container-lowest rounded flex flex-col gap-1 font-code-sm text-code-sm">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-data text-tertiary">09:40 BRT</span>
+<span class="px-1 py-0.2 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical">RESOLVIDO (14m)</span>
+</div>
+<span class="text-on-surface font-medium">Reinicialização de Switch no Hangar 2</span>
+<span class="text-on-surface-variant font-body-sm">Link de fibra redundante estabilizado sem interrupção de voo.</span>
+</div>
+</div>
+</div>
+<!-- Card de Troca Pendente para Homologação -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-error uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">notification_important</span>
+            Solicitação de Troca Pendente
+          </span>
+<span class="font-code-sm text-code-sm text-outline">Ref: 24/OUT</span>
+</div>
+<div class="p-space-sm bg-surface-container-low rounded flex flex-col gap-1.5 font-code-sm text-code-sm">
+<div class="flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm text-error">S1 Ferreira</span>
+<span class="text-on-surface-variant font-code-sm">SARAM 8192031</span>
+</div>
+<span class="material-symbols-outlined text-base text-primary">arrow_forward</span>
+<div class="flex flex-col text-right">
+<span class="font-headline-sm text-body-sm text-tertiary">Cb Santos</span>
+<span class="text-on-surface-variant font-code-sm">SARAM 9021443</span>
+</div>
+</div>
+<div class="pt-1.5 font-body-sm text-body-sm text-on-surface-variant bg-surface-container-lowest p-2 rounded">
+<span class="font-label-tactical text-label-tactical text-outline block">JUSTIFICATIVA REGISTRADA:</span>
+            "Comparecimento à Inspeção de Saúde Periódica no CEMAL (Convocação Oficial DIRSA nº 88/24)."
+          </div>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="w-full py-1.5 px-3 rounded bg-tertiary text-on-tertiary hover:bg-tertiary-container font-headline-sm text-headline-sm flex items-center justify-center gap-1 shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-base">check</span>
+<span>Homologar</span>
+</button>
+<button class="w-full py-1.5 px-3 rounded bg-surface-container-high hover:bg-error hover:text-on-error text-on-surface font-headline-sm text-headline-sm flex items-center justify-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-base">close</span>
+<span>Recusar</span>
+</button>
+</div>
+</div>
+<!-- Miniatura de Pré-visualização da Folha Oficial A4 -->
+<div class="bg-surface-container rounded-lg p-space-md shadow-sm space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">Documento Oficial de Escala</span>
+<span class="font-code-sm text-code-sm text-secondary">A4 Paisagem</span>
+</div>
+<div class="relative w-full h-32 bg-surface-container-lowest rounded overflow-hidden flex flex-col justify-between p-3">
+<div class="flex items-center justify-between opacity-80">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 object-contain" data-alt="Emblema em vetor do glifo e asas da Força Aérea Brasileira em linhas brancas e fundo transparente estilizado para documentação militar formal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZ0IGt7s1w3DTMCluZ7jnQfiqDPrqEh5Wvno468KlBn8ilB_iCck4c4AomFWW7rK85wqpH9xhOw660ewSaM0YHh-cPNNN3OpcqguXJqEIBYg_LIam20gUYbySQlYAY4sWx9UxFzcvziCb2t0-Sf6XgLwM5nPq1eg5hy3mX6qTJIgB55M_eylq1ogAX5UhsYh1mK63v1DzZp-pUcuewSC0AiU6ozw3RvRALYb2OeHpJ">
+<div class="flex flex-col text-[8px] font-label-tactical leading-none text-on-surface">
+<span>MINISTÉRIO DA DEFESA // COMANDO DA AERONÁUTICA</span>
+<span class="text-outline">BASE AÉREA DO GALEÃO - BINFAE-GL // SEÇÃO DE TI</span>
+</div>
+</div>
+<span class="text-[9px] font-telemetry-data text-primary">OUT/2024</span>
+</div>
+<div class="grid grid-cols-7 gap-1 opacity-40">
+<div class="h-1.5 bg-outline-variant rounded-sm"></div>
+<div class="h-1.5 bg-outline-variant rounded-sm"></div>
+<div class="h-1.5 bg-outline-variant rounded-sm"></div>
+<div class="h-1.5 bg-outline-variant rounded-sm"></div>
+<div class="h-1.5 bg-primary rounded-sm"></div>
+<div class="h-1.5 bg-secondary rounded-sm"></div>
+<div class="h-1.5 bg-secondary rounded-sm"></div>
+</div>
+<div class="flex items-center justify-between text-[8px] font-code-sm text-outline opacity-70">
+<span>PORTARIA 142/DIRM // FOLHA 1 DE 1</span>
+<span>ASSINATURA DIGITAL ICP-BRASIL</span>
+</div>
+</div>
+<button class="w-full py-2 px-3 rounded bg-surface-container-low hover:bg-surface-container-high text-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 transition-colors" onclick="window.print()" type="button">
+<span class="material-symbols-outlined text-base">download_for_offline</span>
+<span>Imprimir Escala Oficial A4 [Ctrl+P]</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 4. RODAPÉ TÁTICO INFERIOR -->
+<footer class="mt-space-lg p-space-md bg-surface-container-low rounded-lg flex flex-col md:flex-row items-center justify-between gap-space-md font-code-sm text-code-sm text-on-surface-variant shadow-sm">
+<!-- Atalhos de Teclado -->
+<div class="flex items-center gap-space-md flex-wrap">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">Atalhos Táticos:</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-primary font-label-tactical text-label-tactical">Ctrl+P</kbd>
+<span>Imprimir A4</span>
+</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-secondary font-label-tactical text-label-tactical">Alt+T</kbd>
+<span>Solicitar Troca</span>
+</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-tertiary font-label-tactical text-label-tactical">F5</kbd>
+<span>Sincronizar</span>
+</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline font-label-tactical text-label-tactical">Ctrl+B</kbd>
+<span>Bipar Crachá Militar</span>
+</span>
+</div>
+<!-- Status de Conectividade do Módulo -->
+<div class="flex items-center gap-space-md flex-wrap font-label-tactical text-label-tactical">
+<span class="flex items-center gap-1 text-tertiary">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+        API ESCALA: SINCRONIZADA
+      </span>
+<span class="text-outline-variant">|</span>
+<span class="text-on-surface">SQLite: BANCO_ESCALA_V2</span>
+<span class="text-outline-variant">|</span>
+<span class="text-outline">Última Carga: Hoje às 14:32 BRT</span>
+</div>
+</footer>
+<!-- MODAL DE TROCA DE SERVIÇO (EMBEDDED TÁTICO) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-surface-container-lowest/80 backdrop-blur-sm p-4" id="modal-troca">
+<div class="w-full max-w-lg bg-surface-container-high rounded-xl p-space-lg shadow-xl flex flex-col space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">swap_horiz</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface uppercase">Registrar Solicitação de Troca</h3>
+</div>
+<button class="text-outline hover:text-on-surface" onclick="document.getElementById('modal-troca').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="space-y-space-sm font-code-sm text-code-sm">
+<div>
+<label class="block font-label-tactical text-label-tactical text-outline uppercase mb-1">Militar Solicitante (Escalado)</label>
+<input class="w-full px-3 py-2 bg-surface-container-lowest rounded text-on-surface font-telemetry-data text-telemetry-data focus:outline-none" readonly="" type="text" value="2º Sgt Silva (SARAM 6842910)">
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-label-tactical text-label-tactical text-outline uppercase mb-1">Data da Escala Original</label>
+<input class="w-full px-3 py-2 bg-surface-container-lowest rounded text-on-surface font-telemetry-data text-telemetry-data focus:outline-none" type="text" value="28/10/2024">
+</div>
+<div>
+<label class="block font-label-tactical text-label-tactical text-outline uppercase mb-1">Militar Substituto</label>
+<select class="w-full px-3 py-2 bg-surface-container-lowest rounded text-on-surface font-code-sm text-code-sm focus:outline-none">
+<option>3º Sgt Ribeiro (7129402)</option>
+<option>Cb Santos (9021443)</option>
+<option>S1 Ferreira (8192031)</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block font-label-tactical text-label-tactical text-outline uppercase mb-1">Motivo Operacional / Justificativa</label>
+<textarea class="w-full px-3 py-2 bg-surface-container-lowest rounded text-on-surface font-body-sm text-body-sm placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Informe o motivo nos moldes da Portaria nº 142/DIRM..." rows="3"></textarea>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-4 py-2 rounded bg-surface-container hover:bg-surface-container-highest text-on-surface-variant font-headline-sm text-headline-sm" onclick="document.getElementById('modal-troca').classList.add('hidden')" type="button">
+          Cancelar
+        </button>
+<button class="px-4 py-2 rounded bg-primary text-on-primary hover:bg-primary-container font-headline-sm text-headline-sm shadow-sm" onclick="document.getElementById('modal-troca').classList.add('hidden')" type="button">
+          Encaminhar para Homologação
+        </button>
+</div>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

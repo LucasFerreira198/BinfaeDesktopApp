@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#adc6ff","on-error-container":"#ffdad6","on-secondary-container":"#dfe8ff","on-tertiary":"#003827","on-primary-fixed-variant":"#004494","tertiary":"#27e0a9","secondary-container":"#0066cc","secondary":"#aac7ff","on-surface-variant":"#c2c6d6","on-tertiary-fixed":"#002116","on-primary-container":"#00285d","surface-container-highest":"#2c344d","on-background":"#dbe1ff","outline-variant":"#414754","outline":"#8c909f","inverse-surface":"#dbe1ff","secondary-fixed":"#d7e3ff","surface-container-high":"#212942","on-tertiary-fixed-variant":"#00513b","on-secondary-fixed-variant":"#00458e","surface-container":"#171e37","surface":"#0a122a","on-secondary-fixed":"#001b3e","surface-container-lowest":"#050d25","secondary-fixed-dim":"#aac7ff","on-primary":"#002e69","surface-container-low":"#131a33","surface-bright":"#313852","primary-fixed-dim":"#adc6ff","on-secondary":"#002f65","primary-fixed":"#d8e2ff","surface-variant":"#2c344d","error":"#ffb4ab","tertiary-fixed-dim":"#27e0a9","tertiary-fixed":"#54fdc4","primary-container":"#4c8eff","surface-tint":"#adc6ff","tertiary-container":"#00a47a","error-container":"#93000a","inverse-primary":"#005ac2","on-error":"#690005","on-tertiary-container":"#003122","inverse-on-surface":"#282f49","surface-dim":"#0a122a","background":"#0a122a","on-primary-fixed":"#001a41","on-surface":"#dbe1ff"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-lg":"1rem","gutter-desktop":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"0.75rem","space-xl":"1.5rem","space-md":"0.75rem","margin-desktop":"1.5rem"},fontFamily:{"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"body-md":["Inter"],"headline-lg":["Inter"],"code-md":["JetBrains Mono"],"telemetry-data":["JetBrains Mono"],"headline-sm":["Inter"],"headline-md":["Inter"],"body-lg":["Inter"],"display-lg":["Inter"],"label-tactical":["JetBrains Mono"]},fontSize:{"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen selection:bg-secondary-container selection:text-on-secondary-container"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-50 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full h-full px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-shrink-0"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"/><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-label-tactical text-label-tactical text-primary uppercase">BINFAE-GL // ALA 11 - C&amp;TI FORÇA AÉREA</span><span class="inline-flex items-center px-space-xs py-0.5 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase tracking-wider">SISTEMA TÁTICO - 12 NÓS ATIVOS</span></div></div></div><div class="hidden xl:flex items-center gap-space-lg flex-1 max-w-2xl justify-center"><div class="flex items-center gap-space-sm px-space-sm py-1 bg-surface-container-low rounded-DEFAULT"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-code-sm text-code-sm text-tertiary tracking-wide uppercase">API ONLINE (28ms)</span></div><div class="flex items-center gap-space-md font-telemetry-data text-telemetry-data"><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">BRT:</span><span class="text-on-surface">14:32:08</span></div><div class="w-px h-3.5 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ZULU:</span><span class="text-primary">17:32:08Z</span></div></div><div class="relative flex-1 max-w-xs"><div class="flex items-center bg-surface-container-low rounded-DEFAULT px-space-sm py-1 gap-space-xs"><span class="material-symbols-outlined text-outline text-base">search</span><input class="bg-transparent w-full text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" placeholder="Busca tática de grupos e ativos..." readonly="" type="text"/><kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high rounded-DEFAULT text-outline font-medium">Ctrl+K</kbd></div></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-1.5 rounded-DEFAULT"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"/><span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-low"></span></div><div class="flex flex-col text-left"><span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">2º Sgt Silva</span><span class="font-code-sm text-code-sm text-outline leading-none">SARAM: 6842910</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-10 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col py-space-sm"><div class="px-space-md py-space-xs mb-space-xs"><span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">OPERAÇÃO &amp; LOGÍSTICA</span></div><nav class="flex flex-col gap-0.5 px-space-xs" data-active-classes="bg-secondary-container text-on-secondary-container font-semibold shadow-inner"><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">dashboard</span>Dashboard</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">inventory_2</span>Materiais e Estoque</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">assignment</span>Cautelas e Missões</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="manutencao" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">build</span>Manutenção</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">checklist</span>Pendências e Metas</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">calendar_month</span>Escala de Sobreaviso</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="relatorio-diario" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">description</span>Relatório Diário (24h)</a><a class="flex items-center justify-between px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="locais-fisicos" href="#"><span class="flex items-center"><span class="material-symbols-outlined mr-space-sm text-lg">account_tree</span>Locais Físicos</span><span class="px-1.5 py-0.5 bg-surface-container text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase">Árvore</span></a><a aria-current="page" class="flex items-center px-space-sm py-1.5 rounded-DEFAULT transition-colors bg-secondary-container text-on-secondary-container font-semibold shadow-inner" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">folder_special</span>Grupos e Subgrupos</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="historico-geral" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">history</span>Histórico Geral</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">admin_panel_settings</span>Painel Administrativo</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="configuracoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">settings</span>Configurações</a></nav></div><div class="p-space-sm bg-surface-container-low mx-space-xs mb-space-sm rounded-DEFAULT"><div class="flex items-center justify-between"><span class="flex items-center gap-space-xs font-code-sm text-code-sm text-primary"><span class="material-symbols-outlined text-sm">vpn_key</span>SARAM LINK</span><span class="font-label-tactical text-label-tactical text-tertiary uppercase">ENCRIPTADO</span></div></div></aside><div class="pl-64"><main class="w-full min-h-screen pt-16 pb-10 px-gutter-desktop bg-surface"><div class="flex flex-col w-full">
+<!-- Top Command & Breadcrumb Strip -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md pb-space-md mb-space-md">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs font-label-tactical text-label-tactical text-outline uppercase tracking-wider mb-0.5">
+<span>LOGÍSTICA C&amp;TI</span>
+<span class="text-surface-container-highest">/</span>
+<span class="text-outline">ALA 11 - GALEÃO</span>
+<span class="text-surface-container-highest">/</span>
+<span class="text-primary font-semibold">PORTARIA 142/DIRM-GL</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight flex items-center gap-space-sm">
+        CATÁLOGO DE GRUPOS E SUBGRUPOS TÁTICOS
+        <span class="inline-flex items-center px-1.5 py-0.5 bg-primary-container/20 text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase">
+          NORMAS DE CAUTELA
+        </span>
+</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+        CLASSIFICAÇÃO PATRIMONIAL, LOGÍSTICA DE C&amp;TI E NORMAS DE CAUTELA // PORTARIA 142/DIRM-GL // ALA 11
+      </p>
+</div>
+<!-- Quick Tactical Commands -->
+<div class="flex items-center gap-space-sm flex-wrap self-start xl:self-auto flex-shrink-0">
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 bg-primary hover:bg-primary/90 text-on-primary font-code-md text-code-md font-semibold rounded-DEFAULT transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-base">add_box</span>
+<span>+ NOVO GRUPO</span>
+<kbd class="ml-1 px-1 py-0.5 bg-on-primary/20 text-on-primary rounded font-code-sm text-code-sm font-normal">Ctrl+N</kbd>
+</button>
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 bg-secondary-container hover:bg-secondary-container/80 text-on-secondary-container font-code-md text-code-md font-semibold rounded-DEFAULT transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-base">create_new_folder</span>
+<span>+ NOVO SUBGRUPO</span>
+<kbd class="ml-1 px-1 py-0.5 bg-black/20 text-on-secondary-container rounded font-code-sm text-code-sm font-normal">Alt+S</kbd>
+</button>
+<button class="inline-flex items-center gap-1.5 px-space-sm py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-code-md text-code-md rounded-DEFAULT transition-colors" type="button">
+<span class="material-symbols-outlined text-base text-primary">download</span>
+<span>EXPORTAR MATRIZ</span>
+<kbd class="px-1 py-0.5 bg-surface-container text-outline rounded font-code-sm text-code-sm">Ctrl+E</kbd>
+</button>
+<button class="inline-flex items-center gap-1.5 px-space-sm py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-tertiary font-code-md text-code-md rounded-DEFAULT transition-colors" type="button">
+<span class="material-symbols-outlined text-base animate-spin text-tertiary">sync</span>
+<span>SINCRONIZAR SISGPO</span>
+</button>
+</div>
+</div>
+<!-- Tactical Search & Filter Bar -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm bg-surface-container-low p-space-sm rounded-DEFAULT mb-space-md">
+<div class="md:col-span-7 lg:col-span-8 flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1 gap-space-xs">
+<span class="material-symbols-outlined text-primary text-lg">search</span>
+<input class="bg-transparent w-full text-on-surface placeholder:text-outline font-code-sm text-code-sm focus:outline-none" placeholder="Buscar grupo, subgrupo, código ou especificação (ex: GRP-01, APX, P25)..." type="text"/>
+<span class="text-outline font-code-sm text-code-sm hidden sm:inline-block">Filtro Rápido</span>
+<kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant rounded-DEFAULT">Ctrl+F</kbd>
+</div>
+<div class="md:col-span-3 lg:col-span-2 flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1">
+<span class="font-label-tactical text-label-tactical text-outline mr-2 uppercase">STATUS:</span>
+<select class="bg-transparent text-on-surface font-code-sm text-code-sm focus:outline-none w-full cursor-pointer">
+<option class="bg-surface-container text-on-surface" selected="">Todos os Estados</option>
+<option class="bg-surface-container text-on-surface">Ativos / Homologados</option>
+<option class="bg-surface-container text-on-surface">Restritos / Cripto</option>
+<option class="bg-surface-container text-on-surface">Críticos N3</option>
+</select>
+</div>
+<div class="md:col-span-2 lg:col-span-2 flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1">
+<span class="font-label-tactical text-label-tactical text-outline mr-2 uppercase">TIPO:</span>
+<select class="bg-transparent text-on-surface font-code-sm text-code-sm focus:outline-none w-full cursor-pointer">
+<option class="bg-surface-container text-on-surface" selected="">Todos os Tipos</option>
+<option class="bg-surface-container text-on-surface">Telecom / Rádio</option>
+<option class="bg-surface-container text-on-surface">Redes &amp; Core C&amp;TI</option>
+<option class="bg-surface-container text-on-surface">Servidores &amp; CPD</option>
+<option class="bg-surface-container text-on-surface">Bélico / Controlado</option>
+</select>
+</div>
+</div>
+<!-- KPI Metrics Row (4 Cards) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm mb-space-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex flex-col justify-between relative overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">GRUPOS PRIMÁRIOS</span>
+<span class="material-symbols-outlined text-primary text-xl">folder_special</span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-on-surface leading-none">08</span>
+<span class="font-code-md text-code-md text-primary font-semibold">GRUPOS</span>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1 text-tertiary font-code-sm text-code-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>100% HOMOLOGADOS
+        </span>
+<span class="font-code-sm text-code-sm text-outline">DIR. EMAER</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex flex-col justify-between relative overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">SUBGRUPOS OPERACIONAIS</span>
+<span class="material-symbols-outlined text-secondary text-xl">account_tree</span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-on-surface leading-none">34</span>
+<span class="font-code-md text-code-md text-secondary font-semibold">CLASSES</span>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span class="text-primary font-code-sm text-code-sm">12 Alta Sensibilidade</span>
+<span class="px-1 py-0.2 bg-error-container/30 text-error font-code-sm text-code-sm rounded uppercase">Cripto</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex flex-col justify-between relative overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">TOTAL DE ATIVOS CLASSIFICADOS</span>
+<span class="material-symbols-outlined text-tertiary text-xl">devices</span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-on-surface leading-none">1.845</span>
+<span class="font-code-md text-code-md text-tertiary font-semibold">ITENS</span>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1 font-code-sm text-code-sm text-tertiary">
+<span class="material-symbols-outlined text-xs">qr_code_2</span>98.6% RFID/QR
+        </span>
+<span class="font-code-sm text-code-sm text-outline">AUDITADO 24H</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex flex-col justify-between relative overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">TAXA DE ROTATIVIDADE (CAUTELAS)</span>
+<span class="material-symbols-outlined text-primary-fixed text-xl">sync_alt</span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-display-lg text-display-lg font-bold text-primary-container leading-none">42%</span>
+<span class="font-code-md text-code-md text-primary font-semibold">ATIVA</span>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-code-sm text-code-sm text-on-surface">214 itens sob missão</span>
+<span class="font-code-sm text-code-sm text-tertiary font-medium">CAMPO OK</span>
+</div>
+</div>
+</div>
+<!-- Main Content Grid: 2-Column Tactical Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-lg">
+<!-- Left Column: Master Groups & Subgroups Accordion / Tree (5 of 12 cols on desktop) -->
+<div class="lg:col-span-5 flex flex-col gap-space-sm">
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary">view_list</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface uppercase">CATEGORIZAÇÃO ESTRUTURADA</h2>
+<p class="font-code-sm text-code-sm text-outline">8 Grupos Primários // 34 Subgrupos Ativos</p>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 bg-surface-container-high hover:bg-surface-container-highest text-primary font-code-sm text-code-sm rounded-DEFAULT transition-colors" type="button">
+            Expandir
+          </button>
+<button class="px-2 py-1 bg-surface-container hover:bg-surface-container-high text-outline hover:text-on-surface font-code-sm text-code-sm rounded-DEFAULT transition-colors" type="button">
+            Recolher
+          </button>
+</div>
+</div>
+<!-- Groups List Container -->
+<div class="flex flex-col gap-space-xs">
+<!-- Group 1: EXPANDED / ACTIVE -->
+<div class="bg-surface-container-low rounded-DEFAULT overflow-hidden">
+<div class="p-space-sm bg-surface-container-high flex items-center justify-between cursor-pointer select-none">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-primary text-base">expand_more</span>
+<span class="font-code-md text-code-md font-bold text-primary">GRP-01</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">TELECOMUNICAÇÕES &amp; RÁDIO TÁTICO</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-error-container/30 text-error font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                N3 CRÍTICO
+              </span>
+<span class="px-1.5 py-0.5 bg-surface-container font-code-sm text-code-sm text-on-surface-variant rounded-DEFAULT">
+                312 itens
+              </span>
+</div>
+</div>
+<!-- Subgroups Tree under GRP-01 -->
+<div class="p-space-xs flex flex-col gap-1 bg-surface-container-lowest/60">
+<!-- Subgroup 1 (Selected) -->
+<div class="flex items-center justify-between p-space-sm bg-secondary-container/20 rounded-DEFAULT cursor-pointer shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span class="font-code-sm text-code-sm font-bold text-secondary">SUB-01.1</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface truncate">Transceptores P25 Portáteis (APX 8000/6000)</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-secondary-container text-on-secondary-container font-code-sm text-code-sm font-bold rounded-DEFAULT">64</span>
+<span class="material-symbols-outlined text-primary text-sm">chevron_right</span>
+</div>
+</div>
+<!-- Subgroup 2 -->
+<div class="flex items-center justify-between p-space-sm hover:bg-surface-container rounded-DEFAULT cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm min-w-0 pl-space-xs">
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SUB-01.2</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Rádios Fixos e Estações Base Aeronáuticas</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">18 itens</span>
+</div>
+<!-- Subgroup 3 -->
+<div class="flex items-center justify-between p-space-sm hover:bg-surface-container rounded-DEFAULT cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm min-w-0 pl-space-xs">
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SUB-01.3</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Repetidores e Torres C2 (Ala 11 / Morro do Dendê)</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">8 itens</span>
+</div>
+<!-- Subgroup 4 -->
+<div class="flex items-center justify-between p-space-sm hover:bg-surface-container rounded-DEFAULT cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm min-w-0 pl-space-xs">
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SUB-01.4</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Carregadores Múltiplos e Baterias IMPRES</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">128 itens</span>
+</div>
+<!-- Subgroup 5 -->
+<div class="flex items-center justify-between p-space-sm hover:bg-surface-container rounded-DEFAULT cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm min-w-0 pl-space-xs">
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-medium">SUB-01.5</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Acessórios de Áudio Tático, PTT e Headsets</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">74 itens</span>
+</div>
+<!-- Subgroup 6 -->
+<div class="flex items-center justify-between p-space-sm hover:bg-surface-container rounded-DEFAULT cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm min-w-0 pl-space-xs">
+<span class="w-1 h-1 rounded-full bg-error"></span>
+<span class="font-code-sm text-code-sm text-error font-medium">SUB-01.6</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Chaves Criptográficas KVL e Módulos OTAR</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="px-1 py-0.2 bg-error-container/20 text-error font-code-sm text-code-sm rounded">RESTRITO</span>
+<span class="font-code-sm text-code-sm text-outline">20 itens</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group 2: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-02</span>
+<span class="font-body-md text-body-md text-on-surface truncate">ATIVOS DE REDE &amp; INFRAESTRUTURA CORE</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-tertiary-container/20 text-tertiary font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              ALTA DISPONIBILIDADE
+            </span>
+<span class="font-code-sm text-code-sm text-outline">5 Subgr // 245 itens</span>
+</div>
+</div>
+<!-- Group 3: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-03</span>
+<span class="font-body-md text-body-md text-on-surface truncate">PROCESSAMENTO, VIRTUALIZAÇÃO &amp; SERVIDORES</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-primary-container/20 text-primary font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              CPD / DATA CENTER
+            </span>
+<span class="font-code-sm text-code-sm text-outline">4 Subgr // 118 itens</span>
+</div>
+</div>
+<!-- Group 4: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-04</span>
+<span class="font-body-md text-body-md text-on-surface truncate">SEGURANÇA BÉLICA &amp; MATERIAL CONTROLADO</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-error-container/30 text-error font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              COFRE COMAER
+            </span>
+<span class="font-code-sm text-code-sm text-outline">3 Subgr // 85 itens</span>
+</div>
+</div>
+<!-- Group 5: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-05</span>
+<span class="font-body-md text-body-md text-on-surface truncate">ESTAÇÕES DE TRABALHO &amp; TERMINAIS MILITARES</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              CORPORATIVO
+            </span>
+<span class="font-code-sm text-code-sm text-outline">5 Subgr // 540 itens</span>
+</div>
+</div>
+<!-- Group 6: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-06</span>
+<span class="font-body-md text-body-md text-on-surface truncate">SISTEMAS DE CFTV &amp; CONTROLE DE ACESSO</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              SEGURANÇA ORGÂNICA
+            </span>
+<span class="font-code-sm text-code-sm text-outline">4 Subgr // 192 itens</span>
+</div>
+</div>
+<!-- Group 7: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-07</span>
+<span class="font-body-md text-body-md text-on-surface truncate">CABEAMENTO ESTRUTURADO &amp; PASSIVOS</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              INFRA FÍSICA
+            </span>
+<span class="font-code-sm text-code-sm text-outline">4 Subgr // 280 itens</span>
+</div>
+</div>
+<!-- Group 8: Collapsed -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm hover:bg-surface-container transition-colors flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">GRP-08</span>
+<span class="font-body-md text-body-md text-on-surface truncate">FERRAMENTAL DE PRECISÃO &amp; INSTRUMENTAÇÃO</span>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="px-1.5 py-0.5 bg-surface-container-highest text-on-surface-variant font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+              LABORATÓRIO
+            </span>
+<span class="font-code-sm text-code-sm text-outline">3 Subgr // 64 itens</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Deep Inspection Panel for Selected Subgroup (7 of 12 cols on desktop) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Subgroup Profile Header Card -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-sm pb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs font-label-tactical text-label-tactical text-outline uppercase mb-1">
+<span>GRUPO PAI:</span>
+<span class="text-primary font-bold">GRP-01 // TELECOMUNICAÇÕES &amp; RÁDIO TÁTICO</span>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface flex items-center gap-space-xs">
+              SUB-01.1 — Transceptores P25 Portáteis (APX 8000/6000)
+            </h3>
+<p class="font-code-sm text-code-sm text-on-surface-variant mt-1">
+              GESTOR TÉCNICO: <span class="text-on-surface font-semibold">2º Sgt Silva (SARAM 6842910)</span> // HOMOLOGADOR: <span class="text-primary">1º Ten Cavalcanti</span>
+</p>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<button class="px-space-sm py-1 bg-surface-container-high hover:bg-surface-container-highest text-primary font-code-sm text-code-sm rounded-DEFAULT flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">edit</span>
+              Editar
+            </button>
+<button class="px-space-sm py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-code-sm text-code-sm rounded-DEFAULT flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">print</span>
+              Imprimir
+            </button>
+</div>
+</div>
+<!-- Operational Parameters (Grid of 4 micro-badges) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-space-xs pt-space-sm">
+<div class="p-space-xs bg-surface-container rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline block uppercase">TEMPO DE CAUTELA</span>
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">24h / 12h Turno</span>
+</div>
+<div class="p-space-xs bg-surface-container rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline block uppercase">NÍVEL DE ACESSO</span>
+<span class="font-code-sm text-code-sm font-semibold text-secondary">NÍVEL 3 (Sargento+)</span>
+</div>
+<div class="p-space-xs bg-surface-container rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline block uppercase">CRIPTOGRAFIA</span>
+<span class="font-code-sm text-code-sm font-semibold text-tertiary">AES-256 P25 FASE 2</span>
+</div>
+<div class="p-space-xs bg-surface-container rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline block uppercase">MANUT. PREVENTIVA</span>
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">A cada 90 dias</span>
+</div>
+</div>
+</div>
+<!-- Inventory Breakdown & Tactical Gauge -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-base">pie_chart</span>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">DISTRIBUIÇÃO DE ESTOQUE (64 ITENS)</h4>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary font-bold">100% AUDITADO</span>
+</div>
+<!-- Multi-segment visual bar -->
+<div class="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden flex mb-space-sm">
+<div class="bg-tertiary h-full" style="width: 59.375%;" title="38 Disponíveis (59.4%)"></div>
+<div class="bg-primary h-full" style="width: 28.125%;" title="18 Cautelados em Missão (28.1%)"></div>
+<div class="bg-error h-full" style="width: 9.375%;" title="6 Em Manutenção (9.4%)"></div>
+<div class="bg-secondary-container h-full" style="width: 3.125%;" title="2 Carga Externa (3.1%)"></div>
+</div>
+<!-- Legend -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary flex-shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-bold text-on-surface">38 ITENS</span>
+<span class="font-body-sm text-body-sm text-outline">Prontos / Cofre</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-bold text-on-surface">18 ITENS</span>
+<span class="font-body-sm text-body-sm text-outline">Em Cautela Ativa</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-error flex-shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-bold text-on-surface">06 ITENS</span>
+<span class="font-body-sm text-body-sm text-outline">Bancada / Calibração</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container flex-shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm font-bold text-on-surface">02 ITENS</span>
+<span class="font-body-sm text-body-sm text-outline">CINDACTA / Carga</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tactical Asset Table (Top Assets in this Subgroup) -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT flex flex-col">
+<div class="flex items-center justify-between pb-space-sm mb-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-base">format_list_bulleted</span>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">ATIVOS VINCULADOS (AMOSTRA TÁTICA)</h4>
+</div>
+<button class="font-code-sm text-code-sm text-primary hover:underline flex items-center gap-1" type="button">
+            Ver Todos os 64 Ativos
+            <span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="font-label-tactical text-label-tactical text-outline uppercase bg-surface-container">
+<th class="py-2 px-3">BMP / IDENTIFICADOR</th>
+<th class="py-2 px-3">MODELO / ESPECIFICAÇÃO</th>
+<th class="py-2 px-3">SERIAL (S/N)</th>
+<th class="py-2 px-3">LOCALIZAÇÃO / CAUTELA</th>
+<th class="py-2 px-3 text-right">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2 px-3 font-code-sm text-code-sm font-bold text-primary">BMP-77401</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface">Motorola APX 8000 VHF/UHF/700-800</td>
+<td class="py-2 px-3 font-code-sm text-code-sm text-on-surface-variant">428CNP1982</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-primary">Cautela (2º Sgt Silva)</td>
+<td class="py-2 px-3 text-right">
+<span class="inline-flex items-center px-1.5 py-0.5 bg-tertiary-container/20 text-tertiary font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                    OPERACIONAL
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/60 transition-colors bg-surface-container/20">
+<td class="py-2 px-3 font-code-sm text-code-sm font-bold text-primary">BMP-77402</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface">Motorola APX 8000 VHF/UHF/700-800</td>
+<td class="py-2 px-3 font-code-sm text-code-sm text-on-surface-variant">428CNP1983</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface-variant">Almoxarifado (Cofre C&amp;TI)</td>
+<td class="py-2 px-3 text-right">
+<span class="inline-flex items-center px-1.5 py-0.5 bg-tertiary-container/20 text-tertiary font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                    PRONTO
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2 px-3 font-code-sm text-code-sm font-bold text-primary">BMP-77405</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface">Motorola APX 6000 Monobanda VHF</td>
+<td class="py-2 px-3 font-code-sm text-code-sm text-on-surface-variant">312BNQ0041</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-error">Bancada RF (Ajuste Potência)</td>
+<td class="py-2 px-3 text-right">
+<span class="inline-flex items-center px-1.5 py-0.5 bg-error-container/30 text-error font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                    EM REPARO
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/60 transition-colors bg-surface-container/20">
+<td class="py-2 px-3 font-code-sm text-code-sm font-bold text-primary">BMP-77410</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface">Motorola APX 8000XE Rugged Alta Tensão</td>
+<td class="py-2 px-3 font-code-sm text-code-sm text-on-surface-variant">554DXP8812</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-secondary">Pelotão Especial (Op. Ágata)</td>
+<td class="py-2 px-3 text-right">
+<span class="inline-flex items-center px-1.5 py-0.5 bg-secondary-container text-on-secondary-container font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                    EM MISSÃO
+                  </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2 px-3 font-code-sm text-code-sm font-bold text-primary">BMP-77414</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface">Motorola APX 8000 VHF/UHF/700-800</td>
+<td class="py-2 px-3 font-code-sm text-code-sm text-on-surface-variant">428CNP2100</td>
+<td class="py-2 px-3 font-body-sm text-body-sm text-on-surface-variant">Almoxarifado (Cofre C&amp;TI)</td>
+<td class="py-2 px-3 text-right">
+<span class="inline-flex items-center px-1.5 py-0.5 bg-tertiary-container/20 text-tertiary font-label-tactical text-label-tactical rounded-DEFAULT uppercase">
+                    PRONTO
+                  </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Allocation & Security Policies (Checkboxes / Toggles) -->
+<div class="bg-surface-container-low p-space-md rounded-DEFAULT">
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-base">security</span>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">MATRIZ DE PERMISSÕES &amp; REGRAS DE CAUTELA</h4>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">lock</span> POLÍTICA ATIVA
+          </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<label class="flex items-start gap-space-sm p-space-sm bg-surface-container rounded-DEFAULT cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Termo Digital Obrigatório</span>
+<span class="font-code-sm text-code-sm text-outline">Exigir assinatura eletrônica via SARAM/Certificado FAB</span>
+</div>
+</label>
+<label class="flex items-start gap-space-sm p-space-sm bg-surface-container rounded-DEFAULT cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Autorização Especial CB/SD</span>
+<span class="font-code-sm text-code-sm text-outline">Permitir cautela por soldados mediante despacho do Chefe C&amp;TI</span>
+</div>
+</label>
+<label class="flex items-start gap-space-sm p-space-sm bg-surface-container rounded-DEFAULT cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Alerta de Cautela Estendida (&gt;48h)</span>
+<span class="font-code-sm text-code-sm text-outline">Disparo automático de alerta para Oficial de Dia e Encarregado</span>
+</div>
+</label>
+<label class="flex items-start gap-space-sm p-space-sm bg-surface-container rounded-DEFAULT cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Rastreamento Georreferenciado</span>
+<span class="font-code-sm text-code-sm text-outline">Vincular localização APRS / P25 do terminal ao mapa operacional</span>
+</div>
+</label>
+</div>
+<!-- Action Toolbar for Selected Subgroup -->
+<div class="mt-space-md pt-space-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-outline">
+<span class="material-symbols-outlined text-sm">history</span>
+<span>Última modificação de norma: 04/Out 11:24 por Maj Barreto</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1 bg-surface-container hover:bg-surface-container-highest text-on-surface font-code-sm text-code-sm rounded-DEFAULT transition-colors" type="button">
+              Adicionar Itens em Lote
+            </button>
+<button class="px-space-md py-1 bg-primary hover:bg-primary/90 text-on-primary font-code-sm text-code-sm font-bold rounded-DEFAULT transition-colors" type="button">
+              Salvar Alterações
+            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div><footer class="fixed bottom-0 left-0 right-0 h-10 bg-surface-container-lowest z-50 flex items-center justify-between px-gutter-desktop shadow-[0_-1px_4px_rgba(0,0,0,0.06)]"><div class="flex items-center gap-space-md font-code-sm text-code-sm"><div class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="text-outline font-label-tactical text-label-tactical uppercase">SQLITE WAL:</span><span class="text-tertiary">SYNC ACTIVE</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">SHA-256:</span><span class="text-on-surface font-code-sm text-code-sm">a9f4c3...81e2 [INTEGRITY OK]</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ESTADO:</span><span class="px-1.5 py-0.2 bg-surface-container text-primary rounded-DEFAULT font-label-tactical text-label-tactical uppercase">DEFCON 4 // NORMAL</span></div></div><div class="flex items-center gap-space-md text-outline font-code-sm text-code-sm"><div class="hidden md:flex items-center gap-space-sm"><span>[F1] AJUDA</span><span>[F2] TERMINAL</span><span>[F5] SINCRONIZAR</span><span>[ESC] CANCELAR</span></div><div class="flex items-center gap-space-xs text-on-surface-variant"><span class="material-symbols-outlined text-sm text-tertiary">verified_user</span><span>ALA 11 SECURE CHANNEL</span></div></div></footer></body></html>

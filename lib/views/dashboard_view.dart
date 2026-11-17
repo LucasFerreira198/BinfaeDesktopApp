@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,8 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   int _selectedIndex = 0;
   final FocusNode _searchFocusNode = FocusNode();
+  DateTime _now = DateTime.now();
+  Timer? _nowTimer;
 
   // Wedge Barcode Scanner buffer
   String _barcodeBuffer = '';
@@ -71,6 +74,11 @@ class _DashboardViewState extends State<DashboardView> {
 
     // Registra listener de teclado global para atalhos e scanner USB Wedge
     HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+
+    // Timer de Telemetria e Relógios Táticos (BRT / ZULU)
+    _nowTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _now = DateTime.now());
+    });
   }
 
   Future<void> _toggleFullScreen() async {
@@ -89,6 +97,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   void dispose() {
+    _nowTimer?.cancel();
     HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     _searchFocusNode.dispose();
     super.dispose();
@@ -622,91 +631,68 @@ class _DashboardViewState extends State<DashboardView> {
     return Scaffold(
       body: Row(
         children: [
-          // Sidebar Esquerda Responsiva / Retrátil (Largura 240px ou 72px)
+          // Sidebar Esquerda Responsiva / Retrátil (Largura 260px ou 72px)
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            width: isCollapsed ? 72 : 240,
+            width: isCollapsed ? 72 : 260,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0B0F19) : Colors.white,
+              color: isDark ? AppColors.surfaceContainerLow : Colors.white,
               border: Border(
                 right: BorderSide(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                  color: isDark ? AppColors.outlineVariant : const Color(0xFFE2E8F0),
                   width: 1,
                 ),
               ),
             ),
             child: Column(
               children: [
-                // Top Header Brand (Escudo Estilizado com Micro-servidor)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 12 : 18, vertical: 16),
+                // Top Header Brand (BINFAE-GL // Ala 11 // C&TI)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 12 : 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceContainer : const Color(0xFFF1F5F9),
+                  ),
                   child: Row(
                     mainAxisAlignment: isCollapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
                     children: [
-                      Tooltip(
-                        message: 'Informatica - BINFAE-GL',
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withOpacity(0.4),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              const Icon(Icons.shield_outlined, color: Colors.white, size: 22),
-                              Positioned(
-                                bottom: 10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(1.5),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                  child: const Icon(Icons.dns, color: Colors.white, size: 8),
-                                ),
-                              ),
-                            ],
-                          ),
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.primaryContainer.withOpacity(0.4)),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.military_tech_rounded, color: AppColors.primary, size: 22),
                         ),
                       ),
                       if (!isCollapsed) ...[
                         const SizedBox(width: 12),
-                        Expanded(
+                        const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Informatica',
+                                'BINFAE-GL',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.3,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  letterSpacing: 0.8,
+                                  color: AppColors.primary,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                'BINFAE-GL',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primaryLight,
-                                  letterSpacing: 0.5,
+                                'Ala 11 // C&TI',
+                                style: TextStyle(
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.onSurfaceVariant,
+                                  letterSpacing: 0.6,
                                 ),
                                 maxLines: 1,
                               ),
@@ -717,8 +703,46 @@ class _DashboardViewState extends State<DashboardView> {
                     ],
                   ),
                 ),
-                const Divider(height: 1, thickness: 1),
-                const SizedBox(height: 10),
+
+                // Tactical Navigation Ribbon (NAVEGAÇÃO TÁTICA / 12 NÓS)
+                if (!isCollapsed)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    color: isDark ? AppColors.surfaceContainerLowest : const Color(0xFFE2E8F0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'NAVEGAÇÃO TÁTICA',
+                          style: TextStyle(
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.8,
+                            color: AppColors.outline,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.surfaceContainerHigh : Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            '12 NÓS',
+                            style: TextStyle(
+                              fontFamily: 'JetBrains Mono',
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tertiary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 6),
 
                 // Lista de Itens de Navegação com suporte a modo compacto
                 Expanded(
@@ -747,7 +771,7 @@ class _DashboardViewState extends State<DashboardView> {
                           index: 2,
                           currentIndex: _selectedIndex,
                           label: 'Cautelas e Missões',
-                          icon: Icons.assignment_turned_in_outlined,
+                          icon: Icons.fact_check_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
                           onTap: () => setState(() => _selectedIndex = 2),
@@ -804,7 +828,7 @@ class _DashboardViewState extends State<DashboardView> {
                           index: 6,
                           currentIndex: _selectedIndex,
                           label: 'Relatório Diário (24h)',
-                          icon: Icons.assignment_outlined,
+                          icon: Icons.summarize_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
                           onTap: () => setState(() => _selectedIndex = 6),
@@ -813,23 +837,17 @@ class _DashboardViewState extends State<DashboardView> {
                           index: 7,
                           currentIndex: _selectedIndex,
                           label: 'Locais Físicos',
-                          icon: Icons.place_outlined,
+                          icon: Icons.location_on_outlined,
                           isDark: isDark,
                           isCollapsed: isCollapsed,
                           badgeWidget: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.16),
-                              borderRadius: BorderRadius.circular(6),
+                              color: AppColors.tertiary.withOpacity(0.16),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.tertiary.withOpacity(0.3), width: 0.8),
                             ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.insights, size: 10, color: AppColors.primaryLight),
-                                SizedBox(width: 2),
-                                Text('Árvore', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
-                              ],
-                            ),
+                            child: const Text('Árvore', style: TextStyle(fontFamily: 'JetBrains Mono', fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.tertiary)),
                           ),
                           onTap: () => setState(() => _selectedIndex = 7),
                         ),
@@ -875,190 +893,96 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                 ),
 
-                // Indicador de Leitor USB Wedge
-                isCollapsed
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Tooltip(
-                          message: 'Leitor USB Wedge Ativo',
-                          child: const Icon(Icons.qr_code_scanner, size: 18, color: AppColors.primaryLight),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.qr_code_scanner, size: 14, color: AppColors.primaryLight),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Leitor USB Wedge Ativo',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                // Status de Sincronização em RAM no Rodapé
-                isCollapsed
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Tooltip(
-                          message: stock.isSyncing
-                              ? 'Sincronizando...'
-                              : (stock.syncError != null ? 'Erro de conexão' : 'Banco em 0ms (RAM) - Clique para sincronizar'),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.refresh,
-                              size: 18,
+                // Rodapé Tático da Sidebar (SQLite Local + Proxy BAGL)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF1F5F9),
+                    border: Border(
+                      top: BorderSide(color: isDark ? AppColors.outlineVariant : const Color(0xFFE2E8F0)),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
                               color: stock.syncError != null
-                                  ? AppColors.danger
-                                  : (stock.isSyncing ? AppColors.warning : AppColors.success),
+                                  ? AppColors.error
+                                  : (stock.isSyncing ? AppColors.warning : AppColors.tertiary),
                             ),
-                            onPressed: stock.isSyncing ? null : () => stock.syncData(),
                           ),
-                        ),
-                      )
-                    : Container(
-                        margin: const EdgeInsets.all(12),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: stock.syncError != null
-                                    ? AppColors.danger
-                                    : (stock.isSyncing ? AppColors.warning : AppColors.success),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
+                          const SizedBox(width: 8),
+                          if (!isCollapsed) ...[
                             Expanded(
                               child: Text(
                                 stock.isSyncing
                                     ? 'Sincronizando...'
-                                    : (stock.syncError != null ? 'Erro de conexão' : 'Banco em 0ms (RAM)'),
+                                    : (stock.syncError != null ? 'Erro SQLite' : 'SQLite Local: OK'),
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white70 : const Color(0xFF475569),
+                                  color: isDark ? AppColors.onSurfaceVariant : const Color(0xFF475569),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.refresh, size: 16),
-                              tooltip: 'Sincronizar (F5)',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.surfaceContainerHigh : Colors.white,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text('F5', style: TextStyle(fontFamily: 'JetBrains Mono', fontSize: 9, color: AppColors.outline)),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (!isCollapsed) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'SARAM LINK',
+                              style: TextStyle(
+                                fontFamily: 'JetBrains Mono',
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.outline,
+                              ),
+                            ),
+                            Text(
+                              apiService.proxyEnabled ? 'PROXY PORT 8080' : 'ENCRIPTADO',
+                              style: const TextStyle(
+                                fontFamily: 'JetBrains Mono',
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.tertiary,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-
-                // Cartão de Perfil Militar
-                isCollapsed
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Tooltip(
-                          message: 'Meu Perfil: ${user?.displayName ?? "Operador"}',
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => const UserProfileDialog(),
-                              );
-                            },
-                            child: UserAvatar(
-                              fotoUrl: user?.fotoUrl,
-                              name: user?.displayName,
-                              radius: 18,
-                              iconSize: 18,
-                            ),
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: 1.0,
+                            minHeight: 3,
+                            backgroundColor: AppColors.surfaceContainerHighest,
+                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.tertiary),
                           ),
                         ),
-                      )
-                    : Container(
-                        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => const UserProfileDialog(),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Row(
-                                children: [
-                                  UserAvatar(
-                                    fotoUrl: user?.fotoUrl,
-                                    name: user?.displayName,
-                                    radius: 17,
-                                    iconSize: 16,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          user?.displayName ?? 'S2 D. PAULA',
-                                          style: TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              isAdmin ? 'Administrador TI' : 'Operador TI',
-                                              style: const TextStyle(
-                                                fontSize: 9.5,
-                                                color: AppColors.cyan,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            const Icon(Icons.edit_outlined, size: 10, color: AppColors.cyan),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -1067,15 +991,15 @@ class _DashboardViewState extends State<DashboardView> {
           Expanded(
             child: Column(
               children: [
-                // Header Superior Responsivo
+                // Header Superior Responsivo Tático (Google Stitch Layout)
                 Container(
-                  height: 64,
+                  height: 60,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0E1422) : Colors.white,
+                    color: isDark ? AppColors.surfaceContainerLowest : Colors.white,
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                        color: isDark ? AppColors.outlineVariant : const Color(0xFFE2E8F0),
                         width: 1,
                       ),
                     ),
@@ -1083,13 +1007,13 @@ class _DashboardViewState extends State<DashboardView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Botão Toggle Sidebar + Título da View Atual
+                      // Esquerda: Toggle Sidebar + Título da Tela + Tag Militar
                       Flexible(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(isCollapsed ? Icons.menu : Icons.menu_open, size: 22),
+                              icon: Icon(isCollapsed ? Icons.menu : Icons.menu_open, size: 20),
                               tooltip: isCollapsed ? 'Expandir Menu Lateral' : 'Recolher Menu Lateral',
                               onPressed: () {
                                 setState(() {
@@ -1098,71 +1022,157 @@ class _DashboardViewState extends State<DashboardView> {
                                 });
                               },
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Icon(
                               _selectedIndex < icons.length ? icons[_selectedIndex] : Icons.inventory_2_outlined,
-                              size: 20,
-                              color: AppColors.primaryLight,
+                              size: 19,
+                              color: AppColors.primary,
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 _selectedIndex < titles.length ? titles[_selectedIndex] : 'Informatica - BINFAE-GL',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w800,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: isDark ? AppColors.onSurface : const Color(0xFF0F172A),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+                            if (screenWidth >= 1200) ...[
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'v2.4.0',
+                                  style: TextStyle(
+                                    fontFamily: 'JetBrains Mono',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
 
-                      // Ações do Header (Notificação Discreta de Download + Tela Cheia + Tema + Perfil Dropdown)
+                      // Direita: Status da API, Relógios Táticos, Busca e Perfil
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Status API Online com ponto pulsante (Stitch Telemetry)
+                          if (screenWidth >= 1150) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.tertiary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'API ONLINE',
+                                    style: TextStyle(
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.tertiary,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    '(28ms)',
+                                    style: TextStyle(
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 10,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+
+                          // Relógios Táticos Dual (BRT / ZULU)
+                          if (screenWidth >= 980) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.surfaceContainerLow : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'BRT: ${_now.hour.toString().padLeft(2, '0')}:${_now.minute.toString().padLeft(2, '0')}:${_now.second.toString().padLeft(2, '0')}',
+                                    style: const TextStyle(
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 6),
+                                    child: Text('|', style: TextStyle(color: AppColors.outlineVariant)),
+                                  ),
+                                  Text(
+                                    'ZULU: ${_now.toUtc().hour.toString().padLeft(2, '0')}:${_now.toUtc().minute.toString().padLeft(2, '0')}:${_now.toUtc().second.toString().padLeft(2, '0')}Z',
+                                    style: const TextStyle(
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.tertiary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+
+                          // Notificação de Release se houver
                           if (_latestRelease != null) ...[
                             MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () => UpdaterService.showUpdateModal(context, _latestRelease!),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth < 950 ? 8 : 12,
-                                    vertical: 6,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withOpacity(0.35),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                                    color: AppColors.primaryContainer,
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.download_rounded, size: 14, color: Colors.white),
-                                      if (screenWidth >= 950) ...[
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          '[${_latestRelease!.version.isNotEmpty ? "v${_latestRelease!.version}" : _latestRelease!.tag} disponível]',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
+                                      const Icon(Icons.download_rounded, size: 13, color: Colors.white),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _latestRelease!.version.isNotEmpty ? "v${_latestRelease!.version}" : _latestRelease!.tag,
+                                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1177,13 +1187,13 @@ class _DashboardViewState extends State<DashboardView> {
                             child: GestureDetector(
                               onTap: _openCommandPalette,
                               child: Container(
-                                height: 34,
+                                height: 32,
                                 padding: const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(10),
+                                  color: isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1),
+                                    color: isDark ? AppColors.outlineVariant : const Color(0xFFCBD5E1),
                                   ),
                                 ),
                                 child: Row(
@@ -1192,37 +1202,32 @@ class _DashboardViewState extends State<DashboardView> {
                                     Icon(
                                       Icons.search,
                                       size: 15,
-                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                      color: isDark ? AppColors.outline : const Color(0xFF64748B),
                                     ),
-                                    if (screenWidth >= 920) ...[
-                                      const SizedBox(width: 8),
+                                    if (screenWidth >= 880) ...[
+                                      const SizedBox(width: 6),
                                       Text(
-                                        'Buscar comandos...',
+                                        'Busca rápida...',
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                          fontSize: 11,
+                                          color: isDark ? AppColors.outline : const Color(0xFF64748B),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                    ] else ...[
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: 6),
                                     ],
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(
-                                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
-                                        ),
+                                        color: isDark ? AppColors.surfaceContainerHigh : const Color(0xFFE2E8F0),
+                                        borderRadius: BorderRadius.circular(3),
                                       ),
-                                      child: Text(
-                                        'Ctrl + K',
+                                      child: const Text(
+                                        'Ctrl+K',
                                         style: TextStyle(
-                                          fontSize: 9.5,
+                                          fontSize: 9,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'monospace',
-                                          color: isDark ? Colors.white70 : const Color(0xFF334155),
+                                          fontFamily: 'JetBrains Mono',
+                                          color: AppColors.outline,
                                         ),
                                       ),
                                     ),
@@ -1235,28 +1240,27 @@ class _DashboardViewState extends State<DashboardView> {
 
                           // Botão de Tela Cheia (F11)
                           IconButton(
-                            icon: Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 22),
+                            icon: Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 20),
                             tooltip: _isFullScreen ? 'Sair da Tela Cheia (F11)' : 'Tela Cheia (F11)',
                             onPressed: _toggleFullScreen,
                           ),
-                          const SizedBox(width: 4),
 
                           // Botão de Tema
                           IconButton(
-                            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
+                            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 19),
                             tooltip: 'Alternar Tema Claro/Escuro',
                             onPressed: () => themeProv.toggleTheme(),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
 
-                          // Dropdown de Perfil Militar (S2 D. PAULA / Usuário)
+                          // Dropdown de Perfil Militar Tático (Stitch Profile Badge)
                           PopupMenuButton<String>(
                             tooltip: 'Opções de Conta',
                             offset: const Offset(0, 48),
-                            color: isDark ? const Color(0xFF151D2F) : Colors.white,
+                            color: isDark ? AppColors.surfaceContainerHigh : Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              side: BorderSide(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(color: isDark ? AppColors.outlineVariant : const Color(0xFFE2E8F0)),
                             ),
                             onSelected: (val) {
                               if (val == 'profile') {
@@ -1293,7 +1297,7 @@ class _DashboardViewState extends State<DashboardView> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(user?.displayName ?? 'S2 D. PAULA', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                        const Text('Editar Meu Perfil & Foto', style: TextStyle(fontSize: 10, color: AppColors.cyan)),
+                                        const Text('Editar Meu Perfil & Foto', style: TextStyle(fontSize: 10, color: AppColors.primary)),
                                       ],
                                     ),
                                   ],
@@ -1315,7 +1319,7 @@ class _DashboardViewState extends State<DashboardView> {
                                 value: 'fullscreen',
                                 child: Row(
                                   children: [
-                                    Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 18, color: AppColors.primaryLight),
+                                    Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen, size: 18, color: AppColors.primary),
                                     const SizedBox(width: 10),
                                     Text(_isFullScreen ? 'Sair da Tela Cheia (F11)' : 'Tela Cheia (F11)', style: const TextStyle(fontSize: 13)),
                                   ],
@@ -1325,7 +1329,7 @@ class _DashboardViewState extends State<DashboardView> {
                                 value: 'update',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.system_update_alt, size: 18, color: AppColors.primaryLight),
+                                    Icon(Icons.system_update_alt, size: 18, color: AppColors.primary),
                                     SizedBox(width: 10),
                                     Text('Verificar Atualizações', style: TextStyle(fontSize: 13)),
                                   ],
@@ -1336,7 +1340,7 @@ class _DashboardViewState extends State<DashboardView> {
                                 child: Row(
                                   children: [
                                     Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 18),
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10),
                                     Text(isDark ? 'Modo Claro' : 'Modo Escuro', style: const TextStyle(fontSize: 13)),
                                   ],
                                 ),
@@ -1356,50 +1360,68 @@ class _DashboardViewState extends State<DashboardView> {
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth < 950 ? 6 : 10,
-                                  vertical: 5,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF151D2F) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: isDark ? AppColors.surfaceContainerLow : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0),
+                                    color: isDark ? AppColors.outlineVariant : const Color(0xFFE2E8F0),
                                   ),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    UserAvatar(
-                                      fotoUrl: user?.fotoUrl,
-                                      name: user?.displayName,
-                                      radius: 14,
-                                      iconSize: 14,
-                                    ),
-                                    if (screenWidth >= 950) ...[
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        user?.displayName ?? 'S2 D. PAULA',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                      if (isAdmin) ...[
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(8),
+                                    if (screenWidth >= 820) ...[
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            user?.displayName ?? '2º Sgt Silva',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? AppColors.onSurface : const Color(0xFF0F172A),
+                                            ),
                                           ),
-                                          child: const Text('ADMIN', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
+                                          Text(
+                                            'SARAM ${user?.militar?.saram ?? 6842910}',
+                                            style: const TextStyle(
+                                              fontFamily: 'JetBrains Mono',
+                                              fontSize: 9.5,
+                                              color: AppColors.secondary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(width: 8),
+                                    ],
+                                    Stack(
+                                      children: [
+                                        UserAvatar(
+                                          fotoUrl: user?.fotoUrl,
+                                          name: user?.displayName,
+                                          radius: 14,
+                                          iconSize: 14,
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            width: 7,
+                                            height: 7,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: AppColors.tertiary,
+                                              border: Border.all(color: isDark ? AppColors.surfaceContainerLow : Colors.white, width: 1),
+                                            ),
+                                          ),
                                         ),
                                       ],
-                                    ],
+                                    ),
                                     const SizedBox(width: 4),
-                                    const Icon(Icons.arrow_drop_down, size: 18),
+                                    const Icon(Icons.expand_more_rounded, size: 16, color: AppColors.outline),
                                   ],
                                 ),
                               ),
@@ -1460,29 +1482,21 @@ class _NavHoverItemState extends State<_NavHoverItem> {
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       padding: EdgeInsets.symmetric(
-        horizontal: isCollapsed ? 8 : 14,
-        vertical: 10,
+        horizontal: isCollapsed ? 8 : 12,
+        vertical: 8,
       ),
       decoration: BoxDecoration(
         color: active
-            ? (widget.isDark ? AppColors.cyan.withOpacity(0.12) : const Color(0xFFE6FFFA))
+            ? AppColors.primaryContainer
             : (_isHovered
-                ? (widget.isDark ? const Color(0xFF151D2A) : const Color(0xFFF8FAFC))
+                ? (widget.isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF1F5F9))
                 : Colors.transparent),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: active
-              ? (widget.isDark ? AppColors.cyan.withOpacity(0.7) : AppColors.cyan)
-              : (_isHovered
-                  ? (widget.isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0))
-                  : Colors.transparent),
-          width: 1.2,
-        ),
-        boxShadow: active && widget.isDark
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: active
             ? [
                 BoxShadow(
-                  color: AppColors.cyan.withOpacity(0.18),
-                  blurRadius: 10,
+                  color: AppColors.primaryContainer.withOpacity(0.35),
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ]
@@ -1497,10 +1511,10 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                     widget.icon,
                     size: 20,
                     color: active
-                        ? AppColors.cyan
+                        ? Colors.white
                         : (_isHovered
-                            ? (widget.isDark ? Colors.white : AppColors.cyan)
-                            : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+                            ? (widget.isDark ? AppColors.onSurface : const Color(0xFF0F172A))
+                            : (widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF64748B))),
                   ),
                   if (widget.badgeWidget != null)
                     Positioned(
@@ -1524,10 +1538,10 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                   widget.icon,
                   size: 19,
                   color: active
-                      ? AppColors.cyan
+                      ? Colors.white
                       : (_isHovered
-                          ? (widget.isDark ? Colors.white : AppColors.cyan)
-                          : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+                          ? (widget.isDark ? AppColors.onSurface : const Color(0xFF0F172A))
+                          : (widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF64748B))),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -1537,10 +1551,10 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                       fontSize: 13,
                       fontWeight: active ? FontWeight.bold : (_isHovered ? FontWeight.w600 : FontWeight.w500),
                       color: active
-                          ? (widget.isDark ? Colors.white : AppColors.cyanDark)
+                          ? Colors.white
                           : (_isHovered
-                              ? (widget.isDark ? Colors.white : const Color(0xFF0F172A))
-                              : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569))),
+                              ? (widget.isDark ? AppColors.onSurface : const Color(0xFF0F172A))
+                              : (widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF475569))),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

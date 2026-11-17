@@ -97,250 +97,417 @@ class _StockViewState extends State<StockView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final stock = Provider.of<StockProvider>(context);
-
     final items = stock.filteredItems;
-    final groups = stock.groups;
     final filteredSubgroups = stock.selectedGroupId != null
         ? stock.subgroups.where((s) => s.grupoId == stock.selectedGroupId).toList()
         : stock.subgroups;
 
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. HEADER LOGISTICS PRO: TÍTULO, SUBTÍTULO & AÇÕES RÁPIDAS
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isCompact = constraints.maxWidth < 950;
-              final titleSection = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Materiais e Gestão de Estoque',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${stock.allItems.length} itens registrados no acervo de informática',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              );
+          // =========================================================================
+          // 1. TOP COMMAND & ACTION BAR (Google Stitch #09_StockView)
+          // =========================================================================
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 980;
 
-              final actionWidgets = [
-                SizedBox(
-                  width: constraints.maxWidth < 600 ? double.infinity : 280,
-                  height: 40,
-                  child: TextField(
-                    controller: _searchController,
-                    focusNode: _focusNode,
-                    onChanged: (val) => stock.setSearch(val),
-                    style: const TextStyle(fontSize: 12),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar por nome, BMP, serial...',
-                      hintStyle: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                      ),
-                      prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.cyan),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, size: 16),
-                              onPressed: () {
-                                _searchController.clear();
-                                stock.setSearch('');
-                              },
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.cyan, width: 1.5),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => const ItemFormDialog(),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.cyan,
-                    foregroundColor: const Color(0xFF0F172A),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    elevation: 2,
-                  ),
-                  icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
-                  label: const Text(
-                    'Novo Material',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: stock.isSyncing ? null : () => stock.syncData(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
-                  ),
-                  icon: stock.isSyncing
-                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.sync, size: 16),
-                  label: const Text('Sincronizar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                ),
-              ];
-
-              if (isCompact) {
-                return Column(
+                final titleSection = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    titleSection,
-                    const SizedBox(height: 12),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
                       crossAxisAlignment: WrapCrossAlignment.center,
-                      children: actionWidgets,
+                      spacing: 8,
+                      children: [
+                        const Icon(Icons.inventory_2, color: AppColors.primary, size: 22),
+                        const Text(
+                          'Catálogo de Materiais & Gestão de Estoque',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.tertiary.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.tertiary.withOpacity(0.3)),
+                          ),
+                          child: const Text(
+                            'STOCKVIEW PRO',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tertiary,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Acervo Geral de TI, Comunicações Militares & Equipamentos Táticos — BINFAE-GL / FAB',
+                      style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
                     ),
                   ],
                 );
-              }
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  titleSection,
-                  Row(
+                final actionButtons = Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    // Telemetry pills
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.tertiary,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${stock.allItems.length}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tertiary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            'ITENS ATIVOS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Sincronizar F5
+                    OutlinedButton.icon(
+                      onPressed: stock.isSyncing ? null : () => stock.syncData(),
+                      icon: stock.isSyncing
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                            )
+                          : const Icon(Icons.sync, size: 16, color: AppColors.primary),
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Sincronizar',
+                            style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: const Text('F5', style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline)),
+                          ),
+                        ],
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.5)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+                    // Novo Material
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => const ItemFormDialog(),
+                        );
+                      },
+                      icon: const Icon(Icons.add_box, size: 16, color: Color(0xFF00285D)),
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            '+ Novo Material',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF00285D),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: const Text(
+                              'Ctrl+N',
+                              style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: Color(0xFF00285D)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        elevation: 2,
+                      ),
+                    ),
+                  ],
+                );
+
+                if (isCompact) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      actionWidgets[0],
-                      const SizedBox(width: 10),
-                      actionWidgets[1],
-                      const SizedBox(width: 10),
-                      actionWidgets[2],
+                      titleSection,
+                      const SizedBox(height: 12),
+                      actionButtons,
                     ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: titleSection),
+                    const SizedBox(width: 16),
+                    actionButtons,
+                  ],
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // =========================================================================
+          // 2. SEARCH & METRIC BAR (Google Stitch #09_StockView)
+          // =========================================================================
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 980;
+
+              final searchAndChips = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Tactical search input
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.outlineVariant.withOpacity(0.4)),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _focusNode,
+                      onChanged: (val) => stock.setSearch(val),
+                      style: const TextStyle(fontSize: 12.5, color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Buscar por descrição, BMP, Nº de Série, MAC Address ou Código de Barras... (Ctrl+F)',
+                        hintStyle: const TextStyle(fontSize: 11.5, color: AppColors.outline),
+                        prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.primary),
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_searchController.text.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 16, color: AppColors.outline),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  stock.setSearch('');
+                                },
+                              ),
+                            Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'Ctrl+F',
+                                style: TextStyle(fontSize: 9.5, fontFamily: 'monospace', color: AppColors.outline),
+                              ),
+                            ),
+                          ],
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Quick Status Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildTacticalChip('Todos', '${stock.allItems.length}', stock.selectedStatus == null && !stock.lowStockOnly, AppColors.primary, () => stock.clearFilters()),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('No Depósito', '${stock.metrics.disponivel}', stock.selectedStatus == 'NO_DEPOSITO', AppColors.tertiary, () => stock.setStatus('NO_DEPOSITO')),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('No Setor', '${stock.metrics.noSetor}', stock.selectedStatus == 'NO_SETOR', AppColors.secondary, () => stock.setStatus('NO_SETOR')),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('Cautelado Missão', '${stock.metrics.cautelado}', stock.selectedStatus == 'CAUTELADO', AppColors.primary, () => stock.setStatus('CAUTELADO')),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('Em Manutenção', '${stock.metrics.manutencao}', stock.selectedStatus == 'EM_MANUTENCAO', AppColors.error, () => stock.setStatus('EM_MANUTENCAO')),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('Baixo Estoque', '', stock.lowStockOnly, AppColors.warning, () => stock.toggleLowStockOnly()),
+                      ],
+                    ),
                   ),
                 ],
               );
-            },
-          ),
 
-          const SizedBox(height: 16),
-
-          // 2. FILTROS RÁPIDOS EM CHIPS (Todos, Disponíveis, Cautelados, Manutenção + Grupos)
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isCompact = constraints.maxWidth < 950;
-              final chips = SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildPillChip('Todos', stock.selectedStatus == null && !stock.lowStockOnly, () => stock.clearFilters(), isDark),
-                    const SizedBox(width: 8),
-                    _buildPillChip('No Depósito', stock.selectedStatus == 'NO_DEPOSITO', () => stock.setStatus('NO_DEPOSITO'), isDark),
-                    const SizedBox(width: 8),
-                    _buildPillChip('Em Setores', stock.selectedStatus == 'NO_SETOR', () => stock.setStatus('NO_SETOR'), isDark),
-                    const SizedBox(width: 8),
-                    _buildPillChip('Cautelados', stock.selectedStatus == 'CAUTELADO', () => stock.setStatus('CAUTELADO'), isDark),
-                    const SizedBox(width: 8),
-                    _buildPillChip('Manutenção', stock.selectedStatus == 'EM_MANUTENCAO', () => stock.setStatus('EM_MANUTENCAO'), isDark),
-                    const SizedBox(width: 8),
-                    _buildPillChip('Baixo Estoque', stock.lowStockOnly, () => stock.toggleLowStockOnly(), isDark),
-                  ],
-                ),
-              );
-
-              final dropdowns = Row(
-                mainAxisSize: MainAxisSize.min,
+              final dropdownFilters = Row(
                 children: [
                   // Dropdown Grupo
-                  DropdownButtonHideUnderline(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                      ),
-                      child: DropdownButton<int?>(
-                        value: stock.selectedGroupId,
-                        isDense: true,
-                        hint: const Text('Grupo: Todos', style: TextStyle(fontSize: 11)),
-                        items: [
-                          const DropdownMenuItem(value: null, child: Text('Grupo: Todos', style: TextStyle(fontSize: 11))),
-                          ...stock.groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 11)))),
-                        ],
-                        onChanged: (v) => stock.setGroup(v),
-                      ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'GRUPO DE MATERIAL',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.outline,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 38,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceContainerLowest,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.outlineVariant.withOpacity(0.4)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int?>(
+                              value: stock.selectedGroupId,
+                              isExpanded: true,
+                              dropdownColor: AppColors.surfaceContainerHigh,
+                              hint: const Text('Todos os Grupos', style: TextStyle(fontSize: 11.5, color: Colors.white70)),
+                              items: [
+                                const DropdownMenuItem(value: null, child: Text('Todos os Grupos', style: TextStyle(fontSize: 11.5, color: Colors.white))),
+                                ...stock.groups.map((g) => DropdownMenuItem(value: g.id, child: Text(g.nome, style: const TextStyle(fontSize: 11.5, color: Colors.white)))),
+                              ],
+                              onChanged: (v) => stock.setGroup(v),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
                   // Dropdown Subgrupo
-                  DropdownButtonHideUnderline(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                      ),
-                      child: DropdownButton<int?>(
-                        value: stock.selectedSubgroupId,
-                        isDense: true,
-                        hint: const Text('Subgrupo: Todos', style: TextStyle(fontSize: 11)),
-                        items: [
-                          const DropdownMenuItem(value: null, child: Text('Subgrupo: Todos', style: TextStyle(fontSize: 11))),
-                          ...filteredSubgroups.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nome, style: const TextStyle(fontSize: 11)))),
-                        ],
-                        onChanged: (v) => stock.setSubgroup(v),
-                      ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'SUBGRUPO TÁTICO',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.outline,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 38,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceContainerLowest,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.outlineVariant.withOpacity(0.4)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int?>(
+                              value: stock.selectedSubgroupId,
+                              isExpanded: true,
+                              dropdownColor: AppColors.surfaceContainerHigh,
+                              hint: const Text('Todos os Subgrupos', style: TextStyle(fontSize: 11.5, color: Colors.white70)),
+                              items: [
+                                const DropdownMenuItem(value: null, child: Text('Todos os Subgrupos', style: TextStyle(fontSize: 11.5, color: Colors.white))),
+                                ...filteredSubgroups.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nome, style: const TextStyle(fontSize: 11.5, color: Colors.white)))),
+                              ],
+                              onChanged: (v) => stock.setSubgroup(v),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               );
 
-              if (isCompact) {
-                return Column(
+              if (isWide) {
+                return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    chips,
-                    const SizedBox(height: 10),
-                    dropdowns,
+                    Expanded(flex: 7, child: searchAndChips),
+                    const SizedBox(width: 14),
+                    Expanded(flex: 4, child: dropdownFilters),
                   ],
                 );
               }
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return Column(
                 children: [
-                  Expanded(child: chips),
-                  const SizedBox(width: 12),
-                  dropdowns,
+                  searchAndChips,
+                  const SizedBox(height: 10),
+                  dropdownFilters,
                 ],
               );
             },
@@ -348,7 +515,9 @@ class _StockViewState extends State<StockView> {
 
           const SizedBox(height: 14),
 
-          // 3. TABELA DE ESTOQUE MODERNA COM SUPORTE A MASTER-DETAIL SPLIT PANE
+          // =========================================================================
+          // 3. MAIN WORKSPACE: MILITARY INVENTORY GRID & INSPECTOR SPLIT
+          // =========================================================================
           Expanded(
             child: Focus(
               focusNode: _keyboardFocusNode,
@@ -362,14 +531,14 @@ class _StockViewState extends State<StockView> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
-                          child: _buildTableCard(items, isDark, stock, true),
+                          child: _buildTableCard(items, stock, true),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 14),
                         SizedBox(
                           width: 380,
                           child: DesktopItemInspectorPane(
                             item: _selectedItem!,
-                            isDark: isDark,
+                            isDark: true,
                             onClose: () {
                               setState(() {
                                 _isInspectorOpen = false;
@@ -394,7 +563,7 @@ class _StockViewState extends State<StockView> {
                     );
                   }
 
-                  return _buildTableCard(items, isDark, stock, false);
+                  return _buildTableCard(items, stock, false);
                 },
               ),
             ),
@@ -404,196 +573,346 @@ class _StockViewState extends State<StockView> {
     );
   }
 
-  Widget _buildTableCard(List<ItemModel> items, bool isDark, StockProvider stock, bool isSplit) {
+  Widget _buildTableCard(List<ItemModel> items, StockProvider stock, bool isSplit) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final minTableWidth = isSplit ? 650.0 : 880.0;
+        final minTableWidth = isSplit ? 680.0 : 920.0;
         final tableWidth = math.max(minTableWidth, constraints.maxWidth);
-        return Scrollbar(
-          thumbVisibility: constraints.maxWidth < minTableWidth,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: tableWidth,
-              child: Container(
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Tactical Header Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.outlineVariant.withOpacity(0.3)),
                   ),
                 ),
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Cabeçalho da Tabela
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                    Row(
+                      children: const [
+                        Icon(Icons.table_rows_outlined, size: 16, color: AppColors.secondary),
+                        SizedBox(width: 8),
+                        Text(
+                          'GRID TÁTICO DE PATRIMÔNIO // BINFAE-GL',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 48, child: Text('FOTO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 14),
-                          const Expanded(flex: 4, child: Text('NOME DO MATERIAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 110, child: Text('BMP / PATRIMÔNIO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 120, child: Text('CATEGORIA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 130, child: Text('QUANTIDADE / NÍVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const Expanded(flex: 3, child: Text('LOCALIZAÇÃO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 110, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          const SizedBox(width: 125, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        ],
-                      ),
+                      ],
                     ),
-
-                    // Lista de Linhas
-                    Expanded(
-                      child: items.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
-                                  const SizedBox(height: 12),
-                                  const Text('Nenhum material localizado no acervo.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                  const SizedBox(height: 4),
-                                  const Text('Tente buscar por outro termo ou limpe os filtros.', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                                ],
-                              ),
-                            )
-                          : ListView.separated(
-                              itemCount: items.length,
-                              separatorBuilder: (_, __) => Divider(
-                                height: 1,
-                                color: isDark ? const Color(0xFF1E2838) : const Color(0xFFF1F5F9),
-                              ),
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                final isSelected = _selectedItem?.id == item.id;
-                                return _LogisticsProRow(
-                                  item: item,
-                                  isDark: isDark,
-                                  isSelected: isSelected,
-                                  onTap: () {
-                                    _keyboardFocusNode.requestFocus();
-                                    final screenW = MediaQuery.of(context).size.width;
-                                    if (screenW >= 1100) {
-                                      setState(() {
-                                        _selectedItem = item;
-                                        _isInspectorOpen = true;
-                                      });
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (ctx) => ItemDetailDialog(
-                                          item: item,
-                                          onNavigateView: widget.onNavigate,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  onInspect: () {
-                                    setState(() {
-                                      _selectedItem = item;
-                                      _isInspectorOpen = true;
-                                    });
-                                  },
-                                  onNavigate: widget.onNavigate,
-                                );
-                              },
-                            ),
-                    ),
-
-                    // Rodapé de Paginação
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
-                        ),
-                        border: Border(
-                          top: BorderSide(
-                            color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.tertiary,
                           ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Mostrando ${items.length} de ${stock.allItems.length} materiais cadastrados',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              const Text('Página 1 de 1', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.chevron_left, size: 18),
-                                onPressed: null,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.chevron_right, size: 18),
-                                onPressed: null,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Auto-Sync Ativo',
+                          style: TextStyle(fontSize: 10.5, fontFamily: 'monospace', color: AppColors.tertiary),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          '${items.length} de ${stock.allItems.length} listados',
+                          style: const TextStyle(fontSize: 10.5, fontFamily: 'monospace', color: AppColors.outline),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-            ),
+
+              // Table Body with Horiz Scroll
+              Expanded(
+                child: Scrollbar(
+                  thumbVisibility: constraints.maxWidth < minTableWidth,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: tableWidth,
+                      child: Column(
+                        children: [
+                          // Column Headers
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceContainer,
+                              border: Border(
+                                bottom: BorderSide(color: AppColors.outlineVariant.withOpacity(0.2)),
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                SizedBox(
+                                  width: 110,
+                                  child: Text(
+                                    'BMP / CÓDIGO',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  flex: 4,
+                                  child: Text(
+                                    'DESCRIÇÃO & ESPECIFICAÇÃO',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 120,
+                                  child: Text(
+                                    'S/N - SÉRIE',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 130,
+                                  child: Text(
+                                    'LOCALIZAÇÃO',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 120,
+                                  child: Text(
+                                    'STATUS',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                SizedBox(
+                                  width: 110,
+                                  child: Text(
+                                    'AÇÕES',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Rows
+                          Expanded(
+                            child: items.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.inventory_2_outlined, size: 42, color: AppColors.outline.withOpacity(0.5)),
+                                        const SizedBox(height: 10),
+                                        const Text(
+                                          'Nenhum material localizado no acervo.',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Tente buscar por outro termo ou limpe os filtros.',
+                                          style: TextStyle(color: AppColors.outline, fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    itemCount: items.length,
+                                    separatorBuilder: (_, __) => Divider(
+                                      height: 1,
+                                      color: AppColors.outlineVariant.withOpacity(0.15),
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final item = items[index];
+                                      final isSelected = _selectedItem?.id == item.id;
+                                      return _TacticalStockRow(
+                                        item: item,
+                                        isSelected: isSelected,
+                                        onTap: () {
+                                          _keyboardFocusNode.requestFocus();
+                                          final screenW = MediaQuery.of(context).size.width;
+                                          if (screenW >= 1100) {
+                                            setState(() {
+                                              _selectedItem = item;
+                                              _isInspectorOpen = true;
+                                            });
+                                          } else {
+                                            showDialog(
+                                              context: context,
+                                              builder: (ctx) => ItemDetailDialog(
+                                                item: item,
+                                                onNavigateView: widget.onNavigate,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        onInspect: () {
+                                          setState(() {
+                                            _selectedItem = item;
+                                            _isInspectorOpen = true;
+                                          });
+                                        },
+                                        onNavigate: widget.onNavigate,
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Table Footer / Pagination
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  border: Border(
+                    top: BorderSide(color: AppColors.outlineVariant.withOpacity(0.3)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Exibindo ${items.length} de ${stock.allItems.length} registros',
+                      style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant),
+                    ),
+                    const Text(
+                      'SQLite 3.42 • 100% Sincronizado',
+                      style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildPillChip(String label, bool active, VoidCallback onTap, bool isDark) {
+  Widget _buildTacticalChip(String label, String count, bool active, Color color, VoidCallback onTap) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 140),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: active
-                ? (isDark ? AppColors.cyan.withOpacity(0.15) : const Color(0xFFE6FFFA))
-                : (isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9)),
+            color: active ? color : AppColors.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: active ? AppColors.cyan : (isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
+              color: active ? color : AppColors.outlineVariant.withOpacity(0.4),
             ),
           ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: active ? FontWeight.bold : FontWeight.w500,
-              color: active ? AppColors.cyan : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!active) ...[
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  color: active ? (color == AppColors.tertiary ? const Color(0xFF003827) : const Color(0xFF001B3E)) : Colors.white,
+                ),
+              ),
+              if (count.isNotEmpty) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: active ? Colors.black.withOpacity(0.15) : AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    count,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.bold,
+                      color: active ? Colors.white : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ),
@@ -601,236 +920,105 @@ class _StockViewState extends State<StockView> {
   }
 }
 
-// Linha da Tabela de Estoque Estilo Logistics Pro
-class _LogisticsProRow extends StatefulWidget {
+class _TacticalStockRow extends StatefulWidget {
   final ItemModel item;
-  final bool isDark;
   final bool isSelected;
-  final VoidCallback? onTap;
-  final VoidCallback? onInspect;
+  final VoidCallback onTap;
+  final VoidCallback onInspect;
   final void Function(int targetIndex)? onNavigate;
 
-  const _LogisticsProRow({
+  const _TacticalStockRow({
     required this.item,
-    required this.isDark,
-    this.isSelected = false,
-    this.onTap,
-    this.onInspect,
+    required this.isSelected,
+    required this.onTap,
+    required this.onInspect,
     this.onNavigate,
   });
 
   @override
-  State<_LogisticsProRow> createState() => _LogisticsProRowState();
+  State<_TacticalStockRow> createState() => _TacticalStockRowState();
 }
 
-class _LogisticsProRowState extends State<_LogisticsProRow> {
+class _TacticalStockRowState extends State<_TacticalStockRow> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
-    final isDark = widget.isDark;
 
-    Color statusColor;
-    String statusText;
+    Color badgeColor;
+    String badgeText;
     final upperStatus = item.status.toUpperCase();
     if (upperStatus == 'DISPONIVEL') {
       if (item.estaEmSetor) {
-        statusColor = const Color(0xFF8B5CF6);
-        statusText = 'No Setor';
+        badgeColor = AppColors.secondary;
+        badgeText = 'No Setor';
       } else {
-        statusColor = AppColors.success;
-        statusText = 'Disponível';
+        badgeColor = AppColors.tertiary;
+        badgeText = 'No Depósito';
       }
     } else if (upperStatus == 'EM_USO') {
-      statusColor = const Color(0xFF8B5CF6);
-      statusText = 'Em Uso';
+      badgeColor = AppColors.secondary;
+      badgeText = 'No Setor';
     } else if (upperStatus == 'CAUTELADO') {
-      statusColor = AppColors.cyan;
-      statusText = (item.cautelaAtiva != null && (item.cautelaAtiva!['tipo'] == 'FIXA' || item.cautelaAtiva!['cautela_tipo'] == 'FIXA'))
-          ? 'Setor (Fixa)'
-          : 'Cautelado';
+      badgeColor = AppColors.primary;
+      badgeText = 'Cautelado';
     } else if (upperStatus == 'EM_MANUTENCAO') {
-      statusColor = AppColors.warning;
-      statusText = 'Manutenção';
-    } else if (upperStatus == 'BAIXADO') {
-      statusColor = Colors.grey;
-      statusText = 'Baixado';
+      badgeColor = AppColors.error;
+      badgeText = 'Manutenção';
     } else {
-      statusColor = AppColors.danger;
-      statusText = item.status;
+      badgeColor = AppColors.outline;
+      badgeText = item.status;
     }
-
-    final double ratio = item.quantidadeMinima > 0
-        ? (item.quantidade / (item.quantidadeMinima * 3)).clamp(0.05, 1.0)
-        : (item.quantidade > 0 ? 0.95 : 0.0);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: widget.onTap ?? () async {
-          final res = await showDialog(
-            context: context,
-            builder: (ctx) => ItemDetailDialog(
-              item: item,
-              onNavigateView: widget.onNavigate,
-            ),
-          );
-          if (res == 'NAVIGATE_TO_MAINTENANCE') {
-            widget.onNavigate?.call(3);
-          }
-        },
-        onSecondaryTapDown: (details) async {
-          final position = details.globalPosition;
-          final selected = await showMenu<String>(
-            context: context,
-            position: RelativeRect.fromLTRB(
-              position.dx,
-              position.dy,
-              position.dx + 1,
-              position.dy + 1,
-            ),
-            color: isDark ? const Color(0xFF151D2A) : Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
-            ),
-            items: [
-              PopupMenuItem(
-                value: 'inspect',
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, size: 17, color: AppColors.cyan),
-                    const SizedBox(width: 10),
-                    const Text('Inspecionar Material'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'copy_bmp',
-                child: Row(
-                  children: [
-                    const Icon(Icons.copy, size: 17),
-                    const SizedBox(width: 10),
-                    Text(item.bmp != null ? 'Copiar BMP (${item.bmp})' : 'Copiar Código'),
-                  ],
-                ),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                value: 'move',
-                child: Row(
-                  children: [
-                    const Icon(Icons.swap_horiz, size: 17),
-                    const SizedBox(width: 10),
-                    const Text('Transferir / Movimentar'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    const Icon(Icons.edit_outlined, size: 17),
-                    const SizedBox(width: 10),
-                    const Text('Editar Material'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'full_detail',
-                child: Row(
-                  children: [
-                    const Icon(Icons.open_in_new, size: 17),
-                    const SizedBox(width: 10),
-                    const Text('Detalhes Completos & QR'),
-                  ],
-                ),
-              ),
-            ],
-          );
-
-          if (!mounted) return;
-
-          if (selected == 'inspect') {
-            widget.onInspect?.call();
-          } else if (selected == 'copy_bmp') {
-            final textToCopy = item.bmp ?? item.codigoInterno ?? item.nome;
-            Clipboard.setData(ClipboardData(text: textToCopy));
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: AppColors.cyanDark,
-                content: Text('Copiado para área de transferência: $textToCopy'),
-                duration: const Duration(seconds: 1),
-              ),
-            );
-          } else if (selected == 'move') {
-            showDialog(
-              context: context,
-              builder: (ctx) => MovementDialog(item: item),
-            );
-          } else if (selected == 'edit') {
-            showDialog(
-              context: context,
-              builder: (ctx) => ItemFormDialog(item: item),
-            );
-          } else if (selected == 'full_detail') {
-            final res = await showDialog(
-              context: context,
-              builder: (ctx) => ItemDetailDialog(
-                item: item,
-                onNavigateView: widget.onNavigate,
-              ),
-            );
-            if (res == 'NAVIGATE_TO_MAINTENANCE') {
-              widget.onNavigate?.call(3);
-            }
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: widget.isSelected
-                ? (isDark ? AppColors.cyan.withOpacity(0.14) : const Color(0xFFE0F2FE))
-                : (_isHovered
-                    ? (isDark ? const Color(0xFF1B2438) : const Color(0xFFF8FAFC))
-                    : Colors.transparent),
-            border: widget.isSelected
-                ? const Border(
-                    left: BorderSide(
-                      color: AppColors.cyan,
-                      width: 4,
-                    ),
-                  )
-                : null,
-          ),
+        onTap: widget.onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          color: widget.isSelected
+              ? AppColors.surfaceContainerHighest.withOpacity(0.8)
+              : (_isHovered ? AppColors.surfaceContainerHigh : Colors.transparent),
           child: Row(
             children: [
-              // Miniatura do Material
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    _getItemIcon(item.nome),
-                    size: 18,
-                    color: _isHovered ? AppColors.cyan : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                  ),
+              // BMP / Código
+              SizedBox(
+                width: 110,
+                child: Row(
+                  children: [
+                    Text(
+                      item.bmp ?? 'BMP-${item.id.toString().padLeft(6, '0')}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 12, color: AppColors.outline),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      tooltip: 'Copiar BMP',
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: item.bmp ?? '${item.id}'));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('BMP copiado para a área de transferência'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 14),
-
-              // Nome do Material
+              const SizedBox(width: 8),
+              // Descrição
               Expanded(
                 flex: 4,
                 child: Column(
@@ -838,117 +1026,42 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                   children: [
                     Text(
                       item.nome,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (item.observacoes != null && item.observacoes!.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        item.observacoes!,
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    Text(
+                      item.especificacao ?? item.grupoNome ?? 'Material Geral',
+                      style: const TextStyle(fontSize: 10.5, color: AppColors.outline),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
-
-              // BMP / Patrimônio Militar
-              SizedBox(
-                width: 110,
-                child: Text(
-                  item.bmp != null ? 'BMP-${item.bmp}' : (item.codigoInterno ?? '-'),
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.cyan,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-
-              // Categoria / Subgrupo
+              const SizedBox(width: 8),
+              // S/N
               SizedBox(
                 width: 120,
                 child: Text(
-                  item.subgrupo?.nome ?? 'Geral',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  ),
+                  item.numeroSerie ?? 'N/A',
+                  style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-
-              // Nível de Estoque com Mini Barra de Progresso
+              const SizedBox(width: 8),
+              // Localização
               SizedBox(
                 width: 130,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${item.quantidade} ${item.unidadeMedida.toLowerCase()}',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: LinearProgressIndicator(
-                        value: ratio,
-                        minHeight: 5,
-                        backgroundColor: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          item.quantidade <= item.quantidadeMinima
-                              ? AppColors.warning
-                              : AppColors.cyan,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Localização Física / Setor / Missão
-              Expanded(
-                flex: 3,
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      item.estaEmSetor
-                          ? Icons.domain_outlined
-                          : (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO'
-                              ? Icons.shield_outlined
-                              : (item.local != null ? Icons.warehouse_outlined : Icons.help_outline)),
-                      size: 14,
-                      color: item.estaEmSetor
-                          ? const Color(0xFF8B5CF6)
-                          : (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO'
-                              ? AppColors.warning
-                              : (item.local != null ? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)) : Colors.grey)),
-                    ),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.location_on_outlined, size: 12, color: AppColors.tertiary),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        item.localizacaoAtual,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: item.estaEmSetor ? FontWeight.w600 : FontWeight.normal,
-                          color: item.estaEmSetor
-                              ? (isDark ? const Color(0xFFA78BFA) : const Color(0xFF6D28D9))
-                              : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                        ),
+                        item.localizacaoFisica ?? 'Almoxarifado',
+                        style: const TextStyle(fontSize: 11, color: Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -956,39 +1069,51 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                   ],
                 ),
               ),
-
+              const SizedBox(width: 8),
               // Status Badge
               SizedBox(
-                width: 110,
+                width: 120,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.14),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: statusColor.withOpacity(0.4)),
+                      color: badgeColor.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: badgeColor.withOpacity(0.4)),
                     ),
-                    child: Text(
-                      statusText,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: badgeColor),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          badgeText,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: badgeColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-
-              // Ações Rápidas
+              const SizedBox(width: 8),
+              // Ações
               SizedBox(
-                width: 125,
+                width: 110,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.swap_horiz, size: 16),
+                      icon: const Icon(Icons.swap_horiz, size: 16, color: AppColors.primary),
                       tooltip: 'Transferir / Movimentar',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
@@ -999,9 +1124,15 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                         );
                       },
                     ),
-                    const SizedBox(width: 4),
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 15),
+                      icon: const Icon(Icons.visibility_outlined, size: 16, color: AppColors.tertiary),
+                      tooltip: 'Inspecionar',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                      onPressed: widget.onInspect,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 16, color: AppColors.outline),
                       tooltip: 'Editar',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
@@ -1012,33 +1143,6 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
                         );
                       },
                     ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.visibility_outlined, size: 16),
-                      tooltip: 'Detalhes & QR Code',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-                      onPressed: () async {
-                        final res = await showDialog(
-                           context: context,
-                          builder: (ctx) => ItemDetailDialog(
-                            item: item,
-                            onNavigateView: widget.onNavigate,
-                          ),
-                        );
-                        if (res == 'NAVIGATE_TO_MAINTENANCE') {
-                          widget.onNavigate?.call(3);
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
-                      tooltip: 'Excluir Material',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-                      onPressed: () => _confirmDeleteItem(context, item),
-                    ),
                   ],
                 ),
               ),
@@ -1047,98 +1151,5 @@ class _LogisticsProRowState extends State<_LogisticsProRow> {
         ),
       ),
     );
-  }
-
-  void _confirmDeleteItem(BuildContext context, ItemModel item) {
-    if (item.cautelaAtiva != null || item.status.toUpperCase() == 'CAUTELADO') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não é possível excluir: Este material está cautelado em uso. Efetue a devolução antes de excluir.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    if (item.status.toUpperCase() == 'EM_MANUTENCAO') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não é possível excluir: Material com manutenção em andamento. Conclua o reparo ou baixe o item na pendência.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: const [
-            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
-            SizedBox(width: 8),
-            Text('Excluir Material'),
-          ],
-        ),
-        content: Text(
-          'Tem certeza que deseja excluir o material "${item.nome}" (ID #${item.id}) do inventário?\n\nEsta ação excluirá permanentemente o registro e o histórico do equipamento.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                final stock = Provider.of<StockProvider>(context, listen: false);
-                await stock.deleteItem(item.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Material "${item.nome}" excluído do estoque com sucesso.'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Erro ao excluir material: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  IconData _getItemIcon(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('optiplex') || lower.contains('computador') || lower.contains('desktop') || lower.contains('pc')) {
-      return Icons.computer;
-    } else if (lower.contains('notebook') || lower.contains('laptop') || lower.contains('dell')) {
-      return Icons.laptop_chromebook;
-    } else if (lower.contains('monitor') || lower.contains('tela')) {
-      return Icons.desktop_windows_outlined;
-    } else if (lower.contains('switch') || lower.contains('roteador') || lower.contains('cisco')) {
-      return Icons.router_outlined;
-    } else if (lower.contains('nobreak') || lower.contains('apc') || lower.contains('ups')) {
-      return Icons.battery_charging_full_outlined;
-    } else if (lower.contains('rádio') || lower.contains('ht') || lower.contains('motorola')) {
-      return Icons.settings_remote_outlined;
-    }
-    return Icons.devices_other;
   }
 }

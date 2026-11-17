@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#adc6ff","on-error-container":"#ffdad6","on-secondary-container":"#dfe8ff","on-tertiary":"#003827","on-primary-fixed-variant":"#004494","tertiary":"#27e0a9","secondary-container":"#0066cc","secondary":"#aac7ff","on-surface-variant":"#c2c6d6","on-tertiary-fixed":"#002116","on-primary-container":"#00285d","surface-container-highest":"#2c344d","on-background":"#dbe1ff","outline-variant":"#414754","outline":"#8c909f","inverse-surface":"#dbe1ff","secondary-fixed":"#d7e3ff","surface-container-high":"#212942","on-tertiary-fixed-variant":"#00513b","on-secondary-fixed-variant":"#00458e","surface-container":"#171e37","surface":"#0a122a","on-secondary-fixed":"#001b3e","surface-container-lowest":"#050d25","secondary-fixed-dim":"#aac7ff","on-primary":"#002e69","surface-container-low":"#131a33","surface-bright":"#313852","primary-fixed-dim":"#adc6ff","on-secondary":"#002f65","primary-fixed":"#d8e2ff","surface-variant":"#2c344d","error":"#ffb4ab","tertiary-fixed-dim":"#27e0a9","tertiary-fixed":"#54fdc4","primary-container":"#4c8eff","surface-tint":"#adc6ff","tertiary-container":"#00a47a","error-container":"#93000a","inverse-primary":"#005ac2","on-error":"#690005","on-tertiary-container":"#003122","inverse-on-surface":"#282f49","surface-dim":"#0a122a","background":"#0a122a","on-primary-fixed":"#001a41","on-surface":"#dbe1ff"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-lg":"1rem","gutter-desktop":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"0.75rem","space-xl":"1.5rem","space-md":"0.75rem","margin-desktop":"1.5rem"},fontFamily:{"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"body-md":["Inter"],"headline-lg":["Inter"],"code-md":["JetBrains Mono"],"telemetry-data":["JetBrains Mono"],"headline-sm":["Inter"],"headline-md":["Inter"],"body-lg":["Inter"],"display-lg":["Inter"],"label-tactical":["JetBrains Mono"]},fontSize:{"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen selection:bg-secondary-container selection:text-on-secondary-container"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-50 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full h-full px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-shrink-0"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"/><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-label-tactical text-label-tactical text-primary uppercase">BINFAE-GL // ALA 11 - C&amp;TI FORÇA AÉREA</span><span class="inline-flex items-center px-space-xs py-0.5 bg-tertiary-container/20 text-tertiary font-code-sm text-code-sm rounded-DEFAULT uppercase tracking-wider">SISTEMA TÁTICO - 12 NÓS ATIVOS</span></div></div></div><div class="hidden xl:flex items-center gap-space-lg flex-1 max-w-2xl justify-center"><div class="flex items-center gap-space-sm px-space-sm py-1 bg-surface-container-low rounded-DEFAULT"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-code-sm text-code-sm text-tertiary tracking-wide uppercase">API ONLINE (28ms)</span></div><div class="flex items-center gap-space-md font-telemetry-data text-telemetry-data"><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">BRT:</span><span class="text-on-surface">14:32:08</span></div><div class="w-px h-3.5 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ZULU:</span><span class="text-primary">17:32:08Z</span></div></div><div class="relative flex-1 max-w-xs"><div class="flex items-center bg-surface-container-low rounded-DEFAULT px-space-sm py-1 gap-space-xs"><span class="material-symbols-outlined text-outline text-base">search</span><input class="bg-transparent w-full text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" placeholder="Busca tática de grupos e ativos..." readonly="" type="text"/><kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high rounded-DEFAULT text-outline font-medium">Ctrl+K</kbd></div></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-1.5 rounded-DEFAULT"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/ALJJyrDOK0PIdYWwa7l4H8AH1V-IgpJ-nXMCA9o3MtOl_Ir8CdB1nEqpgPeBVMDjb2a8BoWeH1B1-id5PhbkeOCDZaacCS2ZvRNUaGaN5NsxJ-a8u7zPhx1PDVkQvhzDODz9Kp_SVnkMV8XzJg4kN2Avhdg8B1GMZ2Trb3s8vl2Gd56rsydI8zs43nyym04K_Pl8HdKpw5mvrFA32j4I4Ih-XJOm_McIVQsrMdD4kws-Aq_reKMeTeBWOo2RzR4m"/><span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-low"></span></div><div class="flex flex-col text-left"><span class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">2º Sgt Silva</span><span class="font-code-sm text-code-sm text-outline leading-none">SARAM: 6842910</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-10 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col py-space-sm"><div class="px-space-md py-space-xs mb-space-xs"><span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">OPERAÇÃO &amp; LOGÍSTICA</span></div><nav class="flex flex-col gap-0.5 px-space-xs" data-active-classes="bg-secondary-container text-on-secondary-container font-semibold shadow-inner"><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">dashboard</span>Dashboard</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">inventory_2</span>Materiais e Estoque</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">assignment</span>Cautelas e Missões</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="manutencao" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">build</span>Manutenção</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">checklist</span>Pendências e Metas</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">calendar_month</span>Escala de Sobreaviso</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="relatorio-diario" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">description</span>Relatório Diário (24h)</a><a class="flex items-center justify-between px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="locais-fisicos" href="#"><span class="flex items-center"><span class="material-symbols-outlined mr-space-sm text-lg">account_tree</span>Locais Físicos</span><span class="px-1.5 py-0.5 bg-surface-container text-primary font-code-sm text-code-sm rounded-DEFAULT uppercase">Árvore</span></a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">folder_special</span>Grupos e Subgrupos</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="historico-geral" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">history</span>Histórico Geral</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">admin_panel_settings</span>Painel Administrativo</a><a class="flex items-center px-space-sm py-1.5 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="configuracoes" href="#"><span class="material-symbols-outlined mr-space-sm text-lg">settings</span>Configurações</a></nav></div><div class="p-space-sm bg-surface-container-low mx-space-xs mb-space-sm rounded-DEFAULT"><div class="flex items-center justify-between"><span class="flex items-center gap-space-xs font-code-sm text-code-sm text-primary"><span class="material-symbols-outlined text-sm">vpn_key</span>SARAM LINK</span><span class="font-label-tactical text-label-tactical text-tertiary uppercase">ENCRIPTADO</span></div></div></aside><div class="pl-64"><main class="w-full min-h-screen pt-16 pb-10 px-gutter-desktop bg-surface"><div class="flex flex-col w-full">
+<!-- SCRIPT PARA INTERATIVIDADE & ESTADO DO HISTÓRICO TÁTICO -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Sincroniza estado de navegação ativo na barra lateral
+      const navLinks = document.querySelectorAll("aside nav a");
+      navLinks.forEach(link => {
+        if (link.getAttribute("data-path") === "historico-geral") {
+          link.classList.remove("text-on-surface-variant", "hover:bg-surface-container-high");
+          link.classList.add("bg-secondary-container", "text-on-secondary-container", "font-semibold", "shadow-inner");
+          const icon = link.querySelector(".material-symbols-outlined");
+          if (icon) {
+            icon.style.fontVariationSettings = "'FILL' 1";
+          }
+        }
+      });
+
+      // Relógio ZULU & BRT em tempo real
+      function updateClock() {
+        const now = new Date();
+        const brtStr = now.toLocaleTimeString("pt-BR", { hour12: false });
+        const zuluStr = now.toISOString().substring(11, 19) + "Z";
+        const brtEl = document.getElementById("tactical-brt-clock");
+        const zuluEl = document.getElementById("tactical-zulu-clock");
+        if (brtEl) brtEl.textContent = brtStr;
+        if (zuluEl) zuluEl.textContent = zuluStr;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // Alternância de abas de filtro
+      window.filterEvents = function(category) {
+        const rows = document.querySelectorAll("#audit-table tbody tr");
+        rows.forEach(row => {
+          const rowCat = row.getAttribute("data-category");
+          if (category === "ALL" || rowCat === category) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+          if (btn.getAttribute("data-filter") === category) {
+            btn.classList.add("bg-secondary-container", "text-on-secondary-container", "font-semibold");
+            btn.classList.remove("text-on-surface-variant", "bg-surface-container-low");
+          } else {
+            btn.classList.remove("bg-secondary-container", "text-on-secondary-container", "font-semibold");
+            btn.classList.add("text-on-surface-variant", "bg-surface-container-low");
+          }
+        });
+      };
+
+      // Inspeção de Linhas
+      window.selectAuditRow = function(evtId, protocol, category, operator, saram, role, timestampBrt, timestampZulu, severity, terminalIp, macAddr, sha, desc, bmp) {
+        document.querySelectorAll("#audit-table tbody tr").forEach(r => r.classList.remove("bg-surface-container-high/60"));
+        const activeRow = document.getElementById("row-" + evtId);
+        if (activeRow) activeRow.classList.add("bg-surface-container-high/60");
+
+        document.getElementById("detail-protocol").textContent = protocol;
+        document.getElementById("detail-category").textContent = category;
+        document.getElementById("detail-operator").textContent = operator;
+        document.getElementById("detail-saram").textContent = "SARAM " + saram + " // " + role;
+        document.getElementById("detail-timestamps").textContent = timestampBrt + " (BRT) / " + timestampZulu + " (ZULU)";
+        document.getElementById("detail-terminal").textContent = terminalIp + " [" + macAddr + "]";
+        document.getElementById("detail-hash").textContent = sha;
+        document.getElementById("detail-desc").textContent = desc;
+        document.getElementById("detail-bmp").textContent = bmp;
+        
+        const badgeSev = document.getElementById("detail-severity");
+        badgeSev.textContent = severity;
+        if (severity === "SEC / ALERTA" || severity === "CRÍTICO") {
+          badgeSev.className = "px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-error-container/30 text-error border-l-2 border-error";
+        } else if (severity === "WARN / ATENÇÃO") {
+          badgeSev.className = "px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-secondary-container/20 text-secondary-fixed border-l-2 border-secondary-fixed";
+        } else {
+          badgeSev.className = "px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-tertiary-container/20 text-tertiary border-l-2 border-tertiary";
+        }
+      };
+    });
+  </script>
+<!-- BANNER TÁTICO INSTITUCIONAL BINFAE-GL / ALA 11 COM BRASÃO DA FAB -->
+<div class="relative w-full mb-space-lg rounded-xl overflow-hidden bg-surface-container-low p-space-md shadow-md">
+<div class="absolute -right-8 -bottom-10 opacity-15 pointer-events-none select-none w-72">
+<img alt="Emblema Força Aérea Brasileira" class="w-full object-contain filter drop-shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIVNEkxuA9JBbqDS0e4ajThyjNRHMg_fmKKjzz5B_3KVckmfjktei8rHSVXCmWrMSEsKf8Kfo0LgSkXAFQ78wirvjWRnCp2630J0mCCk3ZTavL7AJijVSFiP7qCuAHNFHTRN7yzca0vxP0lsnsposLq_eDF8rvK0q0HFanNLlL2DIe5WHBJytMvmEzyvBmk6thZxUjLuZaxtgderKaWaJsiXvncbzsylNyMBs4AOCsorSYW93c_VNirw"/>
+</div>
+<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md relative z-10">
+<div class="flex items-center gap-space-md">
+<div class="w-14 h-14 rounded-lg bg-surface-container-high flex items-center justify-center p-1.5 flex-shrink-0 shadow-sm">
+<img alt="Gládio Alado da FAB" class="w-full h-full object-contain filter drop-shadow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIVNEkxuA9JBbqDS0e4ajThyjNRHMg_fmKKjzz5B_3KVckmfjktei8rHSVXCmWrMSEsKf8Kfo0LgSkXAFQ78wirvjWRnCp2630J0mCCk3ZTavL7AJijVSFiP7qCuAHNFHTRN7yzca0vxP0lsnsposLq_eDF8rvK0q0HFanNLlL2DIe5WHBJytMvmEzyvBmk6thZxUjLuZaxtgderKaWaJsiXvncbzsylNyMBs4AOCsorSYW93c_VNirw"/>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-widest bg-tertiary-container/20 px-space-xs py-0.5 rounded-DEFAULT">PORTARIA Nº 142/DIRM-GL</span>
+<span class="font-code-sm text-code-sm text-outline uppercase">NÍVEL DE ACESSO: RESERVADO // AUDITORIA C&amp;TI</span>
+<span class="inline-flex items-center gap-1 font-code-sm text-code-sm text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
+              IMUTABILIDADE ATIVA (BLOCO #8942-W)
+            </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-0.5">
+            HISTÓRICO GERAL // TRILHA DE AUDITORIA OPERACIONAL &amp; LOGS TÁTICOS
+          </h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-4xl mt-0.5">
+            Registro imutável de eventos operacionais, movimentações de carga, cautelas táticas, alterações de prontidão e telemetria do sistema BINFAE-GL com verificação contínua SHA-256 e SQLite WAL.
+          </p>
+</div>
+</div>
+<!-- BOTÕES DE AÇÃO SUPERIOR -->
+<div class="flex items-center gap-space-xs self-stretch lg:self-center justify-end flex-wrap">
+<button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-DEFAULT bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-colors shadow-sm" onclick="alert('Exportação forense gerada com sucesso! Arquivo cryptolog_20241018.sig baixado.');">
+<span class="material-symbols-outlined text-sm text-tertiary">download</span>
+<span>Exportar Relatório [Ctrl+E]</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-DEFAULT bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-colors shadow-sm" onclick="alert('Auditoria Criptográfica Concluída: 14.892 blocos verificados. Integridade SHA-256: 100% OK.');">
+<span class="material-symbols-outlined text-sm text-primary">verified</span>
+<span>Verificar SHA-256 [Alt+V]</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-DEFAULT bg-secondary-container hover:bg-secondary text-on-secondary-container font-headline-sm text-headline-sm transition-all shadow-sm" onclick="location.reload();">
+<span class="material-symbols-outlined text-sm">sync</span>
+<span>Sincronizar [F5]</span>
+</button>
+</div>
+</div>
+</div>
+<!-- PAINEL DE INDICADORES RÁPIDOS (KPIs DE AUDITORIA MILITAR) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-lg">
+<!-- Card 1: Total de Registros -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-outline mb-1">
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider">REGISTROS TÁTICOS (30D)</span>
+<span class="material-symbols-outlined text-primary text-base">receipt_long</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-0.5">
+<span class="font-display-lg text-display-lg text-on-surface font-bold">14.892</span>
+<span class="font-code-sm text-code-sm text-tertiary font-semibold">EVENTOS</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-1">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> WAL Sync ativo
+        </span>
+<span class="text-tertiary font-medium">100% ÍNTEGRO</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full w-full"></div>
+</div>
+</div>
+<!-- Card 2: Movimentações de Cautela -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-outline mb-1">
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider">MOVIMENTAÇÕES CAUTELAS</span>
+<span class="material-symbols-outlined text-tertiary text-base">vpn_key</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-0.5">
+<span class="font-display-lg text-display-lg text-on-surface font-bold">648</span>
+<span class="font-code-sm text-code-sm text-secondary font-semibold">TRANSAÇÕES</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-1">
+<span class="text-on-surface-variant">Despacho / Devolução / Baixa</span>
+<span class="text-primary font-medium">+18 hoje</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-tertiary h-full w-[84%]"></div>
+</div>
+</div>
+<!-- Card 3: Incidentes & Desvios -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-outline mb-1">
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider">INCIDENTES / DESVIOS</span>
+<span class="material-symbols-outlined text-secondary-fixed text-base">warning</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-0.5">
+<span class="font-display-lg text-display-lg text-on-surface font-bold">03</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed font-semibold">ALERTAS</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-1">
+<span class="text-on-surface-variant">Tentativas fora de turno</span>
+<span class="text-secondary-fixed font-medium">0 PENDENTES</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary-fixed h-full w-[12%]"></div>
+</div>
+</div>
+<!-- Card 4: Taxa de Sincronização & Criptografia -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-outline mb-1">
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider">CRIPTO &amp; CARIMBO ICP</span>
+<span class="material-symbols-outlined text-tertiary text-base">security</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-0.5">
+<span class="font-display-lg text-display-lg text-on-surface font-bold">100%</span>
+<span class="font-code-sm text-code-sm text-tertiary font-semibold">AUDITADO</span>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm pt-1">
+<span class="text-on-surface-variant">Assinatura Digital Nível 3</span>
+<span class="text-tertiary font-medium">ICP-BRASIL</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-tertiary-container h-full w-full"></div>
+</div>
+</div>
+</div>
+<!-- BARRA DE FILTROS TÁTICOS AVANÇADOS -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-sm mb-space-lg flex flex-col gap-space-sm">
+<div class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md">
+<!-- Campo de Busca Textual -->
+<div class="relative flex-1 max-w-xl">
+<div class="flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1.5 gap-space-xs">
+<span class="material-symbols-outlined text-outline text-lg">search</span>
+<input class="bg-transparent w-full text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" id="tactical-search-input" placeholder="Filtrar por SARAM, militar, BMP, protocolo (ex: EVT-2024-9982) ou IP..." type="text"/>
+<kbd class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high rounded-DEFAULT text-outline font-medium">Ctrl+F</kbd>
+</div>
+</div>
+<!-- Filtro de Severidade & Período -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<div class="flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1 gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">SEVERIDADE:</span>
+<select class="bg-transparent text-on-surface font-code-sm text-code-sm focus:outline-none cursor-pointer">
+<option class="bg-surface-container" value="ALL">TODOS OS NÍVEIS</option>
+<option class="bg-surface-container" value="INFO">INFORMATIVO (INFO)</option>
+<option class="bg-surface-container" value="WARN">ATENÇÃO (WARN)</option>
+<option class="bg-surface-container" value="ALERT">CRÍTICO / ALERTA (ALERT)</option>
+<option class="bg-surface-container" value="SEC">SEGURANÇA / FORENSE (SEC)</option>
+</select>
+</div>
+<div class="flex items-center bg-surface-container rounded-DEFAULT px-space-sm py-1 gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">PERÍODO:</span>
+<select class="bg-transparent text-on-surface font-code-sm text-code-sm focus:outline-none cursor-pointer">
+<option class="bg-surface-container" value="24H">ÚLTIMAS 24H</option>
+<option class="bg-surface-container" value="7D">ÚLTIMOS 7 DIAS</option>
+<option class="bg-surface-container" selected="" value="30D">ÚLTIMOS 30 DIAS</option>
+<option class="bg-surface-container" value="90D">TRIMESTRE CORRENTE</option>
+<option class="bg-surface-container" value="CUSTOM">INTERVALO PERSONALIZADO</option>
+</select>
+</div>
+<button class="px-space-sm py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-DEFAULT font-code-sm text-code-sm flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-sm">filter_alt</span>
+<span>Filtros Avançados</span>
+</button>
+</div>
+</div>
+<!-- Pílulas de Categoria de Evento -->
+<div class="flex items-center gap-space-xs overflow-x-auto pt-space-xs border-t border-surface-container-highest/30">
+<span class="font-label-tactical text-label-tactical text-outline uppercase pr-1 flex-shrink-0">CATEGORIA:</span>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-secondary-container text-on-secondary-container font-semibold flex-shrink-0" data-filter="ALL" onclick="filterEvents('ALL')">
+        TODOS (14.892)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="CAUTELAS" onclick="filterEvents('CAUTELAS')">
+        CAUTELAS &amp; MISSÕES (648)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="ESTOQUE" onclick="filterEvents('ESTOQUE')">
+        ESTOQUE &amp; PATRIMÔNIO (1.204)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="ESCALA" onclick="filterEvents('ESCALA')">
+        ESCALA &amp; SERVIÇOS (194)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="MANUTENCAO" onclick="filterEvents('MANUTENCAO')">
+        MANUTENÇÃO &amp; BANCADA (812)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="AUTENTICACAO" onclick="filterEvents('AUTENTICACAO')">
+        AUTENTICAÇÃO &amp; ACESSOS (11.642)
+      </button>
+<button class="filter-btn px-space-sm py-1 rounded-DEFAULT font-code-sm text-code-sm transition-colors bg-surface-container-low text-on-surface-variant hover:text-on-surface flex-shrink-0" data-filter="INFRA" onclick="filterEvents('INFRA')">
+        INFRAESTRUTURA &amp; NÓS (392)
+      </button>
+</div>
+</div>
+<!-- WORKBENCH OPERACIONAL DIVIDIDO: TABELA PRINCIPAL + DRAWER DE INSPEÇÃO FORENSE -->
+<div class="grid grid-cols-1 2xl:grid-cols-12 gap-space-md items-start">
+<!-- COLUNA ESQUERDA / CENTRAL: TABELA DE AUDITORIA FORENSE (8 ou 9 colunas) -->
+<div class="2xl:col-span-8 bg-surface-container-low rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="px-space-md py-space-sm bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-base">format_list_bulleted</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">FEED DE TRANSAÇÕES AUDITADAS</span>
+<span class="px-space-xs py-0.5 rounded-DEFAULT bg-surface-container-high font-code-sm text-code-sm text-outline">PÁGINA 1 DE 596</span>
+</div>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-outline">
+<span>ORDENAÇÃO: CRONOLÓGICA DECRESCENTE</span>
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+</div>
+</div>
+<!-- TABELA COM ALTA DENSIDADE DE TELEMETRIA -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="audit-table">
+<thead>
+<tr class="bg-surface-container-lowest/70 text-outline font-label-tactical text-label-tactical uppercase">
+<th class="py-2.5 px-space-md">TIMESTAMP (BRT/Z)</th>
+<th class="py-2.5 px-space-sm">PROTOCOLO / ID</th>
+<th class="py-2.5 px-space-sm">SEVERIDADE</th>
+<th class="py-2.5 px-space-sm">OPERADOR / SARAM</th>
+<th class="py-2.5 px-space-sm">CATEGORIA</th>
+<th class="py-2.5 px-space-sm">DESCRIÇÃO OPERACIONAL</th>
+<th class="py-2.5 px-space-sm">RECURSO / BMP</th>
+<th class="py-2.5 px-space-sm">ORIGEM / IP</th>
+<th class="py-2.5 px-space-md text-right">AÇÕES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest/20 font-body-sm text-body-sm text-on-surface">
+<!-- Registro 1 (SELECIONADO) -->
+<tr class="cursor-pointer bg-surface-container-high/60 hover:bg-surface-container transition-colors" data-category="CAUTELAS" id="row-9982" onclick="selectAuditRow('9982', 'EVT-2024-9982', 'CAUTELAS &amp; MISSÕES', '2º Sgt Silva', '6842910', 'Encarregado TI Ala 11', '18/10/2024 14:05:12', '18/10/2024 17:05:12Z', 'SEC / ALERTA', '10.22.40.12', '00:1A:2B:3C:4D:5E', 'SHA256:7f9b8c2d1e0a4f5b6c8d7e9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c', 'Cautela Extraordinária de Carga Crítica homologada para Cap Menezes (Pelotão Especial). 2x Toughbook Sentinela Rugged despachados com criptografia ativada para Op. Ágata.', 'BMP-88219, BMP-88220')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">18/Out 14:05</div>
+<div class="font-code-sm text-code-sm text-outline">17:05:12Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9982
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-error-container/30 text-error border-l-2 border-error">
+                  SEC / ALERTA
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-on-surface">2º Sgt Silva</div>
+<div class="font-code-sm text-code-sm text-outline">SARAM: 6842910</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-primary uppercase bg-primary-container/20 px-space-xs py-0.5 rounded-DEFAULT">CAUTELAS</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Cautela Extraordinária de Carga Crítica - 2x Toughbook Sentinela despachados para Cap Menezes (Pel. Especial - Op. Ágata).
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-tertiary">
+                BMP-88219/20
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.12
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Registro 2 -->
+<tr class="cursor-pointer hover:bg-surface-container transition-colors" data-category="ESCALA" id="row-9981" onclick="selectAuditRow('9981', 'EVT-2024-9981', 'ESCALA &amp; SERVIÇOS', '3º Sgt Ribeiro', '7102934', 'Operador de Redes', '18/10/2024 11:20:44', '18/10/2024 14:20:44Z', 'INFO / OK', '10.22.40.15', '14:2C:F9:88:11:AA', 'SHA256:3a1b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b', 'Troca Homologada de Escala de Sobreaviso: 3º Sgt Ribeiro assumiu o expediente no lugar de S2 Mario por determinação expressa do Chefe C&amp;TI (1º Ten Cavalcanti).', 'N/A (ESCALA)')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">18/Out 11:20</div>
+<div class="font-code-sm text-code-sm text-outline">14:20:44Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9981
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-tertiary-container/20 text-tertiary border-l-2 border-tertiary">
+                  INFO / OK
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-on-surface">3º Sgt Ribeiro</div>
+<div class="font-code-sm text-code-sm text-outline">SARAM: 7102934</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-secondary-fixed uppercase bg-secondary-container/20 px-space-xs py-0.5 rounded-DEFAULT">ESCALA</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Troca Homologada de Escala de Sobreaviso: 3º Sgt Ribeiro assumiu expediente do S2 Mario por ordem do 1º Ten Cavalcanti.
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                ESCALA-SOB
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.15
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Registro 3 -->
+<tr class="cursor-pointer hover:bg-surface-container transition-colors" data-category="MANUTENCAO" id="row-9980" onclick="selectAuditRow('9980', 'EVT-2024-9980', 'MANUTENÇÃO &amp; BANCADA', '3º Sgt Rocha', '6992140', 'Técnico de Fibras &amp; Redes', '18/10/2024 09:42:01', '18/10/2024 12:42:01Z', 'INFO / OK', '10.22.40.8', 'CC:46:D6:90:33:FF', 'SHA256:5b8a1c9e2d4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b', 'Reparo Concluído &amp; Encerramento de O.S.: Switch Cisco Catalyst Core Hangar 2 reiniciado e cabos ópticos monomodo conectorizados e testados com OTDR.', 'BMP-99142')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">18/Out 09:42</div>
+<div class="font-code-sm text-code-sm text-outline">12:42:01Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9980
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-tertiary-container/20 text-tertiary border-l-2 border-tertiary">
+                  INFO / OK
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-on-surface">3º Sgt Rocha</div>
+<div class="font-code-sm text-code-sm text-outline">SARAM: 6992140</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase bg-tertiary-container/20 px-space-xs py-0.5 rounded-DEFAULT">MANUTENÇÃO</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Reparo Concluído &amp; Encerramento de O.S.: Switch Cisco Core Hangar 2 revalidado e alinhado por OTDR.
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-tertiary">
+                BMP-99142
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.8
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Registro 4 -->
+<tr class="cursor-pointer hover:bg-surface-container transition-colors" data-category="AUTENTICACAO" id="row-9979" onclick="selectAuditRow('9979', 'EVT-2024-9979', 'AUTENTICAÇÃO &amp; ACESSOS', '2º Sgt Silva', '6842910', 'Encarregado TI Ala 11', '18/10/2024 08:05:30', '18/10/2024 11:05:30Z', 'WARN / ATENÇÃO', '10.22.40.12', '00:1A:2B:3C:4D:5E', 'SHA256:9f4a1c6e8b0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f', 'Assunção de Serviço &amp; Abertura de Livro 24h: 2º Sgt Silva autenticado via Biometria + Cartão SARAM. Cautela de armamento e rádios APX 8000 conferida em 100%.', 'LIVRO-24H')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">18/Out 08:05</div>
+<div class="font-code-sm text-code-sm text-outline">11:05:30Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9979
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-secondary-container/20 text-secondary-fixed border-l-2 border-secondary-fixed">
+                  WARN / ATENÇÃO
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-on-surface">2º Sgt Silva</div>
+<div class="font-code-sm text-code-sm text-outline">SARAM: 6842910</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-outline uppercase bg-surface-container px-space-xs py-0.5 rounded-DEFAULT">ACESSO</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Assunção de Serviço &amp; Abertura de Livro 24h: Autenticado via Cartão SARAM e Biometria física. Rádios APX 8000 conferidos.
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                LIVRO-24H
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.12
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Registro 5 -->
+<tr class="cursor-pointer hover:bg-surface-container transition-colors" data-category="INFRA" id="row-9975" onclick="selectAuditRow('9975', 'EVT-2024-9975', 'INFRAESTRUTURA &amp; NÓS', 'SYSTEM (DAEMON)', '0000000', 'Processo Automático', '17/10/2024 22:14:00', '18/10/2024 01:14:00Z', 'INFO / OK', '10.22.40.10', 'DE:AD:BE:EF:CA:FE', 'SHA256:a9f4c3d2e1b0a8c7e6f5d4c3b2a10987654321fedcba0987654321abcdef0123', 'Sincronização Automática SQLite WAL &amp; Backup Criptografado: 14.880 registros sincronizados com o Servidor Local Dell PowerEdge R740. Integridade SHA-256 OK.', 'DB-SQLITE-WAL')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">17/Out 22:14</div>
+<div class="font-code-sm text-code-sm text-outline">01:14:00Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9975
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-tertiary-container/20 text-tertiary border-l-2 border-tertiary">
+                  INFO / OK
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-tertiary">SISTEMA LOCAL</div>
+<div class="font-code-sm text-code-sm text-outline">DAEMON / CRON</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-primary uppercase bg-primary-container/20 px-space-xs py-0.5 rounded-DEFAULT">INFRA</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Sincronização SQLite WAL &amp; Snapshot Dell PowerEdge R740. SHA-256 validado sem inconsistências.
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                SRV-R740
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.10
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Registro 6 -->
+<tr class="cursor-pointer hover:bg-surface-container transition-colors" data-category="ESTOQUE" id="row-9972" onclick="selectAuditRow('9972', 'EVT-2024-9972', 'ESTOQUE &amp; PATRIMÔNIO', '2º Sgt Silva', '6842910', 'Encarregado TI Ala 11', '17/10/2024 19:30:15', '17/10/2024 22:30:15Z', 'SEC / ALERTA', '10.22.40.18', '70:85:C2:55:9A:01', 'SHA256:112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00', 'Movimentação no Cofre de Cautelas: Abertura física com credencial Nível 3 para auditoria física de chaves KVL de criptografia tática Motorola.', 'COFRE-TI-A11')">
+<td class="py-2.5 px-space-md whitespace-nowrap">
+<div class="font-telemetry-data text-telemetry-data text-on-surface font-semibold">17/Out 19:30</div>
+<div class="font-code-sm text-code-sm text-outline">22:30:15Z</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-primary font-bold">
+                EVT-2024-9972
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-error-container/30 text-error border-l-2 border-error">
+                  SEC / ALERTA
+                </span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="font-headline-sm text-headline-sm text-on-surface">2º Sgt Silva</div>
+<div class="font-code-sm text-code-sm text-outline">SARAM: 6842910</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-label-tactical text-label-tactical text-secondary uppercase bg-secondary-container/20 px-space-xs py-0.5 rounded-DEFAULT">PATRIMÔNIO</span>
+</td>
+<td class="py-2.5 px-space-sm max-w-xs truncate text-on-surface-variant font-body-sm text-body-sm">
+                Abertura física do cofre de segurança Nível 3 para auditoria de chaves KVL criptográficas táticas.
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-tertiary">
+                BMP-KVL400
+              </td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-sm text-code-sm text-outline">
+                10.22.40.18
+              </td>
+<td class="py-2.5 px-space-md whitespace-nowrap text-right">
+<button class="p-1 text-primary hover:text-on-primary hover:bg-primary-container rounded-DEFAULT transition-colors" title="Inspecionar Forense">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINAÇÃO TÁTICA -->
+<div class="px-space-md py-space-sm bg-surface-container flex flex-col sm:flex-row items-center justify-between gap-space-sm text-outline font-code-sm text-code-sm">
+<div class="flex items-center gap-space-xs">
+<span>EXIBINDO 1-6 DE 14.892 REGISTROS IMUTÁVEIS</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 bg-surface-container-high rounded-DEFAULT text-on-surface hover:bg-surface-container-highest">« ANTERIOR</button>
+<button class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-DEFAULT font-bold">1</button>
+<button class="px-2 py-1 bg-surface-container-high rounded-DEFAULT text-on-surface hover:bg-surface-container-highest">2</button>
+<button class="px-2 py-1 bg-surface-container-high rounded-DEFAULT text-on-surface hover:bg-surface-container-highest">3</button>
+<span class="px-1 text-outline">...</span>
+<button class="px-2 py-1 bg-surface-container-high rounded-DEFAULT text-on-surface hover:bg-surface-container-highest">596</button>
+<button class="px-2 py-1 bg-surface-container-high rounded-DEFAULT text-on-surface hover:bg-surface-container-highest">PRÓXIMO »</button>
+</div>
+</div>
+</div>
+<!-- COLUNA DIREITA: PAINEL / DRAWER DE INSPEÇÃO FORENSE DO EVENTO SELECIONADO (4 colunas) -->
+<div class="2xl:col-span-4 bg-surface-container-low rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="px-space-md py-space-sm bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-base">fingerprint</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase">ESPELHO FORENSE</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-DEFAULT font-code-sm text-code-sm uppercase tracking-wider bg-error-container/30 text-error border-l-2 border-error" id="detail-severity">
+          SEC / ALERTA
+        </span>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<!-- Cabeçalho do Evento com Protocolo -->
+<div class="flex items-start justify-between bg-surface-container p-space-sm rounded-DEFAULT">
+<div>
+<div class="font-label-tactical text-label-tactical text-outline uppercase">IDENTIFICADOR DO PROTOCOLO</div>
+<div class="font-headline-md text-headline-md text-primary font-bold tracking-tight" id="detail-protocol">EVT-2024-9982</div>
+</div>
+<div class="text-right">
+<div class="font-label-tactical text-label-tactical text-outline uppercase">CATEGORIA</div>
+<div class="font-code-sm text-code-sm text-tertiary font-semibold" id="detail-category">CAUTELAS &amp; MISSÕES</div>
+</div>
+</div>
+<!-- Descrição Tática e Justificativa -->
+<div class="flex flex-col gap-1">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">DESCRITIVO DA OPERAÇÃO TÁTICA</span>
+<div class="p-space-sm bg-surface-container rounded-DEFAULT font-body-sm text-body-sm text-on-surface leading-relaxed" id="detail-desc">
+            Cautela Extraordinária de Carga Crítica homologada para Cap Menezes (Pelotão Especial). 2x Toughbook Sentinela Rugged despachados com criptografia ativada para Op. Ágata.
+          </div>
+</div>
+<!-- Dados do Operador e Responsável Militar -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="bg-surface-container p-space-sm rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">MILITAR RESPONSÁVEL</span>
+<div class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="detail-operator">2º Sgt Silva</div>
+<div class="font-code-sm text-code-sm text-primary" id="detail-saram">SARAM 6842910 // Encarregado TI Ala 11</div>
+</div>
+<div class="bg-surface-container p-space-sm rounded-DEFAULT">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">RECURSO / PATRIMÔNIO</span>
+<div class="font-headline-sm text-headline-sm text-tertiary font-semibold" id="detail-bmp">BMP-88219, BMP-88220</div>
+<div class="font-code-sm text-code-sm text-outline">STATUS: CARGA CAUTELADA</div>
+</div>
+</div>
+<!-- Metadados de Rede & Terminal Tático -->
+<div class="bg-surface-container p-space-sm rounded-DEFAULT flex flex-col gap-1">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">ORIGEM / HARDWARE / TERMINAL</span>
+<div class="font-code-md text-code-md text-on-surface" id="detail-terminal">10.22.40.12 [00:1A:2B:3C:4D:5E]</div>
+<div class="font-code-sm text-code-sm text-outline">TERMINAL: ESTAÇÃO-BMP-01 // COPA-TI ALA 11</div>
+</div>
+<!-- Timestamps com Zulu & BRT -->
+<div class="bg-surface-container p-space-sm rounded-DEFAULT flex flex-col gap-1">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">CARIMBO DE TEMPO OFICIAL</span>
+<div class="font-telemetry-data text-telemetry-data text-on-surface" id="detail-timestamps">
+            18/10/2024 14:05:12 (BRT) / 18/10/2024 17:05:12Z (ZULU)
+          </div>
+<div class="font-code-sm text-code-sm text-tertiary">NTP SERVER: ntp.fab.mil.br (ESTRATO 1 - DELTA &lt; 1ms)</div>
+</div>
+<!-- Hash SHA-256 da Cadeia de Auditoria -->
+<div class="bg-surface-container p-space-sm rounded-DEFAULT flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">HASH CRIPTOGRÁFICO DO BLOCO</span>
+<span class="material-symbols-outlined text-tertiary text-sm">lock</span>
+</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant break-all bg-surface-container-lowest p-1.5 rounded-DEFAULT" id="detail-hash">
+            SHA256:7f9b8c2d1e0a4f5b6c8d7e9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c
+          </div>
+<div class="flex items-center justify-between font-code-sm text-code-sm text-tertiary pt-1">
+<span>ASSINATURA DIGITAL: ICP-BRASIL MILITAR</span>
+<span>BLOCO #8942-W VALIDADO</span>
+</div>
+</div>
+<!-- Ações do Drawer -->
+<div class="flex items-center gap-space-xs mt-1">
+<button class="flex-1 py-2 px-space-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-DEFAULT font-headline-sm text-headline-sm flex items-center justify-center gap-1 transition-colors" onclick="window.print();">
+<span class="material-symbols-outlined text-base">print</span>
+<span>Imprimir Extrato</span>
+</button>
+<button class="flex-1 py-2 px-space-sm bg-secondary-container hover:bg-secondary text-on-secondary-container rounded-DEFAULT font-headline-sm text-headline-sm flex items-center justify-center gap-1 transition-colors shadow-sm" onclick="alert('Assinatura Digital Nível 3 verificada: Emitida por Autoridade Certificadora da Defesa (AC-DEFESA) em favor de 2º Sgt Silva. Validade: ATIVA.');">
+<span class="material-symbols-outlined text-base">verified_user</span>
+<span>Validar Assinatura</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- RODAPÉ TÁTICO INFORMATIVO ESPECÍFICO DE AUDITORIA -->
+<div class="mt-space-lg mb-space-sm p-space-sm rounded-lg bg-surface-container-low flex flex-col md:flex-row items-center justify-between gap-space-sm font-code-sm text-code-sm text-outline">
+<div class="flex items-center gap-space-md flex-wrap">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-tactical text-label-tactical text-outline uppercase">SQLITE WAL:</span>
+<span class="text-tertiary font-semibold">SYNC ATIVO (0.1s atrás)</span>
+</div>
+<div class="hidden sm:block w-px h-3 bg-surface-container-highest"></div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">HASH AUDITORIA:</span>
+<span class="text-on-surface">SHA256:8f4a...e912 (HOMOLOGADO)</span>
+</div>
+<div class="hidden sm:block w-px h-3 bg-surface-container-highest"></div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase">PRONTIDÃO:</span>
+<span class="text-primary font-semibold">DEFCON 4 // NORMAL</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm text-on-surface-variant font-code-sm text-code-sm">
+<span>[Ctrl+F] Filtrar</span>
+<span>[Ctrl+E] Exportar</span>
+<span>[F5] Atualizar</span>
+<span>[Alt+I] Inspecionar</span>
+</div>
+</div>
+</div></main></div><footer class="fixed bottom-0 left-0 right-0 h-10 bg-surface-container-lowest z-50 flex items-center justify-between px-gutter-desktop shadow-[0_-1px_4px_rgba(0,0,0,0.06)]"><div class="flex items-center gap-space-md font-code-sm text-code-sm"><div class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="text-outline font-label-tactical text-label-tactical uppercase">SQLITE WAL:</span><span class="text-tertiary">SYNC ACTIVE</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">SHA-256:</span><span class="text-on-surface font-code-sm text-code-sm">a9f4c3...81e2 [INTEGRITY OK]</span></div><div class="w-px h-3 bg-surface-container-highest"></div><div class="flex items-center gap-space-xs"><span class="text-outline font-label-tactical text-label-tactical uppercase">ESTADO:</span><span class="px-1.5 py-0.2 bg-surface-container text-primary rounded-DEFAULT font-label-tactical text-label-tactical uppercase">DEFCON 4 // NORMAL</span></div></div><div class="flex items-center gap-space-md text-outline font-code-sm text-code-sm"><div class="hidden md:flex items-center gap-space-sm"><span>[F1] AJUDA</span><span>[F2] TERMINAL</span><span>[F5] SINCRONIZAR</span><span>[ESC] CANCELAR</span></div><div class="flex items-center gap-space-xs text-on-surface-variant"><span class="material-symbols-outlined text-sm text-tertiary">verified_user</span><span>ALA 11 SECURE CHANNEL</span></div></div></footer></body></html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-error":"#690005","on-primary-fixed":"#001a41","on-surface-variant":"#c2c6d6","primary-fixed-dim":"#adc6ff","on-primary":"#002e69","error":"#ffb4ab","surface-container-high":"#212942","secondary-fixed":"#d7e3ff","inverse-on-surface":"#282f49","on-background":"#dbe1ff","outline-variant":"#414754","tertiary-fixed":"#54fdc4","surface-tint":"#adc6ff","primary":"#adc6ff","surface-container-lowest":"#050d25","surface":"#0a122a","surface-variant":"#2c344d","primary-fixed":"#d8e2ff","outline":"#8c909f","primary-container":"#4c8eff","on-error-container":"#ffdad6","on-tertiary-fixed":"#002116","on-primary-fixed-variant":"#004494","tertiary-container":"#00a47a","error-container":"#93000a","tertiary":"#27e0a9","on-tertiary-fixed-variant":"#00513b","surface-bright":"#313852","surface-container":"#171e37","inverse-primary":"#005ac2","on-tertiary-container":"#003122","inverse-surface":"#dbe1ff","surface-container-low":"#131a33","on-secondary":"#002f65","background":"#0a122a","secondary-fixed-dim":"#aac7ff","on-secondary-container":"#dfe8ff","surface-dim":"#0a122a","on-secondary-fixed-variant":"#00458e","secondary":"#aac7ff","on-surface":"#dbe1ff","secondary-container":"#0066cc","tertiary-fixed-dim":"#27e0a9","surface-container-highest":"#2c344d","on-primary-container":"#00285d","on-tertiary":"#003827","on-secondary-fixed":"#001b3e"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-xl":"1.5rem","margin":"1rem","gutter-desktop":"1rem","space-lg":"1rem","space-sm":"0.5rem","space-md":"0.75rem","margin-desktop":"1.5rem","space-xs":"0.25rem","gutter":"0.75rem"},"fontFamily":{"telemetry-data":["JetBrains Mono"],"code-sm":["JetBrains Mono"],"code-md":["JetBrains Mono"],"display-lg":["Inter"],"body-sm":["Inter"],"body-md":["Inter"],"headline-sm":["Inter"],"headline-lg":["Inter"],"label-tactical":["JetBrains Mono"],"headline-md":["Inter"],"body-lg":["Inter"]},"fontSize":{"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-surface text-on-surface font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="flex flex-col min-h-0 flex-1"><div class="h-8 bg-surface-container-lowest flex items-center px-space-md gap-space-sm flex-shrink-0"><span class="material-symbols-outlined text-primary text-[14px]">shield</span><span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">BINFAE-GL // SYS-OPS</span></div><div class="p-space-md flex items-center gap-space-md bg-surface-container/60 flex-shrink-0"><div class="relative flex-shrink-0 w-10 h-10 rounded bg-surface-container-high flex items-center justify-center p-1 overflow-hidden"><img alt="Emblema BINFAE-GL" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWqfiwnabsBYUAlglfxAZXOl0JTlc0hnQElhLVteOptN93nyTqHUrnhIokQ1JS_WHcqRr7SxwOZ-IoTT-TOkIEHUYnf8lpb3zh4BD4HQBhCqlVif13irk2f64Nga81cxcmhasjnCatnA96YlE7l5mBTx5v_ppC1_d8Xuz7dyJJdnklC_m87G48IRTE3CuAa0V3Z_9f8yQQIW5NY7-duGdfZgxgEfGnqJAF9-AFDG_bP8CK62yQByWtQ"></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">BINFAE-GL</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary font-code-sm text-code-sm uppercase">TI</span></div><span class="font-code-sm text-code-sm text-on-surface-variant truncate uppercase">Comando &amp; Patrimônio</span></div></div><div class="overflow-y-auto flex-1 py-space-sm px-space-sm flex flex-col gap-1"><nav class="flex flex-col gap-1" data-active-classes="bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary"><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px] mr-3">dashboard</span><span>Dashboard</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined text-[18px] mr-3">inventory_2</span><span>Materiais e Estoque</span></a><a aria-current="page" class="flex items-center px-space-md py-2 rounded-lg transition-colors bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined text-[18px] mr-3 text-primary">fact_check</span><span>Cautelas e Missões</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="manutencao" href="#"><span class="material-symbols-outlined text-[18px] mr-3">handyman</span><span>Manutenção</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined text-[18px] mr-3">checklist_rtl</span><span>Pendências e Metas</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined text-[18px] mr-3">calendar_month</span><span>Escala de Sobreaviso</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="relatorio-diario" href="#"><span class="material-symbols-outlined text-[18px] mr-3">summarize</span><span>Relatório Diário (24h)</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="locais-fisicos" href="#"><span class="material-symbols-outlined text-[18px] mr-3">location_on</span><span>Locais Físicos</span><span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical uppercase tracking-wider ml-auto">Árvore</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined text-[18px] mr-3">category</span><span>Grupos e Subgrupos</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="historico-geral" href="#"><span class="material-symbols-outlined text-[18px] mr-3">history</span><span>Histórico Geral</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined text-[18px] mr-3">admin_panel_settings</span><span>Painel Administrativo</span></a><a class="flex items-center px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="configuracoes" href="#"><span class="material-symbols-outlined text-[18px] mr-3">settings</span><span>Configurações</span></a></nav></div></div><div class="p-space-md bg-surface-container-lowest/80 flex flex-col gap-space-sm flex-shrink-0"><div class="flex items-center gap-space-sm"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span><span class="font-code-sm text-code-sm text-on-surface-variant truncate">SQLite Local: Sincronizado (4ms)</span><kbd class="ml-auto px-space-xs py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-outline">F5</kbd></div><div class="flex items-center justify-between text-outline hover:text-on-surface transition-colors cursor-pointer pt-space-xs"><span class="font-label-tactical text-label-tactical uppercase tracking-wider flex items-center gap-space-xs"><span class="material-symbols-outlined text-[14px]">vpn_lock</span> Proxy BAGL: Ativo</span><span class="font-code-sm text-code-sm text-secondary">PORT 8080</span></div></div></aside><div class="pl-72 flex flex-col min-h-screen"><header class="sticky top-0 z-40 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.3)] border-b border-surface-container/50 flex flex-col w-full">
+  <!-- Top System Window Strip -->
+  <div class="h-7 bg-surface-container-lowest flex items-center justify-between px-space-lg select-none border-b border-surface-container/40 text-outline">
+    <div class="flex items-center gap-space-sm">
+      <div class="w-3.5 h-3.5 flex-shrink-0 flex items-center justify-center">
+        <img alt="Gládio Alado FAB" class="w-full h-full object-contain filter brightness-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWqfiwnabsBYUAlglfxAZXOl0JTlc0hnQElhLVteOptN93nyTqHUrnhIokQ1JS_WHcqRr7SxwOZ-IoTT-TOkIEHUYnf8lpb3zh4BD4HQBhCqlVif13irk2f64Nga81cxcmhasjnCatnA96YlE7l5mBTx5v_ppC1_d8Xuz7dyJJdnklC_m87G48IRTE3CuAa0V3Z_9f8yQQIW5NY7-duGdfZgxgEfGnqJAF9-AFDG_bP8CK62yQByWtQ">
+      </div>
+      <span class="font-label-tactical text-label-tactical text-primary font-bold uppercase tracking-wider text-[11px]">BASE AÉREA DO GALEÃO</span>
+      <span class="text-outline-variant font-code-sm text-code-sm">/</span>
+      <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wide text-[11px]">BINFAE-GL // SEÇÃO DE TI</span>
+      <span class="px-space-xs py-0.2 rounded bg-surface-container font-code-sm text-code-sm text-secondary-fixed text-[11px]">v2.4.0</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="h-6 w-7 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded" title="Minimizar" type="button">
+        <span class="material-symbols-outlined text-[14px]">remove</span>
+      </button>
+      <button class="h-6 w-7 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded" title="Maximizar" type="button">
+        <span class="material-symbols-outlined text-[12px]">crop_square</span>
+      </button>
+      <button class="h-6 w-7 flex items-center justify-center text-on-surface-variant hover:bg-error hover:text-on-error transition-colors rounded" title="Fechar" type="button">
+        <span class="material-symbols-outlined text-[14px]">close</span>
+      </button>
+    </div>
+  </div>
+  <!-- Main Operational Toolbar -->
+  <div class="px-space-lg py-2.5 flex flex-wrap items-center justify-between gap-space-md min-w-0">
+    <!-- Telemetry and Status Left -->
+    <div class="flex items-center gap-space-sm flex-wrap min-w-0">
+      <div class="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-high shadow-sm border border-surface-container-highest/50 flex-shrink-0">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+        </span>
+        <span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-wider">API ONLINE</span>
+        <span class="font-code-sm text-code-sm text-on-surface-variant">28ms</span>
+        <span class="font-code-sm text-code-sm text-outline hidden xl:inline">[backend-info-binfae]</span>
+      </div>
+      <div class="flex items-center gap-space-md px-space-md py-1.5 rounded-lg bg-surface-container font-telemetry-data text-telemetry-data text-on-surface shadow-sm flex-shrink-0">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-primary text-[16px]">schedule</span>
+          <span class="text-primary font-bold">14:32:10 BRT</span>
+        </div>
+        <span class="text-outline-variant font-normal">|</span>
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-tertiary text-[16px]">public</span>
+          <span class="text-tertiary font-bold">17:32:10 ZULU</span>
+        </div>
+      </div>
+      <div class="hidden 2xl:flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container text-tertiary font-label-tactical text-label-tactical shadow-sm flex-shrink-0">
+        <span class="material-symbols-outlined text-[16px]">barcode_scanner</span>
+        <span>LEITOR USB PRONTO</span>
+        <kbd class="px-space-xs py-0.5 rounded bg-surface-container-lowest font-code-sm text-code-sm text-outline ml-1">Ctrl+B</kbd>
+      </div>
+    </div>
+    <!-- Quick Search, Mode, and User Profile Right -->
+    <div class="flex items-center gap-space-sm flex-wrap justify-end min-w-0 flex-shrink-0">
+      <button class="flex items-center gap-space-sm px-space-md py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm flex-shrink-0" type="button">
+        <span class="material-symbols-outlined text-[18px]">search</span>
+        <span class="font-body-md text-body-md hidden md:inline">Comando Rápido...</span>
+        <kbd class="px-space-xs py-0.5 rounded bg-surface-container-lowest font-code-sm text-code-sm text-outline">Ctrl+K</kbd>
+      </button>
+      <div class="flex items-center gap-space-xs flex-shrink-0">
+        <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" title="Alternar Tema Dark/Light" type="button">
+          <span class="material-symbols-outlined text-[18px]">dark_mode</span>
+        </button>
+        <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" title="Modo Tela Cheia (F11)" type="button">
+          <span class="material-symbols-outlined text-[18px]">fullscreen</span>
+        </button>
+      </div>
+      <div class="flex items-center gap-space-md bg-surface-container-high hover:bg-surface-container-highest transition-colors rounded-xl px-space-md py-1 shadow-sm cursor-pointer select-none border border-surface-container-highest/60 flex-shrink-0">
+        <div class="flex flex-col text-right justify-center min-w-0">
+          <span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight truncate">2º Sgt Silva</span>
+          <span class="font-code-sm text-code-sm text-primary tracking-wider leading-none mt-0.5 truncate">SARAM 6842910</span>
+        </div>
+        <div class="relative flex-shrink-0 w-9 h-9 flex items-center justify-center">
+          <img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/40 flex-shrink-0 aspect-square" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD_aqjOenoZQxZ9JrN7Z94nlVt7r4QKoyP9MyZUEGOf54W1N-4rJLhYukVKpg2HeIbekglUCjMcWRd1e6yrC_X80md2kG0dGfJr71R0h4QcIvcVn2OmbCtEAHeoqPpU4E2XFTWYqjIBOEn0D7BZ2NPUcO46I-CF3pHV13gRRmcitymDj1aEFU7YdpAHq1eh8nsS6uNE3Ed77BwLgSitqlqBEY9cFFR6S49cwdcn57x">
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-high"></span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant text-[18px] ml-0.5 flex-shrink-0">expand_more</span>
+      </div>
+    </div>
+  </div>
+</header><main class="w-full bg-surface flex-1 pt-1"><div class="flex flex-col w-full">
+<div class="p-space-lg flex flex-col gap-space-lg">
+<!-- SUBHEADER / STATUS SUMMARY BAR -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container/70 backdrop-blur-md p-space-md rounded-xl shadow-sm">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">CONTROLE DE CAUTELAS &amp; MISSÕES OPERACIONAIS</span>
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical uppercase tracking-wider">MÓDULO 03 // COORDENAÇÃO</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate mt-0.5">BINFAE-GL // SEÇÃO DE TI — Gestão de Equipamentos Táticos em Carga, Destacamentos e Termos de Responsabilidade</span>
+</div>
+<!-- Quick Action Controls -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors shadow-sm font-label-tactical text-label-tactical uppercase tracking-wider" id="btnSync" type="button">
+<span class="material-symbols-outlined text-[16px] text-tertiary animate-none" id="syncIcon">sync</span>
+<span>Sincronizar</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors shadow-sm font-label-tactical text-label-tactical uppercase tracking-wider" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">lock_clock</span>
+<span>Nova Cautela Fixa</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-lg py-2 rounded-lg bg-primary-container hover:bg-primary-container/85 text-on-primary-container transition-all shadow-md font-label-tactical text-label-tactical uppercase tracking-wider font-bold" type="button">
+<span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+<span>Nova Missão Operacional</span>
+</button>
+</div>
+</div>
+<!-- FILTER TABS & SEARCH TACTICAL STRIP -->
+<div class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md">
+<!-- Tabs Navigation -->
+<div class="flex items-center gap-1.5 overflow-x-auto p-1 bg-surface-container-low rounded-xl flex-shrink-0">
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high text-on-surface font-semibold shadow-sm transition-all text-body-md" type="button">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+</span>
+<span>Cautelas Ativas</span>
+<span class="px-1.5 py-0.2 rounded bg-tertiary/20 text-tertiary font-code-sm text-code-sm ml-1 font-bold">14</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-body-md" type="button">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>Missões em Andamento</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-primary font-code-sm text-code-sm ml-1">6</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-body-md" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span>Cautelas Fixas de Posto</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-secondary-fixed font-code-sm text-code-sm ml-1">8</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-body-md" type="button">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span>Histórico / Concluídas</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-outline font-code-sm text-code-sm ml-1">1.240</span>
+</button>
+</div>
+<!-- Search and Filter Tools -->
+<div class="flex items-center gap-space-sm flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-space-md top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-10 pr-16 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-body-md placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary text-body-md transition-all" placeholder="Buscar por missão, militar, SARAM ou BMP..." type="text">
+<kbd class="absolute right-space-sm top-1/2 -translate-y-1/2 px-space-xs py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-outline select-none">Ctrl+F</kbd>
+</div>
+<button class="h-9 px-space-md flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors flex-shrink-0" title="Filtros avançados" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+</div>
+<!-- MAIN TWO-COLUMN SPLIT GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- COLUMN A: TACTICAL LIST OF CAUTELAS & MISSÕES (65% on Desktop -> 7 or 8 cols) -->
+<div class="lg:col-span-7 xl:col-span-7 2xl:col-span-8 flex flex-col gap-space-md">
+<!-- List Header Bar -->
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">REGISTROS DISPONÍVEIS:</span>
+<span class="font-code-sm text-code-sm text-primary font-bold">14 ATIVOS</span>
+<span class="text-outline-variant font-code-sm text-code-sm">/</span>
+<span class="font-code-sm text-code-sm text-tertiary">3 REQUEREM ATENÇÃO</span>
+</div>
+<div class="flex items-center gap-space-xs text-outline font-label-tactical text-label-tactical uppercase tracking-wider">
+<span>ORDENAR:</span>
+<button class="text-on-surface hover:text-primary transition-colors flex items-center gap-0.5" type="button">
+<span>Prazo de Retorno</span>
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+</button>
+</div>
+</div>
+<!-- CARD 1: ACTIVE MISSION (SELECTED / HIGHLIGHTED) -->
+<div class="relative p-space-md rounded-xl bg-surface-container-high/90 hover:bg-surface-container-high transition-all shadow-md flex flex-col gap-space-sm cursor-pointer border-l-4 border-primary">
+<div class="flex items-start justify-between gap-space-sm flex-wrap">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-primary/15 text-primary font-label-tactical text-label-tactical uppercase tracking-wider font-bold">MISSÃO OPERACIONAL</span>
+<span class="px-2 py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical uppercase tracking-wider font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> EM ANDAMENTO
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code-sm text-code-sm">#OP-2024-0089</span>
+</div>
+<div class="flex items-center gap-space-xs text-secondary-fixed font-telemetry-data text-telemetry-data">
+<span class="material-symbols-outlined text-[16px] text-tertiary">timer</span>
+<span class="text-tertiary font-bold">48h RESTANTES</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">OPERAÇÃO SENTINELA DO AR — EXERCÍCIO CONJUNTO</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Destacamento Tático do BINFAE-GL em apoio à segurança do perímetro da Ala 11 e vetores de aproximação militar.</span>
+</div>
+<!-- Responsible Details Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm py-space-xs bg-surface-container-lowest/60 p-space-sm rounded-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-code-sm text-code-sm font-bold flex-shrink-0">
+                1T
+              </div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">1º Ten Cavalcanti</span>
+<span class="font-code-sm text-code-sm text-primary tracking-wider truncate">SARAM 7129402 • Cmt Pelotão OpEsp</span>
+</div>
+</div>
+<div class="flex flex-col justify-center sm:text-right">
+<div class="flex items-center sm:justify-end gap-space-xs font-code-sm text-code-sm text-on-surface">
+<span class="material-symbols-outlined text-[14px] text-outline">call</span>
+<span>(21) 98452-9911</span>
+<span class="text-outline-variant">|</span>
+<span class="text-tertiary font-bold">Rádio Ch-04</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate">Saída: 18/Out 06:00 BRT • Previsão: 22/Out 18:00 BRT</span>
+</div>
+</div>
+<!-- Assets and Progress -->
+<div class="flex flex-col gap-1.5 pt-space-xs">
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">inventory_2</span>
+<span>Carga: <strong>14 Itens Vinculados</strong> (Rádios APX 8000, Laptops Rugged, Câmeras FLIR)</span>
+</span>
+<span class="font-code-sm text-code-sm text-tertiary font-bold">4 de 14 Devolvidos (28%)</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-lowest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-tertiary rounded-full" style="width: 28%"></div>
+</div>
+</div>
+<!-- Quick Action Buttons in Card -->
+<div class="flex items-center justify-between pt-space-xs mt-1 border-t border-surface-container/50">
+<div class="flex items-center gap-space-xs">
+<span class="px-space-xs py-0.5 rounded bg-surface-container text-tertiary font-code-sm text-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">check_circle</span> Autenticado Cmt
+              </span>
+<span class="px-space-xs py-0.5 rounded bg-surface-container text-outline font-code-sm text-code-sm">Termo #089-24</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">picture_as_pdf</span> Termo PDF
+              </button>
+<button class="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">assignment_return</span> Descautelar
+              </button>
+<button class="px-space-md py-1 rounded bg-primary text-on-primary font-label-tactical text-label-tactical uppercase tracking-wider transition-all shadow-sm font-bold flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">tune</span> Gerenciar
+              </button>
+</div>
+</div>
+</div>
+<!-- CARD 2: CAUTELA FIXA DE POSTO -->
+<div class="p-space-md rounded-xl bg-surface-container hover:bg-surface-container-high transition-all shadow-sm flex flex-col gap-space-sm cursor-pointer">
+<div class="flex items-start justify-between gap-space-sm flex-wrap">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary-fixed font-label-tactical text-label-tactical uppercase tracking-wider font-bold">CAUTELA FIXA DE POSTO</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider">PERMANENTE</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code-sm text-code-sm">#CF-POSTO-01</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">RENOVAÇÃO TRIMESTRAL (28 DIAS)</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">POSTO SENTINELA 01 — PORTÃO PRINCIPAL (ESTRADA DO GALEÃO)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dotacão perene de tecnologia da informação e comunicação do corpo da guarda de serviço 24h.</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm py-space-xs bg-surface-container-lowest/40 p-space-sm rounded-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary-fixed font-code-sm text-code-sm font-bold flex-shrink-0">
+                3S
+              </div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">3º Sgt M. Ribeiro</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed tracking-wider truncate">SARAM 6912384 • Cmt da Guarda</span>
+</div>
+</div>
+<div class="flex flex-col justify-center sm:text-right">
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">Ramal: 4122 • Rádio Guardão</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Carga: 6 Itens (Rádios VHF/UHF, Switch PoE, Lanterna)</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs text-body-sm">
+<span class="font-code-sm text-code-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> 100% dos Itens em Carga Ativa
+            </span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+                Imprimir Termo
+              </button>
+<button class="px-space-md py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-tactical text-label-tactical uppercase tracking-wider transition-colors font-bold" type="button">
+                Gerenciar Itens (6)
+              </button>
+</div>
+</div>
+</div>
+<!-- CARD 3: MISSÃO CRÍTICA (ATENÇÃO: DEVOLUÇÃO HOJE) -->
+<div class="p-space-md rounded-xl bg-surface-container hover:bg-surface-container-high transition-all shadow-sm flex flex-col gap-space-sm cursor-pointer border-l-2 border-error">
+<div class="flex items-start justify-between gap-space-sm flex-wrap">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-primary/15 text-primary font-label-tactical text-label-tactical uppercase tracking-wider font-bold">MISSÃO EXTERNA</span>
+<span class="px-2 py-0.5 rounded bg-error-container/30 text-error font-label-tactical text-label-tactical uppercase tracking-wider font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">warning</span> DEVOLUÇÃO HOJE (ATÉ 20:00)
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code-sm text-code-sm">#OP-2024-0077</span>
+</div>
+<span class="font-telemetry-data text-telemetry-data text-error font-bold">3 ITENS PENDENTES</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">DESTACAMENTO RADAR MÓVEL — EXERCÍCIO CRUZEX</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Equipamento de telecomunicação avançada e link de telemetria satelital de campo.</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm py-space-xs bg-surface-container-lowest/40 p-space-sm rounded-lg">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-error-container/40 flex items-center justify-center text-error font-code-sm text-code-sm font-bold flex-shrink-0">
+                CAP
+              </div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">Cap Eng Fontes</span>
+<span class="font-code-sm text-code-sm text-primary tracking-wider truncate">SARAM 5409123 • Seção Operações</span>
+</div>
+</div>
+<div class="flex flex-col justify-center sm:text-right">
+<span class="font-code-sm text-code-sm text-on-surface">Carga: 8 Itens (BGAN Cobham, Gerador, Antena)</span>
+<span class="font-code-sm text-code-sm text-error font-bold">5 devolvidos • 3 em trânsito de retorno</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Último contato rádio: há 35 minutos</span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-1 rounded bg-error-container/40 hover:bg-error-container/60 text-error font-label-tactical text-label-tactical uppercase tracking-wider transition-colors font-bold flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">notification_important</span> Cobrar Devolução
+              </button>
+<button class="px-space-md py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+                Receber Carga
+              </button>
+</div>
+</div>
+</div>
+<!-- CARD 4: CAUTELA SALA DE CRISE -->
+<div class="p-space-md rounded-xl bg-surface-container hover:bg-surface-container-high transition-all shadow-sm flex flex-col gap-space-sm cursor-pointer">
+<div class="flex items-start justify-between gap-space-sm flex-wrap">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-secondary-container/30 text-secondary-fixed font-label-tactical text-label-tactical uppercase tracking-wider font-bold">CAUTELA FIXA</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider">SALA DE OPERAÇÕES</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code-sm text-code-sm">#CF-COPM-04</span>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary">CONFERÊNCIA EM DIA</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">CENTRO DE OPERAÇÕES MILITARES (COPM) — SALA DE CRISE</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Terminais de monitoramento sigiloso, projetores de ultra-alta resolução e switches criptografados.</span>
+</div>
+<div class="flex items-center justify-between pt-space-xs text-body-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-code-sm text-code-sm text-on-surface">Resp: <strong>2º Ten Duarte (SARAM 6821940)</strong></span>
+<span class="text-outline-variant">|</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">12 Itens sob custódia</span>
+</div>
+<button class="px-space-md py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors" type="button">
+              Histórico &amp; Inventário
+            </button>
+</div>
+</div>
+</div>
+<!-- COLUMN B: DETAIL & SCAN MANAGEMENT PANEL (35% on Desktop -> 5 cols) -->
+<div class="lg:col-span-5 xl:col-span-5 2xl:col-span-4 flex flex-col gap-space-md bg-surface-container/90 backdrop-blur-xl p-space-md rounded-2xl shadow-xl">
+<!-- Panel Top Header -->
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">assignment_turned_in</span>
+<div class="flex flex-col">
+<span class="font-label-tactical text-label-tactical text-primary uppercase tracking-wider font-bold">GERENCIAMENTO DA CAUTELA</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">#OP-2024-0089</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="h-8 w-8 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors" title="Imprimir Termo Militar Oficial" type="button">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="h-8 w-8 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors" title="Editar Metadados da Missão" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="h-8 w-8 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-error hover:text-on-error text-on-surface-variant transition-colors" title="Cancelar Cautela" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Responsible Profile Card -->
+<div class="p-space-sm rounded-xl bg-surface-container-lowest/80 flex items-center gap-space-md">
+<div class="relative w-12 h-12 flex-shrink-0 flex items-center justify-center">
+<img alt="1º Ten Cavalcanti" class="w-12 h-12 rounded-full object-cover" data-alt="Close-up military officer in Brazilian Air Force tactical uniform, wearing a communication headset, focused expression, cinematic dark blue aerospace command center ambient lighting, hyper-realistic, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArXJCsUemoB8oFDMDQcGyMlwlrvUnZNXPND5hlYUQgET5miZ6IJk4-y6xkOApBATXbv3n4OLUyhD0P3Tc8_ipxu2i0Ph0TSRJUSPwj3vJOkQZzuMFVhG5cc76M7qrqONFV7E2yHpyLSeWFnXVBJuZRF0MKvO0d5VMqGn2vowyHT-cDvRaEWk1CT6lsj3TFfMGoO8TakYjwqS2ofCxzfBVNKHIzWVYzbyTqDWEUzklD">
+<span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-tertiary"></span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">1º Ten Cavalcanti</span>
+<span class="px-space-xs py-0.5 rounded bg-primary/20 text-primary font-code-sm text-code-sm font-bold">OFICIAL CMT</span>
+</div>
+<span class="font-code-sm text-code-sm text-primary">SARAM 7129402 • Pelotão OpEsp</span>
+<div class="flex items-center gap-space-sm text-outline font-code-sm text-code-sm mt-0.5">
+<span>OM: BINFAE-GL</span>
+<span>•</span>
+<span class="text-tertiary">Tel: (21) 98452-9911</span>
+</div>
+</div>
+</div>
+<!-- BARCODE & RFID WEDGE INTERCEPT SECTION -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[18px]">barcode_scanner</span>
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-wider font-bold">LEITOR DE CÓDIGO USB (WEDGE)</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-high p-0.5 rounded-lg text-code-sm font-code-sm">
+<button class="px-2 py-0.5 rounded bg-primary text-on-primary font-bold" type="button">Unitário</button>
+<button class="px-2 py-0.5 rounded text-on-surface-variant hover:text-on-surface" type="button">Em Lote</button>
+</div>
+</div>
+<!-- Wedge Input Bar -->
+<div class="relative w-full">
+<input autofocus="" class="w-full pl-3 pr-24 py-2.5 rounded-lg bg-surface-container text-on-surface font-telemetry-data text-telemetry-data placeholder:text-outline/70 focus:outline-none focus:ring-2 focus:ring-tertiary transition-all" id="barcodeInput" placeholder="Aguardando bip do leitor USB... (BMP / S/N)" type="text">
+<div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+</span>
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase">PRONTO</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-space-sm pt-1">
+<button class="flex-1 py-1.5 px-space-sm rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors font-label-tactical text-label-tactical uppercase tracking-wider flex items-center justify-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">edit_note</span>
+<span>Adicionar Manual</span>
+</button>
+<button class="flex-1 py-1.5 px-space-sm rounded-lg bg-primary hover:bg-primary/80 text-on-primary transition-colors font-label-tactical text-label-tactical uppercase tracking-wider font-bold flex items-center justify-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">download_done</span>
+<span>Gravar Itens</span>
+</button>
+</div>
+</div>
+<!-- ITEMS CURRENTLY IN THE SELECTED CAUTELA -->
+<div class="flex flex-col gap-space-sm flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">EQUIPAMENTOS CARREGADOS (4 REGISTRADOS)</span>
+<span class="font-code-sm text-code-sm text-primary">POST /cautelas/89/itens</span>
+</div>
+<!-- Items Scroll Area -->
+<div class="flex flex-col gap-1.5 max-h-[380px] overflow-y-auto pr-1">
+<!-- ITEM 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">radio</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm text-on-surface font-bold">BMP-882104</span>
+<span class="px-1 py-0.2 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical text-[9px] uppercase">CAUTELADO</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Rádio Motorola APX 8000 Rugged</span>
+<span class="font-code-sm text-code-sm text-outline truncate">S/N: MOT-9938210 • Estação Bravo</span>
+</div>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors flex-shrink-0" onclick="openReturnModal('BMP-882104', 'Rádio Motorola APX 8000')" type="button">
+                Devolver
+              </button>
+</div>
+<!-- ITEM 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">laptop_chromebook</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm text-on-surface font-bold">BMP-884912</span>
+<span class="px-1 py-0.2 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical text-[9px] uppercase">CAUTELADO</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Dell Latitude 5430 Rugged Extreme</span>
+<span class="font-code-sm text-code-sm text-outline truncate">S/N: DEL-8830114 • Criptografia Ativa</span>
+</div>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors flex-shrink-0" onclick="openReturnModal('BMP-884912', 'Dell Latitude 5430 Rugged')" type="button">
+                Devolver
+              </button>
+</div>
+<!-- ITEM 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm text-on-surface font-bold">BMP-890122</span>
+<span class="px-1 py-0.2 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical text-[9px] uppercase">CAUTELADO</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Câmera Térmica FLIR Ranger HD</span>
+<span class="font-code-sm text-code-sm text-outline truncate">S/N: FLIR-55209 • Lente 150mm</span>
+</div>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-primary hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-colors flex-shrink-0" onclick="openReturnModal('BMP-890122', 'Câmera Térmica FLIR Ranger HD')" type="button">
+                Devolver
+              </button>
+</div>
+<!-- ITEM 4 (ALREADY RETURNED) -->
+<div class="p-space-sm rounded-lg bg-surface-container-lowest/50 flex items-center justify-between gap-space-sm opacity-70">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-tertiary flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm text-on-surface-variant font-bold line-through">BMP-881140</span>
+<span class="px-1 py-0.2 rounded bg-surface-container-high text-tertiary font-label-tactical text-label-tactical text-[9px] uppercase">DEVOLVIDO</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Roteador Satelital Cobham Explorer 710</span>
+<span class="font-code-sm text-code-sm text-outline truncate">Recebido por 2º Sgt Silva • 19/Out 11:20 BRT</span>
+</div>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary flex-shrink-0">OK</span>
+</div>
+</div>
+</div>
+<!-- FAST RETURN INSPECTION DRAWER (COLLAPSIBLE / INTERACTIVE) -->
+<div class="hidden p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-space-sm" id="returnDrawer">
+<div class="flex items-center justify-between">
+<span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-wider font-bold">DESCAUTELAR / RECEBIMENTO DE MATERIAL</span>
+<button class="text-outline hover:text-on-surface" onclick="closeReturnModal()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<div class="flex flex-col">
+<span class="font-code-sm text-code-sm text-primary font-bold" id="returnItemBmp">BMP-882104</span>
+<span class="font-body-sm text-body-sm text-on-surface" id="returnItemDesc">Rádio Motorola APX 8000</span>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">ESTADO DE CONSERVAÇÃO:</label>
+<div class="grid grid-cols-2 gap-1 font-body-sm">
+<button class="py-1 px-2 rounded bg-tertiary-container/30 text-tertiary font-semibold text-center" type="button">Perfeito / Sem Avarias</button>
+<button class="py-1 px-2 rounded bg-surface-container text-on-surface-variant hover:text-on-surface text-center" type="button">Requer Manutenção</button>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">OBSERVAÇÕES DO RECEBEDOR:</label>
+<input class="py-1 px-2 rounded bg-surface-container text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-tertiary" placeholder="Equipamento limpo com bateria carregada..." type="text">
+</div>
+<button class="w-full py-2 rounded-lg bg-tertiary-container hover:bg-tertiary-container/85 text-on-tertiary-container font-label-tactical text-label-tactical uppercase tracking-wider font-bold shadow-md transition-all flex items-center justify-center gap-1" onclick="executeReturn()" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Confirmar Devolução Imediata</span>
+</button>
+</div>
+</div>
+</div>
+<!-- TACTICAL HARDWARE & SHORTCUTS FOOTER STRIP -->
+<div class="p-space-sm bg-surface-container-lowest/90 rounded-xl flex flex-col md:flex-row items-center justify-between gap-space-md shadow-sm">
+<div class="flex items-center gap-space-md flex-wrap">
+<div class="flex items-center gap-space-xs text-tertiary font-label-tactical text-label-tactical uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+<span>BIPE O LEITOR USB A QUALQUER MOMENTO</span>
+</div>
+<span class="text-outline-variant font-code-sm text-code-sm hidden md:inline">|</span>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<kbd class="px-space-xs py-0.5 rounded bg-surface-container-high text-outline">Ctrl+B</kbd>
+<span>Foco no Leitor</span>
+</div>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<kbd class="px-space-xs py-0.5 rounded bg-surface-container-high text-outline">Ctrl+N</kbd>
+<span>Nova Missão</span>
+</div>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<kbd class="px-space-xs py-0.5 rounded bg-surface-container-high text-outline">Esc</kbd>
+<span>Fechar Painel</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm font-code-sm text-code-sm text-outline">
+<span>API ENDPOINTS:</span>
+<span class="text-secondary font-mono">GET /cautelas/{id}</span>
+<span>•</span>
+<span class="text-tertiary font-mono">POST /cautelas/{id}/itens/lote</span>
+</div>
+</div>
+</div>
+<!-- INLINE CLIENT MICRO-INTERACTIONS -->
+<script>
+    function openReturnModal(bmp, desc) {
+      const drawer = document.getElementById('returnDrawer');
+      const bmpEl = document.getElementById('returnItemBmp');
+      const descEl = document.getElementById('returnItemDesc');
+      if (drawer && bmpEl && descEl) {
+        bmpEl.textContent = bmp;
+        descEl.textContent = desc;
+        drawer.classList.remove('hidden');
+        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function closeReturnModal() {
+      const drawer = document.getElementById('returnDrawer');
+      if (drawer) drawer.classList.add('hidden');
+    }
+
+    function executeReturn() {
+      alert('Equipamento devolvido ao acervo com sucesso. Termo de devolução gerado.');
+      closeReturnModal();
+    }
+
+    document.getElementById('btnSync')?.addEventListener('click', function() {
+      const icon = document.getElementById('syncIcon');
+      if (icon) {
+        icon.classList.add('animate-spin');
+        setTimeout(() => {
+          icon.classList.remove('animate-spin');
+        }, 800);
+      }
+    });
+
+    // Global barcode scanner shortcut Ctrl+B
+    window.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        const barcodeInput = document.getElementById('barcodeInput');
+        if (barcodeInput) {
+          barcodeInput.focus();
+          barcodeInput.select();
+        }
+      }
+    });
+  </script>
+</div></main></div>
+
+</body></html>

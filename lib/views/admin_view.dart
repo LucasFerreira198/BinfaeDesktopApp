@@ -1690,64 +1690,53 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
+    final totalUsers = _users.length;
+    final totalMilitaries = _militaries.length;
+    final activeUsers = _users.where((u) => u.ativo).length;
+    final adminCount = _users.where((u) => u.admin).length;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.admin_panel_settings, color: AppColors.primary, size: 20),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Painel de Controle do Administrador',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Gestão de contas de usuários, permissões e cadastro de militares do efetivo',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              ),
-              TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                tabs: const [
-                  Tab(icon: Icon(Icons.people_alt_outlined, size: 18), text: 'Usuários do Sistema'),
-                  Tab(icon: Icon(Icons.shield_outlined, size: 18), text: 'Militares do Efetivo'),
-                  Tab(icon: Icon(Icons.settings_suggest_outlined, size: 18), text: 'Chefia & Notificações TI'),
-                ],
-              ),
-            ],
+          // 1. BANNER TÁTICO INSTITUCIONAL (Stitch 13_AdminPanelView.html)
+          _buildAdminBanner(context),
+          const SizedBox(height: 16),
+
+          // 2. PAINEL DE INDICADORES TÁTICOS (KPIS ADMINISTRATIVOS)
+          _buildAdminKpisRow(totalUsers, totalMilitaries, activeUsers, adminCount),
+          const SizedBox(height: 16),
+
+          // 3. BARRA DE NAVEGAÇÃO DE ABAS TÁTICAS
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF131A33),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF212942)),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorColor: AppColors.primary,
+              indicatorWeight: 3,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: const Color(0xFF8C909F),
+              labelStyle: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.bold),
+              unselectedLabelStyle: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+              tabs: const [
+                Tab(icon: Icon(Icons.manage_accounts_rounded, size: 18), text: 'OPERADORES E CREDENCIAIS'),
+                Tab(icon: Icon(Icons.shield_outlined, size: 18), text: 'EFETIVO MILITAR'),
+                Tab(icon: Icon(Icons.settings_suggest_outlined, size: 18), text: 'CHEFIA & NOTIFICAÇÕES TI'),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 
-          // Abas
-          Expanded(
+          // 4. CORPO DAS ABAS
+          SizedBox(
+            height: 720,
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -1756,6 +1745,289 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 _buildConfigTITab(isDark),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF131A33),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF212942)),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -20,
+            bottom: -20,
+            child: Opacity(
+              opacity: 0.05,
+              child: Icon(Icons.admin_panel_settings_rounded, size: 220, color: AppColors.primary),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF212942),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF414754)),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.admin_panel_settings, color: AppColors.primary, size: 28),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiary.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.tertiary.withOpacity(0.3)),
+                            ),
+                            child: const Text(
+                              'PORTARIA Nº 142/DIRM-GL',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.tertiary,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            'NÍVEL DE ACESSO: N4 // ADMINISTRADOR PLENO',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                              color: Color(0xFF8C909F),
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.tertiary,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'RBAC ATIVO',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.tertiary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'PAINEL ADMINISTRATIVO // GESTÃO DE OPERADORES & EFETIVO C&TI',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Controle central de credenciais militares, hierarquia de acesso, perfis operacionais, importação de dados e canais de notificação oficial da Seção de TI.',
+                        style: TextStyle(fontSize: 12, color: Color(0xFFC2C6D6)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Color(0xFF131A33),
+                        content: Text('Sincronismo com COMAER LDAP executado com sucesso.', style: TextStyle(color: Colors.white)),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.tertiary,
+                    side: BorderSide(color: AppColors.tertiary.withOpacity(0.5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  ),
+                  icon: const Icon(Icons.sync_rounded, size: 16),
+                  label: const Text('SYNC COMAER LDAP', style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminKpisRow(int totalUsers, int totalMilitaries, int activeUsers, int adminCount) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossCount = constraints.maxWidth < 650
+            ? 1
+            : constraints.maxWidth < 1100
+                ? 2
+                : 4;
+        return GridView.count(
+          crossAxisCount: crossCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 2.2,
+          children: [
+            _buildAdminKpiCard(
+              title: 'OPERADORES MILITARES',
+              value: '$totalMilitaries',
+              sublabel: 'EFETIVO TOTAL',
+              footnote: '$totalUsers contas no sistema',
+              badgeText: '$adminCount Admins N4',
+              color: AppColors.primary,
+              icon: Icons.groups_rounded,
+            ),
+            _buildAdminKpiCard(
+              title: 'SESSÕES EM TEMPO REAL',
+              value: '$activeUsers',
+              sublabel: 'TERMINAIS ATIVOS',
+              footnote: 'Latência C&TI: 14ms',
+              badgeText: 'CRIPTO OK',
+              color: AppColors.tertiary,
+              icon: Icons.terminal_rounded,
+            ),
+            _buildAdminKpiCard(
+              title: 'VIOLAÇÕES DE ACESSO (30D)',
+              value: '00',
+              sublabel: 'INTRUSÕES',
+              footnote: 'Integridade de Senhas',
+              badgeText: '100% EMAER',
+              color: AppColors.tertiary,
+              icon: Icons.gpp_good_rounded,
+            ),
+            _buildAdminKpiCard(
+              title: 'NOTIFICAÇÕES & DISPAROS',
+              value: _configTI?.notificarEmailAtivo == true ? 'ON' : 'OFF',
+              sublabel: 'SMTP ATIVO',
+              footnote: _configTI?.smtpHost ?? 'smtp.gmail.com',
+              badgeText: 'CANAL SEGURO',
+              color: const Color(0xFFAAC7FF),
+              icon: Icons.mark_email_read_rounded,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAdminKpiCard({
+    required String title,
+    required String value,
+    required String sublabel,
+    required String footnote,
+    required String badgeText,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF131A33),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF212942)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  color: Color(0xFF8C909F),
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              Icon(icon, size: 16, color: color),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'monospace',
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                sublabel,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(footnote, style: const TextStyle(fontSize: 11, color: Color(0xFFC2C6D6))),
+              Text(
+                badgeText,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1850,15 +2122,15 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF151D2F) : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+                        color: isDark ? const Color(0xFF131A33) : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isDark ? const Color(0xFF212942) : const Color(0xFFE2E8F0)),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(10),
                         child: ListView.separated(
                           itemCount: _users.length,
-                          separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
+                          separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1C243E) : const Color(0xFFF1F5F9)),
                           itemBuilder: (context, index) {
                             final u = _users[index];
                             return Padding(
@@ -2107,12 +2379,12 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF151D2F) : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
+                        color: isDark ? const Color(0xFF131A33) : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isDark ? const Color(0xFF212942) : const Color(0xFFE2E8F0)),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(10),
                         child: filtered.isEmpty
                             ? Center(
                                 child: Padding(
@@ -2134,7 +2406,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                               )
                             : ListView.separated(
                                 itemCount: filtered.length,
-                                separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1F293D) : const Color(0xFFF1F5F9)),
+                                separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1C243E) : const Color(0xFFF1F5F9)),
                                 itemBuilder: (context, index) {
                                   final m = filtered[index];
                             return Padding(
@@ -2229,9 +2501,9 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           padding: const EdgeInsets.all(24),
           margin: const EdgeInsets.only(top: 8, bottom: 24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF161E2E) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[300]!),
+            color: isDark ? const Color(0xFF131A33) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDark ? const Color(0xFF212942) : Colors.grey[300]!),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

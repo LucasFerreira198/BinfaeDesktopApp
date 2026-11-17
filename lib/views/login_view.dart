@@ -549,22 +549,25 @@ class _LoginViewState extends State<LoginView> {
     final auth = Provider.of<AuthProvider>(context);
     final apiService = Provider.of<ApiService>(context);
 
+    final zuluNow = DateTime.now().toUtc();
+    final zuluFormatted = "${zuluNow.hour.toString().padLeft(2, '0')}:${zuluNow.minute.toString().padLeft(2, '0')}:${zuluNow.second.toString().padLeft(2, '0')} Z";
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF080C14) : const Color(0xFFF1F5F9),
+      backgroundColor: AppColors.surface,
       body: Stack(
         children: [
-          // Luzes de ambiente sutis ao fundo (Glows decorativos estilo desktop)
+          // Luzes de ambiente sutis táticas (Stitch Atmospheric Gradients)
           Positioned(
-            top: -120,
-            left: -100,
+            top: -100,
+            right: -100,
             child: Container(
-              width: 450,
-              height: 450,
+              width: 480,
+              height: 480,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withOpacity(isDark ? 0.18 : 0.08),
+                    AppColors.primaryContainer.withOpacity(0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -572,8 +575,8 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
           Positioned(
-            bottom: -150,
-            right: -100,
+            bottom: -120,
+            left: -100,
             child: Container(
               width: 500,
               height: 500,
@@ -581,7 +584,7 @@ class _LoginViewState extends State<LoginView> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF10B981).withOpacity(isDark ? 0.12 : 0.06),
+                    AppColors.tertiary.withOpacity(0.08),
                     Colors.transparent,
                   ],
                 ),
@@ -589,601 +592,551 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
 
-          // Botão de Engrenagem no canto superior direito da janela
-          Positioned(
-            top: 24,
-            right: 24,
-            child: Material(
-              color: Colors.transparent,
-              child: Tooltip(
-                message: apiService.proxyEnabled
-                    ? 'Proxy Ativo (${apiService.proxyHost}:${apiService.proxyPort}) - Clique para ajustar'
-                    : 'Configurações de Proxy Corporativo',
-                child: InkWell(
-                  onTap: _showProxyConfigDialog,
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF131D31) : Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: apiService.proxyEnabled
-                            ? AppColors.primary
-                            : (isDark ? const Color(0xFF1E293B) : const Color(0xFFCBD5E1)),
-                        width: apiService.proxyEnabled ? 1.5 : 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          Icons.settings_outlined,
-                          size: 22,
-                          color: apiService.proxyEnabled
-                              ? AppColors.primaryLight
-                              : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                        ),
-                        if (apiService.proxyEnabled)
-                          Positioned(
-                            right: -2,
-                            top: -2,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: const Color(0xFF10B981),
-                                border: Border.all(
-                                  color: isDark ? const Color(0xFF131D31) : Colors.white,
-                                  width: 1.5,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Centro com o Cartão de Login Modernizado
+          // Centro com Cartão Tático de Login (Google Stitch Design)
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Container(
-                width: 460,
-                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 36),
+                width: 490,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-                    width: 1.2,
-                  ),
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.outlineVariant, width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.45 : 0.08),
-                      blurRadius: 36,
-                      offset: const Offset(0, 14),
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 32,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-                child: Stack(
-                  clipBehavior: Clip.none,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Botão discreto de engrenagem no canto superior direito do cartão
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Tooltip(
-                        message: 'Configurações de Proxy de Rede',
-                        child: InkWell(
-                          onTap: _showProxyConfigDialog,
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: apiService.proxyEnabled
-                                  ? AppColors.primary.withOpacity(0.12)
-                                  : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: apiService.proxyEnabled
-                                    ? AppColors.primary
-                                    : (isDark ? const Color(0xFF2E3D5B) : const Color(0xFFCBD5E1)),
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.settings_outlined,
-                              size: 18,
-                              color: apiService.proxyEnabled
-                                  ? AppColors.primaryLight
-                                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                    // Emblema Institucional Militar FAB / BINFAE
+                    // Top Operational Telemetry Ribbon
                     Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.40),
-                            blurRadius: 22,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: const BoxDecoration(
+                        color: AppColors.surfaceContainerLowest,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(Icons.shield_rounded, color: Colors.white, size: 44),
-                          Positioned(
-                            bottom: 12,
-                            right: 12,
-                            child: Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 1.5),
-                              ),
-                              child: const Icon(Icons.dns_rounded, color: Colors.white, size: 10),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Títulos Oficiais
-                    Text(
-                      'FORÇA AÉREA BRASILEIRA • BINFAE-GL',
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.4,
-                        color: isDark ? AppColors.primaryLight : const Color(0xFF6D28D9),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Sistema de Informática',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Gestão Integrada de Patrimônio & Cautelas',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Badge Interativa de Status da Conexão com a Nuvem
-                    InkWell(
-                      onTap: () => _checkServer(showFeedback: true),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1A2235) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: _serverOnline == true
-                                ? AppColors.success.withOpacity(0.3)
-                                : _serverOnline == false
-                                    ? AppColors.danger.withOpacity(0.3)
-                                    : Colors.transparent,
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_isPinging)
-                              const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryLight),
-                              )
-                            else
+                          Row(
+                            children: [
                               Container(
-                                width: 8,
-                                height: 8,
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _serverOnline == true
-                                      ? AppColors.success
-                                      : _serverOnline == false
-                                          ? AppColors.danger
-                                          : AppColors.warning,
-                                  boxShadow: _serverOnline == true
-                                      ? [
-                                          BoxShadow(
-                                            color: AppColors.success.withOpacity(0.6),
-                                            blurRadius: 6,
-                                            spreadRadius: 1,
-                                          ),
-                                        ]
-                                      : null,
+                                  color: AppColors.tertiary.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 6,
+                                      height: 6,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.tertiary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'DEFCON 4 // RESTRITO',
+                                      style: TextStyle(
+                                        fontFamily: 'JetBrains Mono',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.tertiary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _isPinging
-                                  ? 'Testando conexão...'
-                                  : _serverOnline == true
-                                      ? 'Nuvem SP Online ${_latencyMs != null ? "($_latencyMs ms)" : ""}'
-                                      : _serverOnline == false
-                                          ? 'Servidor Inacessível (Toque p/ testar)'
-                                          : 'Verificando Nuvem...',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: _serverOnline == true
-                                    ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
-                                    : _serverOnline == false
-                                        ? AppColors.danger
-                                        : (isDark ? Colors.white70 : Colors.black87),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'TERMINAL-GL-7740',
+                                style: TextStyle(
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 10,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.refresh_rounded,
-                              size: 13,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (apiService.proxyEnabled) ...[
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: _showProxyConfigDialog,
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.primary.withOpacity(0.35)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.vpn_lock_rounded, size: 12, color: AppColors.primaryLight),
-                              const SizedBox(width: 5),
-                              Text(
-                                'Proxy: ${apiService.proxyHost}:${apiService.proxyPort}',
-                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.edit_outlined, size: 11, color: isDark ? Colors.white54 : Colors.black45),
                             ],
                           ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 22),
-
-                    // Banner de Erro Inline (se houver)
-                    if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        margin: const EdgeInsets.only(bottom: 18),
-                        decoration: BoxDecoration(
-                          color: AppColors.danger.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.danger.withOpacity(0.35)),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 18),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
+                          Row(
+                            children: [
+                              const Icon(Icons.schedule, size: 14, color: AppColors.primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                zuluFormatted,
                                 style: const TextStyle(
-                                  fontSize: 12,
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.danger,
-                                  height: 1.3,
+                                  color: AppColors.onSurfaceVariant,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.danger),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => setState(() => _errorMessage = null),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-
-                    // Campo SARAM / Usuário
-                    TextField(
-                      controller: _userController,
-                      focusNode: _userFocus,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelText: 'SARAM ou Usuário',
-                        hintText: 'Ex: 7654321 ou operador',
-                        prefixIcon: const Icon(Icons.badge_outlined, size: 20),
-                        suffixIcon: _userController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 18),
-                                onPressed: () {
-                                  _userController.clear();
-                                  setState(() {});
-                                },
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: isDark ? const Color(0xFF131B2E) : const Color(0xFFF8FAFC),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF243049) : const Color(0xFFCBD5E1),
+                            ],
                           ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF243049) : const Color(0xFFCBD5E1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                        ),
-                      ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Campo Senha
-                    TextField(
-                      controller: _passController,
-                      focusNode: _passFocus,
-                      obscureText: _obscurePassword,
-                      onSubmitted: (_) => _handleLogin(),
-                      decoration: InputDecoration(
-                        labelText: 'Senha de Acesso',
-                        hintText: 'Digite sua senha',
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                            size: 20,
-                          ),
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                        ),
-                        filled: true,
-                        fillColor: isDark ? const Color(0xFF131B2E) : const Color(0xFFF8FAFC),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF243049) : const Color(0xFFCBD5E1),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF243049) : const Color(0xFFCBD5E1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                        ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 16),
 
-                    // CARD DE OPÇÃO: "LEMBRAR POR 24 HORAS" (Novo recurso solicitado)
-                    InkWell(
-                      onTap: () {
-                        setState(() => _rememberMe = !_rememberMe);
-                      },
-                      borderRadius: BorderRadius.circular(14),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _rememberMe
-                              ? (isDark ? AppColors.primary.withOpacity(0.12) : const Color(0xFFF3E8FF))
-                              : (isDark ? const Color(0xFF131B2E) : const Color(0xFFF8FAFC)),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: _rememberMe
-                                ? AppColors.primary.withOpacity(0.5)
-                                : (isDark ? const Color(0xFF243049) : const Color(0xFFE2E8F0)),
-                            width: 1.2,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(7),
-                              decoration: BoxDecoration(
-                                color: _rememberMe
-                                    ? AppColors.primary.withOpacity(0.2)
-                                    : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(
-                                _rememberMe ? Icons.history_toggle_off_rounded : Icons.schedule_outlined,
-                                size: 18,
-                                color: _rememberMe ? AppColors.primaryLight : const Color(0xFF64748B),
-                              ),
+                    // Main Card Interior Body
+                    Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Telemetry Status Pill & Health Check
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.5)),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Lembrar por 24 horas',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                        ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: _serverOnline == true
+                                            ? AppColors.tertiary
+                                            : (_serverOnline == false ? AppColors.error : AppColors.warning),
+                                        boxShadow: _serverOnline == true
+                                            ? [
+                                                BoxShadow(
+                                                  color: AppColors.tertiary.withOpacity(0.6),
+                                                  blurRadius: 6,
+                                                  spreadRadius: 1,
+                                                ),
+                                              ]
+                                            : null,
                                       ),
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                        decoration: BoxDecoration(
-                                          color: _rememberMe ? AppColors.primary : const Color(0xFF64748B),
-                                          borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'BACKEND NUVEM: ',
+                                              style: TextStyle(
+                                                fontFamily: 'JetBrains Mono',
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.onSurface,
+                                              ),
+                                            ),
+                                            Text(
+                                              _serverOnline == true ? 'ONLINE' : (_serverOnline == false ? 'OFFLINE' : 'VERIFICANDO...'),
+                                              style: TextStyle(
+                                                fontFamily: 'JetBrains Mono',
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: _serverOnline == true ? AppColors.tertiary : AppColors.error,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        child: const Text(
-                                          '24H',
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w800,
-                                            color: Colors.white,
+                                        Text(
+                                          _isPinging
+                                              ? 'Testando conexão...'
+                                              : 'Latência: ${_latencyMs ?? 24}ms • Galeão HUB',
+                                          style: const TextStyle(
+                                            fontFamily: 'JetBrains Mono',
+                                            fontSize: 10,
+                                            color: AppColors.onSurfaceVariant,
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                InkWell(
+                                  onTap: () => _checkServer(showFeedback: true),
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceContainerHigh,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        _isPinging
+                                            ? const SizedBox(
+                                                width: 12,
+                                                height: 12,
+                                                child: CircularProgressIndicator(strokeWidth: 1.8, color: AppColors.primary),
+                                              )
+                                            : const Icon(Icons.sync_rounded, size: 14, color: AppColors.primary),
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          'Testar API',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontFamily: 'JetBrains Mono',
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Heraldry & Header
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 72,
+                                height: 72,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceContainerLowest,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.primaryContainer.withOpacity(0.4), width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primaryContainer.withOpacity(0.2),
+                                      blurRadius: 18,
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.military_tech_rounded, color: AppColors.primary, size: 40),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primaryContainer,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.shield_rounded, color: Colors.white, size: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'BINFAE-GL',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                          const Text(
+                            'SEÇÃO DE INFORMÁTICA // ALA 11',
+                            style: TextStyle(
+                              fontFamily: 'JetBrains Mono',
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Sistema Integrado de Gestão Tática e Patrimônio de TI • Base Aérea do Galeão',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+
+                          // Banner de Erro Inline (se houver)
+                          if (_errorMessage != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.errorContainer.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.error.withOpacity(0.4)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 18),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _errorMessage!,
+                                      style: const TextStyle(fontSize: 12, color: AppColors.error),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.error),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => setState(() => _errorMessage = null),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+
+                          // Campo SARAM / Login
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'SARAM / LOGIN DE REDE FAB',
+                                style: TextStyle(
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onSurfaceVariant,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              TextField(
+                                controller: _userController,
+                                focusNode: _userFocus,
+                                textInputAction: TextInputAction.next,
+                                style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 13, color: AppColors.onSurface),
+                                decoration: InputDecoration(
+                                  hintText: 'Ex: 7891234 ou usuario.silva',
+                                  prefixIcon: const Icon(Icons.badge_outlined, size: 18, color: AppColors.outline),
+                                  suffixIcon: _userController.text.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(Icons.cancel_rounded, size: 16, color: AppColors.outline),
+                                          onPressed: () {
+                                            _userController.clear();
+                                            setState(() {});
+                                          },
+                                        )
+                                      : null,
+                                  filled: true,
+                                  fillColor: AppColors.surfaceContainerLowest,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                  ),
+                                ),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Campo Senha
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'SENHA DE ACESSO TÁTICO',
+                                style: TextStyle(
+                                  fontFamily: 'JetBrains Mono',
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onSurfaceVariant,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              TextField(
+                                controller: _passController,
+                                focusNode: _passFocus,
+                                obscureText: _obscurePassword,
+                                onSubmitted: (_) => _handleLogin(),
+                                style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 13, color: AppColors.onSurface),
+                                decoration: InputDecoration(
+                                  hintText: '••••••••••••',
+                                  prefixIcon: const Icon(Icons.lock_outline_rounded, size: 18, color: AppColors.outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                      size: 18,
+                                      color: AppColors.outline,
+                                    ),
+                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.surfaceContainerLowest,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Lembrar no Terminal
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: () => setState(() => _rememberMe = !_rememberMe),
+                                borderRadius: BorderRadius.circular(6),
+                                child: Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      activeColor: AppColors.primaryContainer,
+                                      onChanged: (val) => setState(() => _rememberMe = val ?? false),
+                                    ),
+                                    const Text(
+                                      'Lembrar neste terminal',
+                                      style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Contate o Administrador da Seção de TI pelo ramal 2411 para redefinição.'),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  'Esqueci as credenciais',
+                                  style: TextStyle(fontSize: 12, color: AppColors.primary),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+
+                          // Botão Principal Acessar Sistema
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: auth.isLoading ? null : _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryContainer,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                elevation: 2,
+                              ),
+                              icon: auth.isLoading
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : const Icon(Icons.login_rounded, size: 20),
+                              label: Text(
+                                auth.isLoading ? 'Autenticando credenciais...' : 'Acessar Sistema',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Botão de Proxy Corporativo
+                          InkWell(
+                            onTap: _showProxyConfigDialog,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    apiService.proxyEnabled ? Icons.vpn_lock_rounded : Icons.dns_outlined,
+                                    size: 16,
+                                    color: apiService.proxyEnabled ? AppColors.tertiary : AppColors.outline,
+                                  ),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    _rememberMe
-                                        ? 'Sessão mantida ativa mesmo ao fechar o app.'
-                                        : 'Ao fechar o app, o login será exigido novamente.',
+                                    apiService.proxyEnabled
+                                        ? 'Proxy Ativo (${apiService.proxyHost}:${apiService.proxyPort})'
+                                        : 'Configurar Servidor Proxy da Rede FAB',
                                     style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: _rememberMe
-                                          ? (isDark ? AppColors.primaryLight : const Color(0xFF6D28D9))
-                                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: apiService.proxyEnabled ? AppColors.tertiary : AppColors.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            Transform.scale(
-                              scale: 0.85,
-                              child: Switch(
-                                value: _rememberMe,
-                                activeColor: AppColors.primary,
-                                onChanged: (val) {
-                                  setState(() => _rememberMe = val);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 22),
 
-                    // Botão Principal de Login
-                    SizedBox(
+                    // Military Compliance Footer
+                    Container(
                       width: double.infinity,
-                      height: 50,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.35),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: const BoxDecoration(
+                        color: AppColors.surfaceContainerLowest,
+                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+                      ),
+                      child: const Column(
+                        children: [
+                          Text(
+                            'USO EXCLUSIVO EM SERVIÇO ATIVO DA FORÇA AÉREA BRASILEIRA • TERMINAL MONITORADO',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'JetBrains Mono',
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                              color: AppColors.outline,
                             ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: auth.isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
-                          child: auth.isLoading
-                              ? const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2),
-                                    ),
-                                    SizedBox(width: 12),
-                                    Text('Autenticando credenciais...', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                  ],
-                                )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.login_rounded, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Acessar Sistema', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                    SizedBox(width: 6),
-                                    Icon(Icons.arrow_forward_rounded, size: 16),
-                                  ],
-                                ),
-                        ),
+                          SizedBox(height: 2),
+                          Text(
+                            'VERSÃO DESKTOP 2.4.0 • SEÇÃO-TI-BAGL',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'JetBrains Mono',
+                              fontSize: 9,
+                              color: AppColors.outlineVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 14),
-
-                    // Rodapé de Segurança e Versão
-                    Text(
-                      'Uso restrito • Base Aérea do Galeão • ${UpdaterService.currentVersion} Nativo',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
-                ),
                   ],
                 ),
               ),

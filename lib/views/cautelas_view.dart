@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/cautela.dart';
@@ -9,7 +8,6 @@ import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/date_utils.dart';
 import '../widgets/cautela_detail_dialog.dart';
-import '../widgets/user_avatar.dart';
 
 class CautelasView extends StatefulWidget {
   const CautelasView({super.key});
@@ -23,21 +21,19 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   List<CautelaModel> _cautelas = [];
   bool _isLoading = true;
   String? _error;
-
-  String _selectedStatusFilter = 'ATIVA';
   final TextEditingController _searchCtrl = TextEditingController();
   int? _observedCautelasVersion;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() {});
       }
     });
-    // 0ms Stale-While-Revalidate: renderiza imediatamente dados salvos localmente
+
     final cached = StorageService().cautelas;
     if (cached.isNotEmpty) {
       _cautelas = cached;
@@ -100,7 +96,6 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
       }
     } catch (e) {
       if (mounted) {
-        // Se já temos dados no cache local, não trava a tela com erro
         if (_cautelas.isNotEmpty) {
           setState(() => _isLoading = false);
         } else {
@@ -114,8 +109,6 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   }
 
   Future<void> _createNewCautela({required String tipo}) async {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final isMission = tipo == 'MISSAO';
     final nameCtrl = TextEditingController();
     final obsCtrl = TextEditingController();
@@ -123,16 +116,22 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
     final created = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF151D2A) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: AppColors.surfaceContainerHigh,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.primary),
+        ),
         title: Row(
           children: [
             Icon(
-              isMission ? Icons.rocket_launch_outlined : Icons.lock_clock_outlined,
-              color: AppColors.cyan,
+              isMission ? Icons.flight_takeoff : Icons.lock_clock,
+              color: AppColors.primary,
             ),
             const SizedBox(width: 10),
-            Text(isMission ? 'Nova Missão Operacional' : 'Nova Cautela Fixa'),
+            Text(
+              isMission ? 'Nova Missão Operacional' : 'Nova Cautela Fixa',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+            ),
           ],
         ),
         content: SizedBox(
@@ -143,38 +142,39 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
             children: [
               Text(
                 isMission
-                    ? 'Informe o nome da missão. A data e hora serão registradas no horário oficial de Brasília.'
-                    : 'Informe o nome/identificador da cautela fixa (ex: Posto Médico, Guarda do Quartel).',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: isDark ? Colors.white70 : const Color(0xFF475569),
-                ),
+                    ? 'Informe a designação da missão tática (Ex: Operação Ágata, Escolta VIP). Prazos e termo de cautela serão gerados com carimbo ZULU.'
+                    : 'Informe o identificador do posto ou divisão (Ex: Guarda do Quartel, Sala de Rádio BAGL).',
+                style: const TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
               ),
               const SizedBox(height: 16),
-              const Text('Nome / Identificação:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text('Nome / Identificação:', style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 6),
               TextField(
                 controller: nameCtrl,
                 autofocus: true,
+                style: const TextStyle(fontSize: 13, color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: isMission ? 'Ex: Missão Escolta VIP, Exercício Operacional...' : 'Ex: Cautela Fixa do PAv...',
+                  hintText: isMission ? 'Ex: Op. Ágata - Posto Avançado Terminal 2' : 'Ex: Cautela Fixa - Posto de Guarda Portão Sul',
+                  hintStyle: const TextStyle(fontSize: 12, color: AppColors.outline),
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  fillColor: AppColors.surfaceContainerLowest,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4))),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
               ),
               const SizedBox(height: 14),
-              const Text('Observações (Opcional):', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text('Observações Táticas (Opcional):', style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 6),
               TextField(
                 controller: obsCtrl,
                 maxLines: 2,
+                style: const TextStyle(fontSize: 13, color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Detalhes adicionais relevantes...',
+                  hintText: 'Ordens de serviço, canal rádio VHF, armamento conjunto...',
+                  hintStyle: const TextStyle(fontSize: 12, color: AppColors.outline),
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  fillColor: AppColors.surfaceContainerLowest,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4))),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
               ),
@@ -184,21 +184,21 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar', style: TextStyle(color: AppColors.outline)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.cyan,
-              foregroundColor: const Color(0xFF0F172A),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              backgroundColor: AppColors.primaryContainer,
+              foregroundColor: const Color(0xFF00285D),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
             onPressed: () async {
               final nome = nameCtrl.text.trim();
               if (nome.isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   const SnackBar(
-                    backgroundColor: AppColors.warning,
-                    content: Text('Por favor, informe o nome ou identificação da missão/cautela.'),
+                    backgroundColor: AppColors.surfaceContainerHigh,
+                    content: Text('Por favor, informe o nome ou identificação da cautela.', style: TextStyle(color: AppColors.warning)),
                   ),
                 );
                 return;
@@ -215,7 +215,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
               } catch (e) {
                 if (ctx.mounted) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(backgroundColor: AppColors.danger, content: Text('Erro: $e')),
+                    SnackBar(backgroundColor: AppColors.surfaceContainerHigh, content: Text('Erro: $e', style: const TextStyle(color: AppColors.error))),
                   );
                 }
               }
@@ -232,8 +232,6 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
   }
 
   void _openQuickScanner() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final scanController = TextEditingController();
     final focusNode = FocusNode();
 
@@ -265,7 +263,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                 if (context.mounted) {
                   setModalState(() {
                     scanning = false;
-                    scanMsg = 'Devolução confirmada! Material "${res.item?.nome ?? trimmed}" devolvido com sucesso.';
+                    scanMsg = 'Devolução confirmada! Material "${res.item?.nome ?? trimmed}" retornado ao depósito com sucesso.';
                   });
                   scanController.clear();
                   focusNode.requestFocus();
@@ -283,13 +281,19 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
             }
 
             return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF151D2A) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: AppColors.surfaceContainerHigh,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: AppColors.tertiary),
+              ),
               title: const Row(
                 children: [
-                  Icon(Icons.qr_code_scanner, color: AppColors.cyan),
+                  Icon(Icons.barcode_reader, color: AppColors.tertiary),
                   SizedBox(width: 10),
-                  Text('Descautelar por Leitor USB / Scanner'),
+                  Text(
+                    'Descautelar por Leitor USB / Scanner',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ],
               ),
               content: SizedBox(
@@ -297,47 +301,50 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Passe o leitor de código de barras ou digite o BMP para registrar a devolução imediata:',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: isDark ? Colors.white70 : const Color(0xFF475569),
-                      ),
+                    const Text(
+                      'Passe o leitor de código de barras USB ou digite o BMP para registrar a devolução imediata ao almoxarifado:',
+                      style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: scanController,
                       focusNode: focusNode,
                       autofocus: true,
+                      style: const TextStyle(fontSize: 13, color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Aguardando leitura do leitor USB...',
-                        prefixIcon: const Icon(Icons.qr_code, color: AppColors.cyan),
+                        hintText: 'Aguardando bip do leitor USB (ex: BMP-051902)...',
+                        hintStyle: const TextStyle(fontSize: 12, color: AppColors.outline),
+                        prefixIcon: const Icon(Icons.qr_code, color: AppColors.tertiary),
                         filled: true,
-                        fillColor: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        fillColor: AppColors.surfaceContainerLowest,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onSubmitted: submitCode,
                     ),
                     if (scanning) ...[
                       const SizedBox(height: 12),
-                      const LinearProgressIndicator(),
+                      const LinearProgressIndicator(color: AppColors.tertiary),
                     ],
                     if (scanMsg != null) ...[
                       const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: scanMsg!.startsWith('Devolução')
-                              ? AppColors.success.withOpacity(0.15)
-                              : AppColors.danger.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(8),
+                              ? AppColors.tertiary.withOpacity(0.15)
+                              : AppColors.error.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: scanMsg!.startsWith('Devolução') ? AppColors.tertiary : AppColors.error,
+                          ),
                         ),
                         child: Text(
                           scanMsg!,
                           style: TextStyle(
-                            fontSize: 12.5,
+                            fontSize: 12,
+                            fontFamily: 'monospace',
                             fontWeight: FontWeight.bold,
-                            color: scanMsg!.startsWith('Devolução') ? AppColors.success : AppColors.danger,
+                            color: scanMsg!.startsWith('Devolução') ? AppColors.tertiary : AppColors.error,
                           ),
                         ),
                       ),
@@ -348,7 +355,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Concluir'),
+                  child: const Text('Concluir', style: TextStyle(color: AppColors.primary)),
                 ),
               ],
             );
@@ -371,243 +378,317 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     final activeCautelas = _cautelas.where((c) => c.status == 'ATIVA').toList();
     final concludedCautelas = _cautelas.where((c) => c.status == 'CONCLUIDA').toList();
 
-    int totalItensEmUso = 0;
-    for (final c in activeCautelas) {
-      totalItensEmUso += c.itensCautelados;
-    }
+    final missoesAtivas = activeCautelas.where((c) => c.tipo == 'MISSAO').toList();
+    final fixasAtivas = activeCautelas.where((c) => c.tipo == 'FIXA').toList();
 
     final query = _searchCtrl.text.trim().toLowerCase();
 
-    List<CautelaModel> filteredList;
+    List<CautelaModel> currentList;
     if (_tabController.index == 0) {
-      // Missões Ativas
-      filteredList = activeCautelas.where((c) => c.tipo == 'MISSAO').toList();
+      currentList = activeCautelas;
     } else if (_tabController.index == 1) {
-      // Cautelas Fixas
-      filteredList = activeCautelas.where((c) => c.tipo == 'FIXA').toList();
+      currentList = missoesAtivas;
+    } else if (_tabController.index == 2) {
+      currentList = fixasAtivas;
     } else {
-      // Concluídas
-      filteredList = concludedCautelas;
+      currentList = concludedCautelas;
     }
 
     if (query.isNotEmpty) {
-      filteredList = filteredList.where((c) {
+      currentList = currentList.where((c) {
         final nameMatch = c.nome.toLowerCase().contains(query);
         final creatorMatch = (c.criador?.nomeGuerra.toLowerCase() ?? '').contains(query);
-        return nameMatch || creatorMatch;
+        final respMatch = c.responsavelNome.toLowerCase().contains(query);
+        final saramMatch = c.responsavelSaram.toLowerCase().contains(query);
+        return nameMatch || creatorMatch || respMatch || saramMatch;
       }).toList();
     }
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. HEADER LOANHUB: TÍTULO, SUBTÍTULO & 4 KPIS NO TOPO
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isCompact = constraints.maxWidth < 900;
-              final titleSection = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Cautelas e Missões Operacionais',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'Controle de cautelação, militares responsáveis e prazos de devolução',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              );
+          // =========================================================================
+          // 1. SUBHEADER / STATUS SUMMARY BAR (Google Stitch #08_CautelasView)
+          // =========================================================================
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 980;
 
-              final actionButtons = [
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    side: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFCBD5E1)),
-                  ),
-                  onPressed: _openQuickScanner,
-                  icon: const Icon(Icons.qr_code_scanner, size: 16, color: AppColors.cyan),
-                  label: const Text('Leitor USB / Scanner Devolução', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                ),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.cyan,
-                    foregroundColor: const Color(0xFF0F172A),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => _createNewCautela(tipo: _tabController.index == 1 ? 'FIXA' : 'MISSAO'),
-                  icon: const Icon(Icons.add, size: 18, color: Color(0xFF0F172A)),
-                  label: const Text('+ Nova Cautela / Missão', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
-                ),
-              ];
+                final titleSection = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      children: [
+                        const Text(
+                          'CONTROLE DE CAUTELAS & MISSÕES OPERACIONAIS',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.tertiary.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.tertiary.withOpacity(0.35)),
+                          ),
+                          child: const Text(
+                            'MÓDULO 03 // COORDENAÇÃO',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tertiary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'BINFAE-GL // SEÇÃO DE TI — Gestão de Equipamentos Táticos em Carga, Destacamentos e Termos de Responsabilidade',
+                      style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant),
+                    ),
+                  ],
+                );
 
-              if (isCompact) {
+                final actionButtons = Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _loadCautelas,
+                      icon: const Icon(Icons.sync, size: 15, color: AppColors.tertiary),
+                      label: const Text('Sincronizar', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white)),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _createNewCautela(tipo: 'FIXA'),
+                      icon: const Icon(Icons.lock_clock, size: 15, color: AppColors.primary),
+                      label: const Text('Nova Cautela Fixa', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white)),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () => _createNewCautela(tipo: 'MISSAO'),
+                      icon: const Icon(Icons.flight_takeoff, size: 16, color: Color(0xFF00285D)),
+                      label: const Text(
+                        'Nova Missão Operacional',
+                        style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Color(0xFF00285D)),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+                  ],
+                );
+
+                if (isWide) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: titleSection),
+                      const SizedBox(width: 14),
+                      actionButtons,
+                    ],
+                  );
+                }
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     titleSection,
                     const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: actionButtons,
-                    ),
+                    actionButtons,
                   ],
                 );
-              }
+              },
+            ),
+          ),
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 14),
+
+          // =========================================================================
+          // 2. FILTER TABS & SEARCH TACTICAL STRIP (Google Stitch #08_CautelasView)
+          // =========================================================================
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 900;
+
+              final tabsWidget = Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  indicator: BoxDecoration(
+                    color: AppColors.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: AppColors.onSurfaceVariant,
+                  labelStyle: const TextStyle(fontSize: 11.5, fontFamily: 'monospace', fontWeight: FontWeight.bold),
+                  tabs: [
+                    Tab(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.tertiary),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('Cautelas Ativas'),
+                          const SizedBox(width: 6),
+                          _buildCountBadge('${activeCautelas.length}', AppColors.tertiary),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primary),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('Missões em Andamento'),
+                          const SizedBox(width: 6),
+                          _buildCountBadge('${missoesAtivas.length}', AppColors.primary),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.secondary),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('Cautelas Fixas'),
+                          const SizedBox(width: 6),
+                          _buildCountBadge('${fixasAtivas.length}', AppColors.secondary),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.outline),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('Concluídas'),
+                          const SizedBox(width: 6),
+                          _buildCountBadge('${concludedCautelas.length}', AppColors.outline),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+              final searchAndScanner = Row(
                 children: [
-                  titleSection,
-                  Row(
-                    children: [
-                      actionButtons[0],
-                      const SizedBox(width: 10),
-                      actionButtons[1],
-                    ],
+                  Expanded(
+                    child: Container(
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+                      ),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        onChanged: (v) => setState(() {}),
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Filtrar por nome, responsável ou SARAM...',
+                          hintStyle: const TextStyle(fontSize: 11, color: AppColors.outline),
+                          prefixIcon: const Icon(Icons.search, size: 16, color: AppColors.primary),
+                          suffixIcon: _searchCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close, size: 14, color: AppColors.outline),
+                                  onPressed: () {
+                                    _searchCtrl.clear();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: _openQuickScanner,
+                    icon: const Icon(Icons.barcode_reader, size: 15, color: Color(0xFF003827)),
+                    label: const Text('Descautelar (Bip)', style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Color(0xFF003827))),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.tertiary,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
                   ),
                 ],
               );
-            },
-          ),
 
-          const SizedBox(height: 18),
-
-          // 2. LINHA DE 4 KPIS LOANHUB
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final kpiCards = [
-                _LoanHubKpiCard(
-                  title: 'Missões Ativas',
-                  value: '${activeCautelas.length}',
-                  glowColor: AppColors.cyan,
-                  isDark: isDark,
-                ),
-                _LoanHubKpiCard(
-                  title: 'Materiais em Campo',
-                  value: '$totalItensEmUso',
-                  glowColor: const Color(0xFF38BDF8),
-                  isDark: isDark,
-                ),
-                _LoanHubKpiCard(
-                  title: 'Devoluções Hoje',
-                  value: '${(activeCautelas.length * 0.4).round()}',
-                  glowColor: AppColors.warning,
-                  isDark: isDark,
-                  badge: 'Previsão',
-                ),
-                _LoanHubKpiCard(
-                  title: 'Cautelas Concluídas',
-                  value: '${concludedCautelas.length}',
-                  glowColor: AppColors.success,
-                  isDark: isDark,
-                ),
-              ];
-
-              if (constraints.maxWidth >= 900) {
+              if (isWide) {
                 return Row(
                   children: [
-                    for (int i = 0; i < kpiCards.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 14),
-                      Expanded(child: kpiCards[i]),
-                    ],
+                    Expanded(child: tabsWidget),
+                    const SizedBox(width: 12),
+                    SizedBox(width: 380, child: searchAndScanner),
                   ],
                 );
               }
 
-              final itemWidth = (constraints.maxWidth - 14) / 2;
-              return Wrap(
-                spacing: 14,
-                runSpacing: 14,
-                children: kpiCards.map((card) => SizedBox(width: itemWidth, child: card)).toList(),
-              );
-            },
-          ),
-
-          const SizedBox(height: 18),
-
-          // 3. BARRA DE TABS E BUSCA
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isCompact = constraints.maxWidth < 850;
-
-              final tabsWidget = Container(
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildTabPill('Missões Operacionais (${activeCautelas.where((c) => c.tipo == "MISSAO").length})', 0, isDark),
-                      _buildTabPill('Cautelas Fixas (${activeCautelas.where((c) => c.tipo == "FIXA").length})', 1, isDark),
-                      _buildTabPill('Histórico Concluídas (${concludedCautelas.length})', 2, isDark),
-                    ],
-                  ),
-                ),
-              );
-
-              final searchWidget = SizedBox(
-                width: isCompact ? double.infinity : 280,
-                height: 38,
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged: (_) => setState(() {}),
-                  style: const TextStyle(fontSize: 12),
-                  decoration: InputDecoration(
-                    hintText: 'Buscar por missão ou militar...',
-                    hintStyle: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
-                    prefixIcon: const Icon(Icons.search, size: 16, color: AppColors.cyan),
-                    filled: true,
-                    fillColor: isDark ? const Color(0xFF151D2A) : const Color(0xFFF1F5F9),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  ),
-                ),
-              );
-
-              if (isCompact) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    tabsWidget,
-                    const SizedBox(height: 10),
-                    searchWidget,
-                  ],
-                );
-              }
-
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return Column(
                 children: [
-                  Expanded(child: tabsWidget),
-                  const SizedBox(width: 14),
-                  searchWidget,
+                  tabsWidget,
+                  const SizedBox(height: 10),
+                  searchAndScanner,
                 ],
               );
             },
@@ -615,478 +696,256 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 
           const SizedBox(height: 14),
 
-          // 4. TABELA ESTRUTURADA DE CAUTELAS (ESTILO LOANHUB)
+          // =========================================================================
+          // 3. CAUTELAS GRID / FEED (Google Stitch #08_CautelasView)
+          // =========================================================================
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                const minTableWidth = 840.0;
-                final tableWidth = math.max(minTableWidth, constraints.maxWidth);
-                return Scrollbar(
-                  thumbVisibility: constraints.maxWidth < minTableWidth,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: tableWidth,
-                      child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                : _error != null
+                    ? Center(
+                        child: Text(_error!, style: const TextStyle(color: AppColors.error)),
+                      )
+                    : currentList.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fact_check_outlined, size: 48, color: AppColors.outline.withOpacity(0.5)),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  'Nenhuma cautela ou missão localizada nesta categoria.',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: currentList.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            itemBuilder: (ctx, i) {
+                              final c = currentList[i];
+                              return _TacticalCautelaCard(
+                                cautela: c,
+                                onInspect: () => _openCautelaDetail(c),
+                              );
+                            },
+                          ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildCountBadge(String count, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        count,
+        style: TextStyle(fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: color),
+      ),
+    );
+  }
+}
+
+class _TacticalCautelaCard extends StatelessWidget {
+  final CautelaModel cautela;
+  final VoidCallback onInspect;
+
+  const _TacticalCautelaCard({
+    required this.cautela,
+    required this.onInspect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isMission = cautela.tipo == 'MISSAO';
+    final isConcluded = cautela.status == 'CONCLUIDA';
+
+    final badgeColor = isConcluded
+        ? AppColors.outline
+        : (isMission ? AppColors.primary : AppColors.secondary);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row: Title, type badge, inspect button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      cautela.nome,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: badgeColor.withOpacity(0.35)),
+                      ),
+                      child: Text(
+                        isMission ? '#MS-${cautela.id.toString().padLeft(4, '0')}' : '#FX-${cautela.id.toString().padLeft(4, '0')}',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                          color: badgeColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Cabeçalho da Tabela
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        SizedBox(width: 100, child: Text('ID CAUTELA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        Expanded(flex: 3, child: Text('MISSÃO / DESTINO', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        Expanded(flex: 3, child: Text('MILITAR RESPONSÁVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        SizedBox(width: 120, child: Text('MATERIAIS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        SizedBox(width: 130, child: Text('DATA DE SAÍDA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        SizedBox(width: 100, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                        SizedBox(width: 80, child: Text('AÇÕES', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                      ],
-                    ),
-                  ),
-
-                  // Lista de Linhas
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _error != null
-                            ? Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.error_outline, size: 38, color: AppColors.danger),
-                                    const SizedBox(height: 8),
-                                    Text('Erro ao carregar cautelas: $_error', style: const TextStyle(color: AppColors.danger)),
-                                    const SizedBox(height: 8),
-                                    ElevatedButton(onPressed: _loadCautelas, child: const Text('Tentar Novamente')),
-                                  ],
-                                ),
-                              )
-                            : filteredList.isEmpty
-                                ? Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.assignment_turned_in_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
-                                        const SizedBox(height: 10),
-                                        const Text('Nenhuma cautela encontrada.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      ],
-                                    ),
-                                  )
-                                : ListView.separated(
-                                    itemCount: filteredList.length,
-                                    separatorBuilder: (_, __) => Divider(
-                                      height: 1,
-                                      color: isDark ? const Color(0xFF1E2838) : const Color(0xFFF1F5F9),
-                                    ),
-                                    itemBuilder: (ctx, i) {
-                                      final c = filteredList[i];
-                                      return _LoanHubTableRow(
-                                        cautela: c,
-                                        isDark: isDark,
-                                        onTap: () => _openCautelaDetail(c),
-                                      );
-                                    },
-                                  ),
-                  ),
-
-                  // Rodapé
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(16),
-                        bottomRight: Radius.circular(16),
-                      ),
-                      border: Border(
-                        top: BorderSide(
-                          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        ),
+                      color: isConcluded ? AppColors.outline.withOpacity(0.15) : AppColors.tertiary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: isConcluded ? AppColors.outline.withOpacity(0.3) : AppColors.tertiary.withOpacity(0.4),
                       ),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Mostrando ${filteredList.length} missões / cautelas',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                          ),
+                        Icon(
+                          isConcluded ? Icons.check_circle_outline : Icons.timer_outlined,
+                          size: 13,
+                          color: isConcluded ? AppColors.outline : AppColors.tertiary,
                         ),
-                        Row(
-                          children: [
-                            const Text('Página 1 de 1', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_left, size: 18),
-                              onPressed: null,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right, size: 18),
-                              onPressed: null,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
+                        const SizedBox(width: 4),
+                        Text(
+                          isConcluded ? 'CONCLUÍDA' : 'EM CURSO',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: isConcluded ? AppColors.outline : AppColors.tertiary,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: onInspect,
+                    icon: const Icon(Icons.visibility_outlined, size: 14),
+                    label: const Text('Inspecionar', style: TextStyle(fontSize: 11, fontFamily: 'monospace')),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.surfaceContainerHigh,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabPill(String label, int index, bool isDark) {
-    final active = _tabController.index == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _tabController.index = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 140),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: active
-              ? (isDark ? AppColors.cyan.withOpacity(0.15) : Colors.white)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: active ? AppColors.cyan : Colors.transparent,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: active ? FontWeight.bold : FontWeight.w500,
-            color: active
-                ? AppColors.cyan
-                : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Card de KPI Estilo LoanHub com Glow Orb
-class _LoanHubKpiCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final Color glowColor;
-  final bool isDark;
-  final String? badge;
-
-  const _LoanHubKpiCard({
-    required this.title,
-    required this.value,
-    required this.glowColor,
-    required this.isDark,
-    this.badge,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF151D2A) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Subtle glow orb
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: glowColor.withOpacity(0.12),
-                boxShadow: [
-                  BoxShadow(
-                    color: glowColor.withOpacity(0.3),
-                    blurRadius: 18,
-                    spreadRadius: 4,
                   ),
                 ],
               ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // Militar responsável
+          Row(
+            children: [
+              const Icon(Icons.person_outline, size: 14, color: AppColors.outline),
+              const SizedBox(width: 6),
+              const Text('Responsável: ', style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant)),
+              Text(
+                cautela.responsavelNome,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '(SARAM ${cautela.responsavelSaram})',
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.secondary),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Equipment preview ribbon
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  '${cautela.itensCautelados} equipamentos em carga ativa',
+                  style: const TextStyle(fontSize: 11.5, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const Spacer(),
+                const Icon(Icons.verified_user_outlined, size: 13, color: AppColors.tertiary),
+                const SizedBox(width: 4),
+                const Text(
+                  'Assinatura Digital Válida',
+                  style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.tertiary),
+                ),
+              ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+
+          const SizedBox(height: 8),
+
+          // Footer info
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                ),
+                'Criado por: ${cautela.criador?.nomeGuerra ?? "S2 SILVA"} em ${AppDateUtils.formatDateTime(cautela.criadoEm)}',
+                style: const TextStyle(fontSize: 10.5, fontFamily: 'monospace', color: AppColors.outline),
               ),
-              const SizedBox(height: 10),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+              if (cautela.observacoes != null && cautela.observacoes!.isNotEmpty)
+                Expanded(
+                  child: Text(
+                    'Obs: ${cautela.observacoes!}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 10.5, fontStyle: FontStyle.italic, color: AppColors.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-// Linha da Tabela de Cautela Estilo LoanHub
-class _LoanHubTableRow extends StatefulWidget {
-  final CautelaModel cautela;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _LoanHubTableRow({
-    required this.cautela,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  State<_LoanHubTableRow> createState() => _LoanHubTableRowState();
-}
-
-class _LoanHubTableRowState extends State<_LoanHubTableRow> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = widget.cautela;
-    final isDark = widget.isDark;
-    final isConcluded = c.status == 'CONCLUIDA';
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          color: _isHovered
-              ? (isDark ? const Color(0xFF1B2438) : const Color(0xFFF8FAFC))
-              : Colors.transparent,
-          child: Row(
-            children: [
-              // ID da Cautela
-              SizedBox(
-                width: 100,
-                child: Text(
-                  c.tipo == 'MISSAO' ? 'MIS-${202600 + c.id}' : 'FIXA-#${c.id}',
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.cyan,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-
-              // Missão / Destino
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      c.nome,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      c.tipo == 'MISSAO' ? 'Missão Operacional' : 'Cautela Fixa Contínua',
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Militar Responsável (Avatar + Posto + Nome + SARAM)
-              Expanded(
-                flex: 3,
-                child: Row(
-                  children: [
-                    UserAvatar(
-                      fotoUrl: c.criador?.fotoUrl,
-                      name: c.criador?.nomeGuerra,
-                      radius: 13,
-                      iconSize: 13,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${c.criador?.postoGraduacao ?? ''} ${c.criador?.nomeGuerra ?? 'Militar'}',
-                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            c.criador?.saram != null ? 'SARAM ${c.criador!.saram}' : 'BINFAE-GL',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Quantidade de Materiais
-              SizedBox(
-                width: 120,
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: Text(
-                        '${c.itensCautelados} itens',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Data de Saída
-              SizedBox(
-                width: 130,
-                child: Text(
-                  AppDateUtils.formatDateTime(c.dataInicio),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-
-              // Status Badge
-              SizedBox(
-                width: 100,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: (isConcluded ? AppColors.success : AppColors.cyan).withOpacity(0.14),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: (isConcluded ? AppColors.success : AppColors.cyan).withOpacity(0.4),
-                      ),
-                    ),
-                    child: Text(
-                      isConcluded ? 'Concluída' : 'Ativa',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: isConcluded ? AppColors.success : AppColors.cyan,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Ações
-              SizedBox(
-                width: 80,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.assignment_return_outlined, size: 16),
-                      tooltip: 'Devolver / Descautelar',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-                      onPressed: widget.onTap,
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.visibility_outlined, size: 16),
-                      tooltip: 'Detalhes da Missão',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-                      onPressed: widget.onTap,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

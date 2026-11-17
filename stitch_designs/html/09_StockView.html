@@ -1,0 +1,921 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary-fixed":"#d8e2ff","tertiary":"#27e0a9","on-primary":"#002e69","primary-container":"#4c8eff","on-primary-container":"#00285d","tertiary-fixed-dim":"#27e0a9","surface-container-high":"#212942","on-background":"#dbe1ff","surface":"#0a122a","surface-dim":"#0a122a","tertiary-container":"#00a47a","secondary-fixed":"#d7e3ff","on-surface-variant":"#c2c6d6","primary":"#adc6ff","tertiary-fixed":"#54fdc4","background":"#0a122a","on-secondary":"#002f65","on-secondary-fixed-variant":"#00458e","secondary-container":"#0066cc","inverse-surface":"#dbe1ff","on-tertiary-fixed":"#002116","on-secondary-container":"#dfe8ff","on-error-container":"#ffdad6","outline-variant":"#414754","inverse-primary":"#005ac2","surface-container":"#171e37","surface-tint":"#adc6ff","on-tertiary-container":"#003122","surface-variant":"#2c344d","secondary-fixed-dim":"#aac7ff","surface-bright":"#313852","on-primary-fixed-variant":"#004494","error":"#ffb4ab","on-error":"#690005","on-primary-fixed":"#001a41","secondary":"#aac7ff","primary-fixed-dim":"#adc6ff","surface-container-highest":"#2c344d","surface-container-lowest":"#050d25","on-tertiary-fixed-variant":"#00513b","on-surface":"#dbe1ff","error-container":"#93000a","on-secondary-fixed":"#001b3e","on-tertiary":"#003827","surface-container-low":"#131a33","outline":"#8c909f","inverse-on-surface":"#282f49"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"0.75rem","gutter-desktop":"1rem","space-lg":"1rem","gutter":"0.75rem","margin":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","margin-desktop":"1.5rem","space-xl":"1.5rem"},"fontFamily":{"telemetry-data":["JetBrains Mono"],"body-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Inter"],"label-tactical":["JetBrains Mono"],"headline-lg":["Inter"],"display-lg":["Inter"],"code-sm":["JetBrains Mono"],"headline-md":["Inter"],"code-md":["JetBrains Mono"],"body-md":["Inter"]},"fontSize":{"telemetry-data":["14px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"600"}],"label-tactical":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"code-md":["13px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"500"}],"body-md":["13px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-surface text-on-surface font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="flex flex-col min-h-0 flex-1"><div class="h-8 bg-surface-container-lowest flex items-center px-space-md gap-space-sm flex-shrink-0"><span class="material-symbols-outlined text-primary text-[14px]">shield</span><span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">BINFAE-GL // SYS-OPS</span></div><div class="p-space-md flex items-center gap-space-md bg-surface-container/60 flex-shrink-0"><div class="relative flex-shrink-0 w-10 h-10 rounded bg-surface-container-high flex items-center justify-center p-1 overflow-hidden"><img alt="Emblema BINFAE-GL" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWqfiwnabsBYUAlglfxAZXOl0JTlc0hnQElhLVteOptN93nyTqHUrnhIokQ1JS_WHcqRr7SxwOZ-IoTT-TOkIEHUYnf8lpb3zh4BD4HQBhCqlVif13irk2f64Nga81cxcmhasjnCatnA96YlE7l5mBTx5v_ppC1_d8Xuz7dyJJdnklC_m87G48IRTE3CuAa0V3Z_9f8yQQIW5NY7-duGdfZgxgEfGnqJAF9-AFDG_bP8CK62yQByWtQ"></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">BINFAE-GL</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary font-code-sm text-code-sm uppercase">TI</span></div><span class="font-code-sm text-code-sm text-on-surface-variant truncate uppercase">Comando &amp; Patrimônio</span></div></div><div class="overflow-y-auto flex-1 py-space-sm px-space-sm flex flex-col gap-1"><nav class="flex flex-col gap-1"><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-tertiary text-[20px]">grid_view</span><span class="font-body-md text-body-md flex-1 text-on-surface font-bold">Dashboard</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="materiais-e-estoque" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="font-body-md text-body-md flex-1">Materiais e Estoque</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="cautelas-e-missoes" href="#"><span class="material-symbols-outlined text-[20px]">fact_check</span><span class="font-body-md text-body-md flex-1">Cautelas e Missões</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="manutencao" href="#"><span class="material-symbols-outlined text-[20px]">handyman</span><span class="font-body-md text-body-md flex-1">Manutenção</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="pendencias-e-metas" href="#"><span class="material-symbols-outlined text-[20px]">checklist_rtl</span><span class="font-body-md text-body-md flex-1">Pendências e Metas</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="escala-de-sobreaviso" href="#"><span class="material-symbols-outlined text-[20px]">calendar_month</span><span class="font-body-md text-body-md flex-1">Escala de Sobreaviso</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="relatorio-diario" href="#"><span class="material-symbols-outlined text-[20px]">summarize</span><span class="font-body-md text-body-md flex-1">Relatório Diário (24h)</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="locais-fisicos" href="#"><span class="material-symbols-outlined text-[20px]">location_on</span><span class="font-body-md text-body-md flex-1">Locais Físicos</span><span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical flex items-center gap-0.5 border border-tertiary/20"><span class="material-symbols-outlined text-[12px]">account_tree</span>Árvore</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="grupos-e-subgrupos" href="#"><span class="material-symbols-outlined text-[20px]">category</span><span class="font-body-md text-body-md flex-1">Grupos e Subgrupos</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="historico-geral" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span class="font-body-md text-body-md flex-1">Histórico Geral</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="painel-administrativo" href="#"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span><span class="font-body-md text-body-md flex-1">Painel Administrativo</span></a><a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="configuracoes" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="font-body-md text-body-md flex-1">Configurações</span></a></nav></div></div><div class="p-space-md bg-surface-container-lowest/80 flex flex-col gap-space-sm flex-shrink-0"><div class="flex items-center gap-space-sm"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span><span class="font-code-sm text-code-sm text-on-surface-variant truncate">SQLite Local: Sincronizado</span><kbd class="ml-auto px-space-xs py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-outline">F5</kbd></div><div class="flex items-center justify-between text-outline hover:text-on-surface transition-colors cursor-pointer pt-space-xs"><span class="font-label-tactical text-label-tactical uppercase tracking-wider flex items-center gap-space-xs"><span class="material-symbols-outlined text-[14px]">vpn_lock</span> Proxy BAGL: Ativo</span><span class="font-code-sm text-code-sm">PORT 8080</span></div></div></aside><div class="pl-72 flex flex-col min-h-screen"><header class="sticky top-0 z-40 w-full bg-surface-container-lowest/95 backdrop-blur-md border-b border-surface-container-highest/60 flex flex-col shadow-sm select-none">
+  <!-- Titlebar Superior Militar -->
+  <div class="h-8 bg-surface-container-lowest flex items-center justify-between px-space-lg select-none border-b border-surface-container/40">
+    <div class="flex items-center gap-space-sm">
+      <span class="font-label-tactical text-label-tactical text-primary font-bold uppercase tracking-wider">BASE AÉREA DO GALEÃO</span>
+      <span class="text-outline-variant font-code-sm text-code-sm">/</span>
+      <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wide">BINFAE-GL // SEÇÃO DE TI</span>
+      <span class="px-space-xs py-0.5 rounded bg-surface-container font-code-sm text-code-sm text-secondary-fixed">v2.4.0</span>
+    </div>
+    <div class="flex items-center gap-0.5">
+      <button class="h-7 w-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded" title="Minimizar" type="button">
+        <span class="material-symbols-outlined text-[14px]">remove</span>
+      </button>
+      <button class="h-7 w-8 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded" title="Maximizar" type="button">
+        <span class="material-symbols-outlined text-[12px]">crop_square</span>
+      </button>
+      <button class="h-7 w-8 flex items-center justify-center text-on-surface-variant hover:bg-error hover:text-on-error transition-colors rounded" title="Fechar" type="button">
+        <span class="material-symbols-outlined text-[14px]">close</span>
+      </button>
+    </div>
+  </div>
+  <!-- Main Navigation Header Bar -->
+  <div class="min-h-16 py-2 px-space-lg flex flex-wrap items-center justify-between gap-space-md min-w-0">
+    <!-- Left side: System status pill & Dual Clocks & USB Reader -->
+    <div class="flex items-center gap-space-sm flex-wrap min-w-0">
+      <div class="flex items-center gap-space-sm px-space-md py-1.5 rounded-lg bg-surface-container-high shadow-sm border border-surface-container-highest/50 flex-shrink-0">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+        </span>
+        <span class="font-label-tactical text-label-tactical text-tertiary uppercase tracking-wider">API ONLINE</span>
+        <span class="font-code-sm text-code-sm text-on-surface-variant">28ms</span>
+        <span class="font-code-sm text-code-sm text-outline hidden xl:inline">[backend-info-binfae]</span>
+      </div>
+      <div class="flex items-center gap-space-md px-space-md py-1.5 rounded-lg bg-surface-container font-telemetry-data text-telemetry-data text-on-surface shadow-sm flex-shrink-0">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-primary text-[16px]">schedule</span>
+          <span class="text-primary font-bold">14:32:10 BRT</span>
+        </div>
+        <span class="text-outline-variant font-normal">|</span>
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-tertiary text-[16px]">public</span>
+          <span class="text-tertiary font-bold">17:32:10 ZULU</span>
+        </div>
+      </div>
+      <div class="hidden 2xl:flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container text-tertiary font-label-tactical text-label-tactical shadow-sm flex-shrink-0">
+        <span class="material-symbols-outlined text-[16px]">barcode_scanner</span>
+        <span>LEITOR USB PRONTO</span>
+        <kbd class="px-space-xs py-0.5 rounded bg-surface-container-lowest font-code-sm text-code-sm text-outline ml-1">Ctrl+B</kbd>
+      </div>
+    </div>
+    <!-- Right side: Quick Command Search, Theme & Fullscreen Controls, User Profile Badge -->
+    <div class="flex items-center gap-space-sm flex-wrap justify-end min-w-0 flex-shrink-0">
+      <button class="flex items-center gap-space-sm px-space-md py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm flex-shrink-0" type="button">
+        <span class="material-symbols-outlined text-[18px]">search</span>
+        <span class="font-body-md text-body-md hidden md:inline">Comando Rápido...</span>
+        <kbd class="px-space-xs py-0.5 rounded bg-surface-container-lowest font-code-sm text-code-sm text-outline">Ctrl+K</kbd>
+      </button>
+      <div class="flex items-center gap-space-xs flex-shrink-0">
+        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" title="Alternar Tema Dark/Light" type="button">
+          <span class="material-symbols-outlined text-[20px]">dark_mode</span>
+        </button>
+        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" title="Modo Tela Cheia (F11)" type="button">
+          <span class="material-symbols-outlined text-[20px]">fullscreen</span>
+        </button>
+      </div>
+      <!-- User Profile Badge com avatar circular proporcional sem achatamento -->
+      <div class="flex items-center gap-space-md bg-surface-container-high hover:bg-surface-container-highest transition-colors rounded-xl px-space-md py-1.5 shadow-sm cursor-pointer select-none border border-surface-container-highest/60 flex-shrink-0">
+        <div class="flex flex-col text-right justify-center min-w-0">
+          <span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight truncate">2º Sgt Silva</span>
+          <span class="font-code-sm text-code-sm text-primary tracking-wider leading-none mt-1 truncate">SARAM 6842910</span>
+        </div>
+        <div class="relative flex-shrink-0 w-10 h-10 flex items-center justify-center">
+          <img alt="Profile" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/40 flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD_aqjOenoZQxZ9JrN7Z94nlVt7r4QKoyP9MyZUEGOf54W1N-4rJLhYukVKpg2HeIbekglUCjMcWRd1e6yrC_X80md2kG0dGfJr71R0h4QcIvcVn2OmbCtEAHeoqPpU4E2XFTWYqjIBOEn0D7BZ2NPUcO46I-CF3pHV13gRRmcitymDj1aEFU7YdpAHq1eh8nsS6uNE3Ed77BwLgSitqlqBEY9cFFR6S49cwdcn57x" style="aspect-ratio: 1 / 1; min-width: 2.5rem; min-height: 2.5rem;">
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary ring-2 ring-surface-container-high"></span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant text-[20px] ml-0.5 flex-shrink-0">expand_more</span>
+      </div>
+    </div>
+  </div>
+</header><main class="w-full bg-surface flex-1"><div class="flex flex-col w-full px-space-lg py-space-md gap-space-lg">
+<!-- TOP COMMAND & ACTION BAR -->
+<div class="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded-xl shadow-md">
+<div class="flex flex-col gap-0.5">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Catálogo de Materiais &amp; Gestão de Estoque</h1>
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-label-tactical text-label-tactical uppercase tracking-wider ml-1">STOCKVIEW PRO</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Acervo Geral de TI, Comunicações Militares &amp; Equipamentos Táticos — BINFAE-GL / FAB</p>
+</div>
+<!-- Quick Status Telemetry Pills & Actions -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<div class="hidden lg:flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container font-telemetry-data text-code-sm text-on-surface">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-tertiary font-bold">1.482</span>
+<span class="text-on-surface-variant font-normal">ITENS ATIVOS</span>
+</div>
+<div class="hidden xl:flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container font-code-sm text-code-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+<span>100% AUDITADO</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors shadow-sm text-body-md font-body-md" id="btn-sync" title="Sincronizar Banco de Dados Local (F5)">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+<span class="hidden sm:inline">Sincronizar</span>
+<kbd class="px-space-xs py-0.5 rounded bg-surface-container-lowest font-code-sm text-code-sm text-outline ml-1">F5</kbd>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors shadow-sm text-body-md font-body-md" title="Modo Coletor Contínuo">
+<span class="material-symbols-outlined text-tertiary text-[18px]">barcode_reader</span>
+<span class="hidden md:inline">Coletor USB</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors shadow-sm text-body-md font-body-md" title="Exportar Catálogo Geral">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="hidden md:inline">CSV / Relatório</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-primary-container hover:bg-secondary-container text-on-primary-container font-headline-sm text-headline-sm transition-colors shadow-md ml-1" onclick="document.getElementById('dialog-novo-material').classList.remove('hidden')" title="Adicionar Novo Item ao Acervo">
+<span class="material-symbols-outlined text-[20px]">add_box</span>
+<span>+ Novo Material</span>
+<kbd class="px-space-xs py-0.5 rounded bg-on-primary-container/20 text-on-primary-container font-code-sm text-code-sm ml-1">Ctrl+N</kbd>
+</button>
+</div>
+</div>
+</div>
+<!-- SEARCH & METRIC BAR -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Big Tactical Search Input -->
+<div class="lg:col-span-8 flex flex-col gap-space-xs">
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-space-md text-primary text-[20px] pointer-events-none">search</span>
+<input class="w-full pl-11 pr-24 py-2.5 bg-surface-container-lowest text-on-surface placeholder:text-outline text-body-md font-body-md rounded-lg shadow-inner focus:outline-none focus:ring-1 focus:ring-primary" id="tactical-search" placeholder="Buscar por descrição, BMP/Patrimônio, Nº de Série, MAC Address ou Código de Barras... (Ctrl+F)" type="text">
+<div class="absolute right-space-sm flex items-center gap-space-xs">
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" id="clear-search" title="Limpar Busca">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-outline font-code-sm text-code-sm uppercase">Ctrl+F</span>
+</div>
+</div>
+<!-- Quick Status Filter Chips -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 select-none">
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-primary text-on-primary text-code-sm font-code-sm shadow-sm transition-transform active:scale-95 flex-shrink-0">
+<span>Todos</span>
+<span class="bg-on-primary/20 px-1.5 py-0.2 rounded-full font-bold">1.482</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-tertiary text-code-sm font-code-sm transition-colors flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>No Depósito</span>
+<span class="bg-surface-container-lowest px-1.5 py-0.2 rounded-full text-on-surface">864</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-primary text-code-sm font-code-sm transition-colors flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span>No Setor</span>
+<span class="bg-surface-container-lowest px-1.5 py-0.2 rounded-full text-on-surface">492</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-secondary text-code-sm font-code-sm transition-colors flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Cautelado em Missão</span>
+<span class="bg-surface-container-lowest px-1.5 py-0.2 rounded-full text-on-surface">88</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-error text-code-sm font-code-sm transition-colors flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span>Em Manutenção</span>
+<span class="bg-surface-container-lowest px-1.5 py-0.2 rounded-full text-on-surface">38</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-outline text-code-sm font-code-sm transition-colors flex-shrink-0">
+<span>Inservível/Baixa</span>
+<span class="bg-surface-container-lowest px-1.5 py-0.2 rounded-full text-on-surface">0</span>
+</button>
+</div>
+</div>
+<!-- Dropdown Filters Toolbar -->
+<div class="lg:col-span-4 grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-outline uppercase">Grupo de Material</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest text-on-surface text-body-sm font-body-sm px-space-sm py-2 rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-primary shadow-inner">
+<option>Todos os Grupos (6)</option>
+<option>Comunicações &amp; Rádios Táticos</option>
+<option>Informática &amp; Servidores Rugged</option>
+<option>Redes, Switches &amp; Satélite</option>
+<option>CFTV, Sensores &amp; FLIR</option>
+<option>Energia, UPS &amp; Nobreaks</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-outline text-[16px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-outline uppercase">Local / Almoxarifado</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest text-on-surface text-body-sm font-body-sm px-space-sm py-2 rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-primary shadow-inner">
+<option>Todas as Localizações</option>
+<option>Hangar-TI #4 - Depósito Principal</option>
+<option>Reserva Tática - Armário B03</option>
+<option>Bancada Técnica &amp; Manutenção</option>
+<option>Posto Sentinela Alfa (SAG)</option>
+<option>TPS-2 / Sala de Rádio BAGL</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-outline text-[16px] pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- MAIN WORKSPACE: HIGH-DENSITY MILITARY INVENTORY GRID & INSPECTOR SPLIT -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-md items-start">
+<!-- LEFT: High-Density Table (8 or 9 cols on wide displays) -->
+<div class="xl:col-span-8 2xl:col-span-9 bg-surface-container-low rounded-xl shadow-md overflow-hidden flex flex-col">
+<!-- Table Header Bar -->
+<div class="flex items-center justify-between px-space-md py-2.5 bg-surface-container-lowest">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">table_rows</span>
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider text-on-surface">GRID TÁTICO DE PATRIMÔNIO // BINFAE-GL</span>
+</div>
+<div class="flex items-center gap-space-md text-code-sm font-code-sm text-outline">
+<span class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            Auto-Sync Ativo
+          </span>
+<span>15 de 1.482 listados</span>
+</div>
+</div>
+<!-- Tactical Responsive Table Container -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-tactical text-label-tactical uppercase tracking-wider select-none">
+<th class="py-2.5 px-space-md">BMP / Código</th>
+<th class="py-2.5 px-space-md">Descrição &amp; Especificação</th>
+<th class="py-2.5 px-space-md">S/N - Série</th>
+<th class="py-2.5 px-space-md">Local Físico</th>
+<th class="py-2.5 px-space-md">Status</th>
+<th class="py-2.5 px-space-md">Detentor / Missão</th>
+<th class="py-2.5 px-space-md text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest/20 font-body-sm text-body-sm">
+<!-- Row 1: Active Selection Example (Motorola APX) -->
+<tr class="bg-surface-container-high/80 hover:bg-surface-container-highest transition-colors cursor-pointer group" onclick="selectItem('BMP-882104', 'Rádio Transceptor Motorola APX 8000 P25 Rugged', 'APX8K-MIL-BR', 'SN-MOT-9938210-B', 'Hangar-TI #4 - Armário B03', 'No Depósito', 'Disponível / Almoxarifado Central', 'Motorola Solutions Inc.', 'Operacional / Calibrado 2024')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-882104</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Rádio Transceptor Motorola APX 8000 P25 Rugged</span>
+<span class="text-outline font-code-sm text-code-sm">Comunicações Táticas • Dual-Band VHF/700/800MHz</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">MOT-9938210-B</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-tertiary">warehouse</span>
+<span>Hangar-TI #4 (B03)</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                  No Depósito
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface-variant font-code-sm text-code-sm truncate max-w-[130px]">
+                Disponível
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Cautelar ou Movimentar Material">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir Etiqueta Térmica QR Code">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar Registro">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Dell Latitude Rugged -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-884912', 'Notebook Militar Dell Latitude Rugged 5430', 'LAT-5430-EXTREME', 'SN-DELL-8830114', 'Posto Sentinela Alfa (SAG)', 'Cautelado em Missão', '1º Ten. Moreira (Op. Ágata)', 'Dell Federal Systems', 'Operacional / Certificação MIL-STD-810H')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-884912</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Notebook Militar Dell Latitude 5430 Rugged Extreme</span>
+<span class="text-outline font-code-sm text-code-sm">Informática Operacional • i7 32GB 1TB SSD IP-65</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">DEL-8830114-X</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-secondary">flight_takeoff</span>
+<span>Sentinela Alfa</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-primary-container/20 text-secondary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Cautelado Missão
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface font-semibold font-code-sm text-code-sm truncate max-w-[130px]">
+                1º Ten. Moreira
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Cautelar ou Movimentar Material">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir Etiqueta">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar Registro">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Cisco Catalyst Rugged Switch -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-879003', 'Switch Cisco Catalyst 2960-X 24P PoE+ Rugged', 'WS-C2960X-24PD-L', 'SN-FOC2140S02', 'Hangar-TI #4 - Rack Central 01', 'No Depósito', 'Disponível / Reserva Técnica', 'Cisco Systems', 'Operacional / Firmware 15.2(7)E8')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-879003</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Switch Cisco Catalyst 2960-X 24P Gigabit PoE+</span>
+<span class="text-outline font-code-sm text-code-sm">Infraestrutura • 24 Portas 1GbE + 2x 10G SFP+</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">FOC2140S02-Z</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-tertiary">dns</span>
+<span>Rack TI-01</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                  No Depósito
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface-variant font-code-sm text-code-sm truncate max-w-[130px]">
+                Disponível
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Movimentar">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Câmera Térmica FLIR Ranger HD (In Maintenance) -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-890122', 'Câmera Térmica Perimetral FLIR Ranger HD', 'RANGER-HD-MIL', 'SN-FLIR-55209-A', 'Bancada TI - Lab Eletrônica', 'Em Manutenção', '2º Sgt Almeida (Ordem #482)', 'Teledyne FLIR LLC', 'Em Calibração de Sensor Térmico')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-890122</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Câmera Térmica Perimetral FLIR Ranger HD Long-Range</span>
+<span class="text-outline font-code-sm text-code-sm">Segurança &amp; CFTV • Alcance 8km PTZ Militar</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">FLIR-55209-A</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-error truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-error">handyman</span>
+<span>Bancada TI #2</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-error-container/40 text-error font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                  Em Manutenção
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-error font-semibold font-code-sm text-code-sm truncate max-w-[130px]">
+                2º Sgt Almeida
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Movimentar">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Terminal Satelital Cobham BGAN -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-881140', 'Terminal Satelital BGAN Cobham Explorer 710', 'BGAN-EXP-710', 'SN-CBH-901124-K', 'TPS-2 / Sala de Rádio BAGL', 'No Setor', 'Suboficial Carvalho (Comando)', 'Cobham SATCOM', 'Operacional / Inmarsat Class-1 Ready')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-881140</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Roteador Satelital BGAN Cobham Explorer 710</span>
+<span class="text-outline font-code-sm text-code-sm">Satélite Tático • Streaming HDR BGAN 650kbps</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">CBH-901124-K</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-primary">satellite_alt</span>
+<span>Sala de Rádio</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-primary-container/20 text-primary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                  No Setor
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface font-semibold font-code-sm text-code-sm truncate max-w-[130px]">
+                SO Carvalho
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Movimentar">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Nobreak Senoidal APC Smart-UPS 3000VA -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-874219', 'Nobreak Senoidal APC Smart-UPS 3000VA Rack 2U', 'SMT3000RMI2U', 'SN-AS19041289', 'Hangar-TI #4 - Sala de Energia', 'No Depósito', 'Disponível / Baterias 100%', 'Schneider Electric / APC', 'Operacional / Teste de Carga Ok')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-874219</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Nobreak Senoidal Puro APC Smart-UPS 3000VA 2U</span>
+<span class="text-outline font-code-sm text-code-sm">Energia &amp; Backup • Placa NMC SNMP Gerenciável</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">AS19041289</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-tertiary">bolt</span>
+<span>Sala de Energia</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/30 text-tertiary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                  No Depósito
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface-variant font-code-sm text-code-sm truncate max-w-[130px]">
+                Disponível
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Movimentar">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 7: Rádio Portátil Harris Falcon III -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer group" onclick="selectItem('BMP-889920', 'Rádio Militar Multibanda L3Harris Falcon III AN/PRC-152A', 'AN/PRC-152A', 'SN-HAR-771920', 'Reserva Tática - Armário B03', 'Cautelado em Missão', 'Cap. Valente (Comando Tático)', 'L3Harris Technologies', 'Criptografia Tipo-1 NSA Validada')">
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-telemetry-data text-code-sm text-primary font-bold">BMP-889920</span>
+<button class="text-outline hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity" title="Copiar BMP">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold truncate max-w-xs xl:max-w-sm">Rádio Tático L3Harris Falcon III AN/PRC-152A</span>
+<span class="text-outline font-code-sm text-code-sm">Comunicações Seguras • V/UHF Militar 30-512MHz</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md font-telemetry-data text-code-sm text-on-surface-variant">HAR-771920-A</td>
+<td class="py-2.5 px-space-md">
+<div class="flex items-center gap-1 text-on-surface truncate max-w-[140px]">
+<span class="material-symbols-outlined text-[14px] text-secondary">security</span>
+<span>Op. Sentinela</span>
+</div>
+</td>
+<td class="py-2.5 px-space-md">
+<span class="px-space-xs py-0.5 rounded bg-primary-container/20 text-secondary font-code-sm text-code-sm flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Cautelado Missão
+                </span>
+</td>
+<td class="py-2.5 px-space-md text-on-surface font-semibold font-code-sm text-code-sm truncate max-w-[130px]">
+                Cap. Valente
+              </td>
+<td class="py-2.5 px-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1 rounded text-outline hover:text-primary transition-colors" title="Movimentar">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-secondary transition-colors" title="Imprimir">
+<span class="material-symbols-outlined text-[16px]">print</span>
+</button>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Tactical Pagination & SQLite Stats Footer -->
+<div class="flex flex-col sm:flex-row items-center justify-between px-space-md py-3 bg-surface-container-lowest gap-space-sm select-none">
+<div class="flex items-center gap-space-sm font-code-sm text-code-sm text-on-surface-variant">
+<span>Exibindo <strong>1-7</strong> de <strong>1.482</strong> registros</span>
+<span class="text-outline">•</span>
+<span class="hidden md:inline">Página 1 de 212</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-outline hover:text-on-surface font-code-sm text-code-sm disabled:opacity-40 transition-colors" disabled="">
+            &lt; Anterior
+          </button>
+<button class="w-7 h-7 rounded bg-primary text-on-primary font-code-sm text-code-sm font-bold flex items-center justify-center shadow-sm">
+            1
+          </button>
+<button class="w-7 h-7 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-code-sm text-code-sm flex items-center justify-center transition-colors">
+            2
+          </button>
+<button class="w-7 h-7 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-code-sm text-code-sm flex items-center justify-center transition-colors">
+            3
+          </button>
+<span class="text-outline px-1">...</span>
+<button class="w-7 h-7 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-code-sm text-code-sm flex items-center justify-center transition-colors">
+            212
+          </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-code-sm text-code-sm transition-colors">
+            Próximo &gt;
+          </button>
+</div>
+</div>
+</div>
+<!-- RIGHT: QUICK PREVIEW TACTICAL DRAWER / INSPECTOR CARD -->
+<div class="xl:col-span-4 2xl:col-span-3 bg-surface-container-low rounded-xl shadow-md p-space-md flex flex-col gap-space-md sticky top-24">
+<!-- Preview Header -->
+<div class="flex items-center justify-between bg-surface-container-lowest p-space-sm rounded-lg">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+<span class="font-label-tactical text-label-tactical uppercase tracking-wider text-on-surface">INSPEÇÃO OPERACIONAL</span>
+</div>
+<span class="font-code-sm text-code-sm text-tertiary flex items-center gap-1 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          PRONTO
+        </span>
+</div>
+<!-- Equipment Visual & Barcode Badge -->
+<div class="flex flex-col bg-surface-container rounded-lg p-space-md gap-space-sm">
+<div class="relative w-full h-36 rounded bg-surface-container-lowest overflow-hidden flex items-center justify-center">
+<img class="w-full h-full object-cover opacity-85" data-alt="Aerospace military tactical radio and communication hardware rugged handheld transceiver device sitting on a high tech military electronics workbench in BINFAE-GL command center, dark tactical lighting, glowing cyan telemetry status LEDs, matte black finish with military stencils" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFTTi68csxIQTYA0toJ8zlUpwraBYOLh-NwNiNMYQkIpSRMX-ZdcNsp6JJRoe_aKmWt3XEzHA9rkPKOg6Bb-rAMhFC1Kx5gguBlgzNDF0FcsgfP5gkM8h-IwzJ3GYaXR7SwHluc5alrEhkCkTI5VsScKUgVge1af5i9C6HDvNGC6Y0A6CvY3pAjALeO6ULOqv0X1FRl5fgZHcaFbefGvgL3u7Xz_HtsRuxZWRe5ghY">
+<div class="absolute top-2 left-2 px-space-xs py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-telemetry-data text-code-sm text-primary font-bold">
+<span id="preview-bmp">BMP-882104</span>
+</div>
+<div class="absolute bottom-2 right-2 px-space-xs py-0.5 rounded bg-tertiary/20 backdrop-blur text-tertiary font-code-sm text-code-sm">
+            CALIBRADO FAB
+          </div>
+</div>
+<!-- Rendered Code 128 / QR Code Graphic Mock -->
+<div class="bg-surface-container-lowest p-space-sm rounded flex flex-col items-center justify-center gap-1 shadow-inner">
+<div class="flex items-center gap-0.5 h-8 w-full justify-center overflow-hidden opacity-90 px-4">
+<!-- Inline SVG Barcode pattern -->
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewBox="0 0 160 30">
+<rect height="30" width="3" x="0" y="0"></rect>
+<rect height="30" width="1" x="5" y="0"></rect>
+<rect height="30" width="4" x="8" y="0"></rect>
+<rect height="30" width="2" x="15" y="0"></rect>
+<rect height="30" width="1" x="20" y="0"></rect>
+<rect height="30" width="5" x="23" y="0"></rect>
+<rect height="30" width="2" x="31" y="0"></rect>
+<rect height="30" width="3" x="35" y="0"></rect>
+<rect height="30" width="1" x="41" y="0"></rect>
+<rect height="30" width="4" x="44" y="0"></rect>
+<rect height="30" width="2" x="51" y="0"></rect>
+<rect height="30" width="5" x="56" y="0"></rect>
+<rect height="30" width="1" x="64" y="0"></rect>
+<rect height="30" width="3" x="68" y="0"></rect>
+<rect height="30" width="2" x="74" y="0"></rect>
+<rect height="30" width="4" x="79" y="0"></rect>
+<rect height="30" width="1" x="86" y="0"></rect>
+<rect height="30" width="3" x="90" y="0"></rect>
+<rect height="30" width="5" x="96" y="0"></rect>
+<rect height="30" width="2" x="104" y="0"></rect>
+<rect height="30" width="1" x="109" y="0"></rect>
+<rect height="30" width="4" x="113" y="0"></rect>
+<rect height="30" width="2" x="120" y="0"></rect>
+<rect height="30" width="3" x="125" y="0"></rect>
+<rect height="30" width="5" x="131" y="0"></rect>
+<rect height="30" width="1" x="139" y="0"></rect>
+<rect height="30" width="3" x="143" y="0"></rect>
+<rect height="30" width="2" x="149" y="0"></rect>
+<rect height="30" width="4" x="154" y="0"></rect>
+</svg>
+</div>
+<span class="font-telemetry-data text-code-sm text-outline tracking-widest leading-none mt-0.5" id="preview-barcode-txt">*BMP-882104*</span>
+</div>
+</div>
+<!-- Quick Metadata Details -->
+<div class="flex flex-col gap-space-xs font-body-sm text-body-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight" id="preview-title">
+          Rádio Transceptor Motorola APX 8000 P25 Rugged
+        </h2>
+<div class="flex flex-col gap-1.5 mt-1">
+<div class="flex justify-between py-1 bg-surface-container px-space-sm rounded">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Nº de Série:</span>
+<span class="text-on-surface font-telemetry-data text-code-sm font-semibold" id="preview-sn">MOT-9938210-B</span>
+</div>
+<div class="flex justify-between py-1 bg-surface-container px-space-sm rounded">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Localização Atual:</span>
+<span class="text-on-surface font-semibold text-right" id="preview-loc">Hangar-TI #4 (B03)</span>
+</div>
+<div class="flex justify-between py-1 bg-surface-container px-space-sm rounded">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Status Atual:</span>
+<span class="text-tertiary font-bold font-code-sm text-code-sm" id="preview-status">No Depósito</span>
+</div>
+<div class="flex justify-between py-1 bg-surface-container px-space-sm rounded">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Detentor / Missão:</span>
+<span class="text-on-surface font-semibold text-right" id="preview-detentor">Almoxarifado Central</span>
+</div>
+<div class="flex justify-between py-1 bg-surface-container px-space-sm rounded">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Fabricante / Fornecedor:</span>
+<span class="text-on-surface font-body-sm" id="preview-fab">Motorola Solutions Inc.</span>
+</div>
+</div>
+</div>
+<!-- Recent Movement History (Last 3 events) -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-tactical text-label-tactical text-outline uppercase tracking-wider">Últimas Movimentações</span>
+<div class="flex flex-col gap-1.5 font-code-sm text-code-sm">
+<div class="flex items-start gap-space-xs p-1.5 rounded bg-surface-container-lowest">
+<span class="material-symbols-outlined text-tertiary text-[14px] mt-0.5">input</span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="text-on-surface truncate">Devolução de Cautela #3194</span>
+<span class="text-outline text-body-sm">Ontem às 18:20 por 2º Sgt Almeida</span>
+</div>
+</div>
+<div class="flex items-start gap-space-xs p-1.5 rounded bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary text-[14px] mt-0.5">output</span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="text-on-surface truncate">Cautela Missão Pátio BAGL</span>
+<span class="text-outline text-body-sm">18/Out às 07:15 por 1º Ten Moreira</span>
+</div>
+</div>
+<div class="flex items-start gap-space-xs p-1.5 rounded bg-surface-container-lowest">
+<span class="material-symbols-outlined text-secondary text-[14px] mt-0.5">build_circle</span>
+<div class="flex flex-col flex-1 min-w-0">
+<span class="text-on-surface truncate">Inspeção Preventiva TI Semestral</span>
+<span class="text-outline text-body-sm">12/Out às 14:00 por 2º Sgt Silva</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Fast Action Buttons inside Inspector -->
+<div class="flex flex-col gap-space-xs mt-auto pt-space-xs">
+<button class="w-full py-2 px-space-md rounded-lg bg-primary hover:bg-secondary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">assignment_turned_in</span>
+<span>Cautelar Material Agora</span>
+</button>
+<div class="grid grid-cols-2 gap-space-xs">
+<button class="py-1.5 px-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-body-sm flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-secondary text-[16px]">qr_code_scanner</span>
+<span>Etiqueta BMP</span>
+</button>
+<button class="py-1.5 px-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-error text-body-sm font-body-sm flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">report_problem</span>
+<span>Abrir OS Defeito</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- PERSISTENT LOCAL SQLITE / TACTICAL STATUS FOOTER BAR -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-lowest px-space-md py-2 rounded-lg text-code-sm font-code-sm text-outline shadow-inner">
+<div class="flex items-center gap-space-md flex-wrap">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">database</span>
+<span class="font-bold">SQLite Local: 1.482 registros em cache</span>
+</div>
+<span class="text-outline-variant">|</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">speed</span>
+<span>Latência de Consulta: <span class="text-on-surface font-semibold">0.8ms</span></span>
+</div>
+<span class="text-outline-variant">|</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[14px]">lan</span>
+<span>Proxy BAGL: <span class="text-tertiary font-bold">ATIVO [Porta 8080]</span></span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span>Última Sincronização: <span class="text-on-surface font-telemetry-data" id="last-sync-time">14:32:05 BRT</span></span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-bold">SEÇÃO TI • BINFAE-GL</span>
+</div>
+</div>
+<!-- MODAL / DIALOG: NOVO MATERIAL (CTRL+N) -->
+<div class="fixed inset-0 z-50 bg-surface/85 backdrop-blur-md flex items-center justify-center p-space-md hidden" id="dialog-novo-material">
+<div class="w-full max-w-2xl bg-surface-container-low rounded-xl shadow-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+<!-- Modal Header -->
+<div class="flex items-center justify-between px-space-lg py-space-md bg-surface-container-lowest">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">add_circle</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">Cadastrar Novo Material Tático</h3>
+<span class="font-code-sm text-code-sm text-outline">Entrada de Patrimônio • Seção de TI BINFAE-GL</span>
+</div>
+</div>
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors" onclick="document.getElementById('dialog-novo-material').classList.add('hidden')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Modal Body Form -->
+<div class="p-space-lg flex flex-col gap-space-md overflow-y-auto max-h-[75vh]">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Código BMP / Patrimônio *</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest text-on-surface font-telemetry-data text-code-md px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" type="text" value="BMP-884920">
+<button class="absolute right-2 top-2 text-primary hover:text-secondary font-code-sm text-code-sm font-bold" title="Auto-Gerar Próximo BMP Livre">AUTO</button>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Número de Série (S/N) *</label>
+<input class="w-full bg-surface-container-lowest text-on-surface font-telemetry-data text-code-md px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Ex: SN-MOT-102948-C" type="text">
+</div>
+<div class="md:col-span-2 flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Descrição Completa do Material *</label>
+<input class="w-full bg-surface-container-lowest text-on-surface font-body-md text-body-md px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Ex: Rádio Transceptor Portátil Motorola APX 8000 P25 Rugged" type="text">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Grupo de Equipamento</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+<option>Comunicações &amp; Rádios Táticos</option>
+<option>Informática &amp; Servidores</option>
+<option>Redes &amp; Switches</option>
+<option>CFTV &amp; Segurança</option>
+<option>Energia / Nobreaks</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Local de Armazenamento</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+<option>Hangar-TI #4 - Depósito Principal</option>
+<option>Reserva Tática - Armário B03</option>
+<option>Bancada Técnica &amp; Manutenção</option>
+<option>TPS-2 / Sala de Rádio BAGL</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Fabricante / Marca</label>
+<input class="w-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Ex: Motorola Solutions / Cisco / Dell" type="text">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Estado Operacional Inicial</label>
+<select class="w-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+<option>Operacional - Pronto para Missão</option>
+<option>Em Quarentena / Em Teste</option>
+<option>Aguardando Manutenção / Calibração</option>
+</select>
+</div>
+<div class="md:col-span-2 flex flex-col gap-1">
+<label class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Observações Militares / Homologação</label>
+<textarea class="w-full bg-surface-container-lowest text-on-surface font-body-sm text-body-sm px-space-sm py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Informações de garantia, firmware, lote de compra ou restrição de uso..." rows="2"></textarea>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="flex items-center justify-between px-space-lg py-space-md bg-surface-container-lowest">
+<span class="font-code-sm text-code-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+          Registro auditado por 2º Sgt Silva
+        </span>
+<div class="flex items-center gap-space-sm">
+<button class="px-space-md py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-md text-body-md transition-colors" onclick="document.getElementById('dialog-novo-material').classList.add('hidden')">
+            Cancelar
+          </button>
+<button class="px-space-md py-2 rounded-lg bg-primary hover:bg-secondary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center gap-1 transition-colors shadow-sm" onclick="salvarNovoMaterial()">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span>Salvar no Acervo</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Tactical Item Inspector selection update function
+  function selectItem(bmp, title, model, sn, loc, status, detentor, fab, cond) {
+    document.getElementById('preview-bmp').innerText = bmp;
+    document.getElementById('preview-barcode-txt').innerText = '*' + bmp + '*';
+    document.getElementById('preview-title').innerText = title;
+    document.getElementById('preview-sn').innerText = sn;
+    document.getElementById('preview-loc').innerText = loc;
+    document.getElementById('preview-status').innerText = status;
+    document.getElementById('preview-detentor').innerText = detentor;
+    document.getElementById('preview-fab').innerText = fab;
+
+    // Adjust color of status indicator based on item state
+    const statusEl = document.getElementById('preview-status');
+    if (status.includes('Depósito')) {
+      statusEl.className = 'text-tertiary font-bold font-code-sm text-code-sm';
+    } else if (status.includes('Missão')) {
+      statusEl.className = 'text-secondary font-bold font-code-sm text-code-sm';
+    } else if (status.includes('Manutenção')) {
+      statusEl.className = 'text-error font-bold font-code-sm text-code-sm';
+    } else {
+      statusEl.className = 'text-primary font-bold font-code-sm text-code-sm';
+    }
+  }
+
+  // Keyboard shortcut Intercepts: Ctrl+N for New Material, Ctrl+F for Search Focus
+  window.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'n' || e.key === 'N')) {
+      e.preventDefault();
+      const modal = document.getElementById('dialog-novo-material');
+      if (modal) modal.classList.remove('hidden');
+    }
+    if (e.ctrlKey && (e.key === 'f' || e.key === 'F')) {
+      e.preventDefault();
+      const search = document.getElementById('tactical-search');
+      if (search) search.focus();
+    }
+  });
+
+  // Clear search trigger
+  const clearBtn = document.getElementById('clear-search');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      const search = document.getElementById('tactical-search');
+      if (search) {
+        search.value = '';
+        search.focus();
+      }
+    });
+  }
+
+  // Sync button feedback simulation
+  const syncBtn = document.getElementById('btn-sync');
+  if (syncBtn) {
+    syncBtn.addEventListener('click', function() {
+      const icon = syncBtn.querySelector('.material-symbols-outlined');
+      if (icon) icon.classList.add('animate-spin');
+      setTimeout(function() {
+        if (icon) icon.classList.remove('animate-spin');
+        const now = new Date();
+        const timeStr = String(now.getHours()).padStart(2, '0') + ':' + 
+                        String(now.getMinutes()).padStart(2, '0') + ':' + 
+                        String(now.getSeconds()).padStart(2, '0') + ' BRT';
+        const syncLabel = document.getElementById('last-sync-time');
+        if (syncLabel) syncLabel.innerText = timeStr;
+      }, 600);
+    });
+  }
+
+  function salvarNovoMaterial() {
+    // Feedback and close
+    const modal = document.getElementById('dialog-novo-material');
+    if (modal) modal.classList.add('hidden');
+  }
+</script></main></div>
+
+
+</body></html>

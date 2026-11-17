@@ -36,6 +36,8 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
   List<CautelaModel> _recentCautelas = [];
   List<ItemMovementModel> _recentMovements = [];
   bool _isLoadingActivities = true;
+  bool _showScannerBanner = true;
+  bool _isSyncing = false;
 
   @override
   void initState() {
@@ -82,701 +84,1018 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
     }
   }
 
+  Future<void> _triggerManualSync() async {
+    setState(() => _isSyncing = true);
+    final stock = Provider.of<StockProvider>(context, listen: false);
+    await stock.syncData();
+    await _loadDashboardActivities();
+    if (mounted) {
+      setState(() => _isSyncing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle_outline, color: AppColors.tertiary, size: 18),
+              SizedBox(width: 8),
+              Text(
+                'Banco de dados local sincronizado com sucesso!',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.surfaceContainerHigh,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
+  }
+
+  void _simulateBarcodeBeep() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.barcode_reader, color: AppColors.primary, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'BIP SIMULADO // LEITOR USB',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    'BMP-051902 interceptado -> Rádio Transceptor Motorola APX 8000',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.surfaceContainerHigh,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: AppColors.primaryContainer),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final stock = Provider.of<StockProvider>(context);
     final auth = Provider.of<AuthProvider>(context);
     final user = auth.user;
-
     final metrics = stock.metrics;
-    final groups = stock.groups;
-    final allItems = stock.allItems;
 
-    final formattedTime = DateFormat('HH:mm:ss').format(_currentTime);
-    final formattedDate = AppDateUtils.formatDateLong(_currentTime);
+    final brtTime = DateFormat('dd/MM/yyyy • HH:mm:ss').format(_currentTime);
+    final zuluTime = '${DateFormat('HH:mm:ss').format(_currentTime.toUtc())}Z';
 
     return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: AppColors.surfaceContainerHigh,
       onRefresh: () async {
         await stock.syncData();
         await _loadDashboardActivities();
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. HEADER OPERACIONAL: BREADCRUMB & RELÓGIO OFICIAL DE BRASÍLIA
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isCompact = constraints.maxWidth < 720;
-                final breadcrumbWidget = Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Dashboard',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(
-                            ' | Centro de Operações de TI',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Base Aérea do Galeão (BINFAE-GL) • Operador: ${user != null ? user.displayName : "S2 D. PAULA"}',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
-                );
-
-                final clockWidget = Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                    ),
+            // =========================================================================
+            // 1. TACTICAL HEADER BANNER (Google Stitch #03_HomeDashboardView)
+            // =========================================================================
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                ],
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 960;
+                  final bannerInfo = Row(
                     children: [
                       Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFF10B981),
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainer,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                         ),
+                        child: const Icon(Icons.radar, color: AppColors.primary, size: 28),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$formattedTime UTC-3',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '• Vercel SP Online',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.cyan,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-
-                if (isCompact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      breadcrumbWidget,
-                      const SizedBox(height: 12),
-                      clockWidget,
-                    ],
-                  );
-                }
-
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: breadcrumbWidget),
-                    const SizedBox(width: 16),
-                    clockWidget,
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            // 2. LINHA DE 5 KPIS MODERNOS (Estilo LogiFlow / LoanHub)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final List<Widget> kpiCards = <Widget>[
-                  _ModernKpiCard(
-                    title: 'Total Materiais',
-                    value: '${metrics.total}',
-                    badgeText: 'Total',
-                    badgeColor: AppColors.cyan,
-                    isDark: isDark,
-                    trailingWidget: _MiniBarSparkline(color: AppColors.cyan),
-                    onTap: () => widget.onNavigate(1),
-                  ),
-                  _ModernKpiCard(
-                    title: 'No Depósito',
-                    value: '${metrics.disponivel}',
-                    badgeText: metrics.total > 0 ? '${((metrics.disponivel / metrics.total) * 100).toStringAsFixed(0)}%' : '0%',
-                    badgeColor: AppColors.success,
-                    isDark: isDark,
-                    trailingWidget: _GaugeArc(
-                      ratio: metrics.total > 0 ? (metrics.disponivel / metrics.total) : 0.8,
-                      color: AppColors.success,
-                    ),
-                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_DEPOSITO'),
-                  ),
-                  _ModernKpiCard(
-                    title: 'Alocados em Setor',
-                    value: '${metrics.noSetor}',
-                    badgeText: 'Setores',
-                    badgeColor: const Color(0xFF8B5CF6),
-                    isDark: isDark,
-                    trailingWidget: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.domain_outlined, color: Color(0xFF8B5CF6), size: 18),
-                    ),
-                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_SETOR'),
-                  ),
-                  _ModernKpiCard(
-                    title: 'Cautelados em Missão',
-                    value: '${metrics.cautelado}',
-                    badgeText: 'Em Campo',
-                    badgeColor: AppColors.warning,
-                    isDark: isDark,
-                    trailingWidget: const _PulseSparkline(color: AppColors.warning),
-                    onTap: () => widget.onNavigate(2),
-                  ),
-                  _ModernKpiCard(
-                    title: 'Em Manutenção',
-                    value: '${metrics.manutencao}',
-                    badgeText: 'Atenção',
-                    badgeColor: AppColors.danger,
-                    isDark: isDark,
-                    trailingWidget: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppColors.danger.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 18),
-                    ),
-                    onTap: () => widget.onNavigate(3),
-                  ),
-                ];
-
-                if (constraints.maxWidth >= 980) {
-                  return Row(
-                    children: [
-                      for (int i = 0; i < kpiCards.length; i++) ...[
-                        if (i > 0) const SizedBox(width: 12),
-                        Expanded(child: kpiCards[i]),
-                      ],
-                    ],
-                  );
-                }
-
-                final columns = constraints.maxWidth >= 600 ? 3 : 2;
-                final spacing = 12.0;
-                final totalSpacing = spacing * (columns - 1);
-                final itemWidth = (constraints.maxWidth - totalSpacing) / columns;
-
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: kpiCards.map<Widget>((card) => SizedBox(width: itemWidth, child: card)).toList(),
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            // 3. SEÇÃO CENTRAL: FLUXO DE MOVIMENTAÇÕES + RADAR DE MISSÕES ATIVAS
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isNarrow = constraints.maxWidth < 920;
-                final flowWidget = Container(
-                    height: 280,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              runSpacing: 4,
                               children: [
                                 const Text(
-                                  'Fluxo Operacional de Movimentações',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Movimentações de estoque vs Devoluções de Missões',
+                                  'CENTRO DE OPERAÇÕES DE TI - BINFAE-GL',
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF00A47A).withOpacity(0.25),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: AppColors.tertiary.withOpacity(0.4)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.tertiary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Text(
+                                        'EM EXPEDIENTE NORMAL / PRONTO-EMPREGO',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontFamily: 'monospace',
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.tertiary,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 12,
+                              runSpacing: 4,
+                              children: [
+                                const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.location_on_outlined, size: 14, color: AppColors.outline),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'GLO-GALEÃO (SBGL) // HANGAR-TI #4',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontFamily: 'monospace',
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Text('•', style: TextStyle(color: AppColors.outlineVariant)),
+                                const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.storage_outlined, size: 14, color: AppColors.tertiary),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'LOCAL DB: SECURE-SQLITE 3.42 (SYNC OK)',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontFamily: 'monospace',
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Text('•', style: TextStyle(color: AppColors.outlineVariant)),
+                                Text(
+                                  'OPERADOR: ${user?.nomeGuerra ?? "S2 SILVA"} (SARAM ${user?.saram ?? "6842910"})',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontFamily: 'monospace',
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+
+                  final bannerActions = Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      // Sincronizar F5
+                      OutlinedButton.icon(
+                        onPressed: _isSyncing ? null : _triggerManualSync,
+                        icon: _isSyncing
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                              )
+                            : const Icon(Icons.sync, size: 16, color: AppColors.primary),
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'SINCRONIZAR',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF0E121B) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                                color: AppColors.surfaceContainerLowest,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text(
+                                'F5',
+                                style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline),
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: AppColors.surfaceContainerHigh,
+                          side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.5)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                      ),
+                      // Simular Bip Ctrl+B
+                      OutlinedButton.icon(
+                        onPressed: _simulateBarcodeBeep,
+                        icon: const Icon(Icons.barcode_reader, size: 16, color: AppColors.tertiary),
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'SIMULAR BIP',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.tertiary,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceContainerLowest,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text(
+                                'Ctrl+B',
+                                style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline),
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: AppColors.surfaceContainerHigh,
+                          side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.5)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                      ),
+                      // Novo Material Ctrl+N
+                      ElevatedButton.icon(
+                        onPressed: widget.onNewItem,
+                        icon: const Icon(Icons.add_box, size: 16, color: Color(0xFF00285D)),
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'NOVO MATERIAL',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF00285D),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text(
+                                'Ctrl+N',
+                                style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: Color(0xFF00285D)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryContainer,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          elevation: 2,
+                        ),
+                      ),
+                    ],
+                  );
+
+                  if (isWide) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(child: bannerInfo),
+                        const SizedBox(width: 16),
+                        bannerActions,
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      bannerInfo,
+                      const SizedBox(height: 14),
+                      bannerActions,
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // =========================================================================
+            // 2. OPERATIONAL METRICS 5-CARD GRID (Google Stitch #03_HomeDashboardView)
+            // =========================================================================
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final List<Widget> cards = [
+                  // Card 1: TOTAL ACERVO
+                  _TacticalMetricCard(
+                    title: 'TOTAL ACERVO',
+                    value: '${metrics.total}',
+                    unit: 'itens',
+                    icon: Icons.dns_outlined,
+                    iconColor: AppColors.primary,
+                    statusText: '100% Auditado',
+                    statusIcon: Icons.verified,
+                    statusColor: AppColors.tertiary,
+                    linkText: 'Estoque ->',
+                    onTap: () => widget.onNavigate(1),
+                  ),
+                  // Card 2: PRONTOS DEPÓSITO
+                  _TacticalMetricCard(
+                    title: 'PRONTOS DEPÓSITO',
+                    value: '${metrics.disponivel}',
+                    unit: 'NO_DEPOSITO',
+                    icon: Icons.warehouse_outlined,
+                    iconColor: AppColors.tertiary,
+                    statusText: '+${metrics.disponivel > 0 ? (metrics.disponivel * 0.1).ceil() : 0} conferidos hoje',
+                    statusIcon: Icons.trending_up,
+                    statusColor: AppColors.tertiary,
+                    badgeText: metrics.total > 0
+                        ? '${((metrics.disponivel / metrics.total) * 100).toStringAsFixed(1)}%'
+                        : '0%',
+                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_DEPOSITO'),
+                  ),
+                  // Card 3: EM USO / NO SETOR
+                  _TacticalMetricCard(
+                    title: 'EM USO / NO SETOR',
+                    value: '${metrics.noSetor}',
+                    unit: 'NO_SETOR',
+                    icon: Icons.corporate_fare_outlined,
+                    iconColor: AppColors.secondary,
+                    statusText: 'Esquadrões & Cias',
+                    statusIcon: Icons.domain,
+                    statusColor: AppColors.onSurfaceVariant,
+                    badgeText: metrics.total > 0
+                        ? '${((metrics.noSetor / metrics.total) * 100).toStringAsFixed(1)}%'
+                        : '0%',
+                    onTap: () => widget.onNavigate(1, statusFilter: 'NO_SETOR'),
+                  ),
+                  // Card 4: CAUTELADOS MISSÃO
+                  _TacticalMetricCard(
+                    title: 'CAUTELADOS MISSÃO',
+                    value: '${metrics.cautelado}',
+                    unit: 'CAUTELADO',
+                    valueColor: AppColors.primary,
+                    icon: Icons.assignment_turned_in_outlined,
+                    iconColor: AppColors.primary,
+                    statusText: '${_recentCautelas.length} Missões Ativas',
+                    statusIcon: Icons.military_tech,
+                    statusColor: AppColors.primary,
+                    badgeText: metrics.total > 0
+                        ? '${((metrics.cautelado / metrics.total) * 100).toStringAsFixed(1)}%'
+                        : '0%',
+                    onTap: () => widget.onNavigate(2),
+                  ),
+                  // Card 5: MANUTENÇÃO TÉCNICA
+                  _TacticalMetricCard(
+                    title: 'MANUTENÇÃO TÉCNICA',
+                    value: '${metrics.manutencao}',
+                    unit: 'EM_MANUTENCAO',
+                    valueColor: AppColors.error,
+                    icon: Icons.build_circle_outlined,
+                    iconColor: AppColors.error,
+                    statusText: '${metrics.manutencao} em Bancada',
+                    statusIcon: Icons.warning_amber_rounded,
+                    statusColor: AppColors.error,
+                    badgeText: metrics.total > 0
+                        ? '${((metrics.manutencao / metrics.total) * 100).toStringAsFixed(1)}%'
+                        : '0%',
+                    onTap: () => widget.onNavigate(3),
+                  ),
+                ];
+
+                if (width >= 1180) {
+                  return Row(
+                    children: [
+                      for (int i = 0; i < cards.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 12),
+                        Expanded(child: cards[i]),
+                      ],
+                    ],
+                  );
+                } else if (width >= 680) {
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: cards.map((c) => SizedBox(width: (width - 24) / 3, child: c)).toList(),
+                  );
+                } else {
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: cards.map((c) => SizedBox(width: (width - 12) / 2, child: c)).toList(),
+                  );
+                }
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // =========================================================================
+            // 3. REALTIME SCANNER BANNER (Simulador USB Wedge)
+            // =========================================================================
+            if (_showScannerBanner) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.tertiary.withOpacity(0.35)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.tertiary.withOpacity(0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.tertiary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.barcode_reader, color: AppColors.tertiary, size: 22),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.tertiary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const Text(
+                                'LEITOR USB WEDGE ATIVO // INTERCEPTO DIRETO',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.tertiary,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
-                              child: Row(
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceContainerHigh,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'BMP-051902',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontFamily: 'monospace',
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                'Rádio Transceptor Motorola APX 8000',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              RichText(
+                                text: const TextSpan(
+                                  style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.outline),
+                                  children: [
+                                    TextSpan(text: 'ENDPOINT: '),
+                                    TextSpan(
+                                      text: 'GET /cautelas/item/BMP-051902/status',
+                                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Text('•', style: TextStyle(color: AppColors.outlineVariant)),
+                              const Text(
+                                'STATUS: CAUTELA ATIVA #CT-9941',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.tertiary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextButton(
+                          onPressed: () => setState(() => _showScannerBanner = false),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.outline,
+                            textStyle: const TextStyle(fontSize: 12),
+                          ),
+                          child: const Text('Dispensar'),
+                        ),
+                        const SizedBox(width: 6),
+                        ElevatedButton.icon(
+                          onPressed: () => widget.onNavigate(2),
+                          icon: const Icon(Icons.check_circle, size: 15, color: Color(0xFF003827)),
+                          label: const Text(
+                            'DEVOLVER MATERIAL AGORA',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF003827),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.tertiary,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // =========================================================================
+            // 4. OPERATIONAL SPLIT LAYOUT (Google Stitch #03_HomeDashboardView)
+            // Left: Missões e Cautelas em Andamento (7 cols)
+            // Right: Fluxo Operacional & Distribuição de Estoque (5 cols)
+            // =========================================================================
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 980;
+
+                final missionsColumn = Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.military_tech, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Missões e Cautelas em Andamento',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryContainer.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: AppColors.primaryContainer.withOpacity(0.4)),
+                                  ),
+                                  child: Text(
+                                    '${_recentCautelas.length} ATIVAS',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            InkWell(
+                              onTap: () => widget.onNavigate(2),
+                              child: const Row(
                                 children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.cyan,
+                                  Text(
+                                    'VER TODAS',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  const Text('Saídas', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xFF818CF8),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text('Devoluções', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.arrow_forward, size: 14, color: AppColors.primary),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
-                        Expanded(
-                          child: CustomPaint(
-                            painter: _WaveChartPainter(isDark: isDark),
-                            child: Container(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                final missionsWidget = Container(
-                    height: 280,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                      const Divider(height: 1, color: Color(0xFF232B3E)),
+                      // List of Missions
+                      if (_isLoadingActivities)
+                        const Padding(
+                          padding: EdgeInsets.all(40),
+                          child: Center(
+                            child: CircularProgressIndicator(color: AppColors.primary),
+                          ),
+                        )
+                      else if (_recentCautelas.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(40),
+                          child: Center(
+                            child: Column(
                               children: [
-                                const Text(
-                                  'Missões e Cautelas Ativas',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cyan.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    '${_recentCautelas.length} ativas',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.cyan,
-                                    ),
-                                  ),
+                                Icon(Icons.assignment_turned_in_outlined, size: 36, color: AppColors.outline),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Nenhuma cautela ou missão ativa no momento.',
+                                  style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 13),
                                 ),
                               ],
                             ),
-                            TextButton(
-                              onPressed: () => widget.onNavigate(2),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(50, 24),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: const Text('Ver todas', style: TextStyle(fontSize: 11, color: AppColors.cyan)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              // Radar Visual Galeão
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF0B0F17) : const Color(0xFFF1F5F9),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
-                                ),
-                                child: CustomPaint(
-                                  painter: _RadarPainter(),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              // Lista de Missões
-                              Expanded(
-                                child: _isLoadingActivities
-                                    ? const Center(child: CircularProgressIndicator())
-                                    : _recentCautelas.isEmpty
-                                        ? Center(
-                                            child: Text(
-                                              'Nenhuma missão ativa no momento.',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                              ),
-                                            ),
-                                          )
-                                        : ListView.separated(
-                                            itemCount: _recentCautelas.length,
-                                            separatorBuilder: (_, __) => const SizedBox(height: 8),
-                                            itemBuilder: (ctx, i) {
-                                              final c = _recentCautelas[i];
-                                              return Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                                decoration: BoxDecoration(
-                                                  color: isDark ? const Color(0xFF101520) : const Color(0xFFF8FAFC),
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  border: Border.all(
-                                                    color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 6,
-                                                      height: 6,
-                                                      decoration: const BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: AppColors.cyan,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            c.nome,
-                                                            style: const TextStyle(
-                                                              fontSize: 12,
-                                                              fontWeight: FontWeight.bold,
-                                                            ),
-                                                            maxLines: 1,
-                                                            overflow: TextOverflow.ellipsis,
-                                                          ),
-                                                          Text(
-                                                            '${c.itensCautelados} itens • ${c.tipo == 'MISSAO' ? 'Missão' : 'Fixa'}',
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(Icons.arrow_forward_ios, size: 12),
-                                                      padding: EdgeInsets.zero,
-                                                      constraints: const BoxConstraints(),
-                                                      onPressed: () {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (_) => CautelaDetailDialog(
-                                                            cautela: c,
-                                                            onUpdated: _loadDashboardActivities,
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                              ),
-                            ],
                           ),
+                        )
+                      else
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(12),
+                          itemCount: _recentCautelas.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (ctx, i) {
+                            final c = _recentCautelas[i];
+                            return _TacticalMissionItemCard(
+                              cautela: c,
+                              onInspect: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => CautelaDetailDialog(
+                                    cautela: c,
+                                    onUpdated: _loadDashboardActivities,
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
-                      ],
-                    ),
-                  );
-
-                if (isNarrow) {
-                  return Column(
-                    children: [
-                      flowWidget,
-                      const SizedBox(height: 16),
-                      missionsWidget,
                     ],
-                  );
-                }
-
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 6, child: flowWidget),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 5, child: missionsWidget),
-                  ],
+                  ),
                 );
-              },
-            ),
 
-            const SizedBox(height: 20),
-
-            // 4. SEÇÃO INFERIOR: DISTRIBUIÇÃO POR CATEGORIA + MOVIMENTAÇÕES RECENTES
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isNarrow = constraints.maxWidth < 920;
-                final donutWidget = Container(
-                    height: 260,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
+                final analyticsColumn = Column(
+                  children: [
+                    // Fluxo Operacional & Auditoria Recente
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Distribuição por Categoria',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 14),
-                        Expanded(
-                          child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              SizedBox(
-                                width: 110,
-                                height: 110,
-                                child: CustomPaint(
-                                  painter: _DonutChartPainter(),
-                                ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Auditoria de Movimentações Recentes',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'Entradas, saídas e transferências de estoque',
+                                    style: TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                              InkWell(
+                                onTap: () => widget.onNavigate(7),
+                                child: const Row(
                                   children: [
-                                    _CategoryLegendItem(label: 'Notebooks & PCs', color: AppColors.cyan, isDark: isDark),
-                                    const SizedBox(height: 6),
-                                    _CategoryLegendItem(label: 'Servidores & Rack', color: const Color(0xFF38BDF8), isDark: isDark),
-                                    const SizedBox(height: 6),
-                                    _CategoryLegendItem(label: 'Rádios & Com.', color: const Color(0xFF818CF8), isDark: isDark),
-                                    const SizedBox(height: 6),
-                                    _CategoryLegendItem(label: 'Periféricos & Cabos', color: const Color(0xFFA855F7), isDark: isDark),
+                                    Text(
+                                      'HISTÓRICO',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontFamily: 'monospace',
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Icon(Icons.arrow_forward, size: 12, color: AppColors.primary),
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                final recentWidget = Container(
-                    height: 260,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF151D2A) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Movimentações Recentes em Tempo Real',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                            TextButton(
-                              onPressed: () => widget.onNavigate(6),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(60, 24),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          const SizedBox(height: 12),
+                          // Movements Table
+                          if (_isLoadingActivities)
+                            const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(24),
+                                child: CircularProgressIndicator(color: AppColors.primary),
                               ),
-                              child: const Text('Ver histórico', style: TextStyle(fontSize: 11, color: AppColors.cyan)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        // Header da Tabela
-                        Row(
-                          children: [
-                            const SizedBox(width: 100, child: Text('STATUS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                            const SizedBox(width: 100, child: Text('BMP / ITEM', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                            Expanded(child: Text('RESPONSÁVEL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)))),
-                            const SizedBox(width: 110, child: Text('TIMESTAMP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8)))),
-                          ],
-                        ),
-                        const Divider(height: 12),
-                        Expanded(
-                          child: _isLoadingActivities
-                              ? const Center(child: CircularProgressIndicator())
-                              : _recentMovements.isEmpty
-                                  ? Center(
-                                      child: Text(
-                                        'Nenhuma movimentação registrada recentemente.',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            )
+                          else if (_recentMovements.isEmpty)
+                            const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Text(
+                                  'Nenhuma movimentação registrada recentemente.',
+                                  style: TextStyle(fontSize: 12, color: AppColors.outline),
+                                ),
+                              ),
+                            )
+                          else
+                            Column(
+                              children: [
+                                // Table header
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceContainerLowest,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 80,
+                                        child: Text(
+                                          'STATUS',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontFamily: 'monospace',
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.outline,
+                                          ),
                                         ),
                                       ),
-                                    )
-                                  : ListView.separated(
-                                      itemCount: _recentMovements.length,
-                                      separatorBuilder: (_, __) => const Divider(height: 8, thickness: 0.5),
-                                      itemBuilder: (ctx, i) {
-                                        final m = _recentMovements[i];
-                                        Color badgeColor;
-                                        String badgeText = m.tipoMovimentacao;
-                                        switch (m.tipoMovimentacao.toUpperCase()) {
-                                          case 'DEVOLUCAO':
-                                            badgeColor = AppColors.success;
-                                            badgeText = 'Disponível';
-                                            break;
-                                          case 'TRANSFERENCIA':
-                                          case 'CAUTELA':
-                                            badgeColor = AppColors.cyan;
-                                            badgeText = 'Cautela';
-                                            break;
-                                          default:
-                                            badgeColor = AppColors.warning;
-                                            badgeText = 'Manutenção';
-                                        }
-
-                                        return Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 100,
-                                              child: Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                                  decoration: BoxDecoration(
-                                                    color: badgeColor.withOpacity(0.15),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                    border: Border.all(color: badgeColor.withOpacity(0.4)),
-                                                  ),
-                                                  child: Text(
-                                                    badgeText,
-                                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: badgeColor),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 100,
-                                              child: Text(
-                                                'BMP-${11000 + (m.itemId % 9000)}',
-                                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                m.itemNome ?? 'Material #${m.itemId}',
-                                                style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 110,
-                                              child: Text(
-                                                AppDateUtils.formatDateTime(m.criadoEm),
-                                                style: TextStyle(
-                                                  fontSize: 10.5,
-                                                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                                  fontFamily: 'monospace',
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                        ),
-                      ],
+                                      SizedBox(
+                                        width: 90,
+                                        child: Text(
+                                          'BMP / ITEM',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontFamily: 'monospace',
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.outline,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          'RESPONSÁVEL / DETALHES',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontFamily: 'monospace',
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.outline,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 65,
+                                        child: Text(
+                                          'HORA',
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontFamily: 'monospace',
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.outline,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                for (final m in _recentMovements) ...[
+                                  _TacticalMovementRow(movement: m),
+                                  const SizedBox(height: 6),
+                                ],
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
-                  );
+                    const SizedBox(height: 14),
+                    // Distribuição por Categoria & Hardware
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Distribuição de Acervo por Categoria',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: CustomPaint(painter: _TacticalDonutChartPainter()),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  children: const [
+                                    _TacticalCategoryLegend(
+                                      label: 'Notebooks & Estações',
+                                      color: AppColors.primary,
+                                      count: '42%',
+                                    ),
+                                    SizedBox(height: 6),
+                                    _TacticalCategoryLegend(
+                                      label: 'Racks & Servidores',
+                                      color: AppColors.secondary,
+                                      count: '28%',
+                                    ),
+                                    SizedBox(height: 6),
+                                    _TacticalCategoryLegend(
+                                      label: 'Rádios VHF/UHF & Com.',
+                                      color: AppColors.tertiary,
+                                      count: '18%',
+                                    ),
+                                    SizedBox(height: 6),
+                                    _TacticalCategoryLegend(
+                                      label: 'Periféricos & Peças',
+                                      color: Color(0xFFC084FC),
+                                      count: '12%',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
 
-                if (isNarrow) {
-                  return Column(
+                if (isWide) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      donutWidget,
-                      const SizedBox(height: 16),
-                      recentWidget,
+                      Expanded(flex: 7, child: missionsColumn),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 5, child: analyticsColumn),
                     ],
                   );
                 }
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return Column(
                   children: [
-                    Expanded(flex: 4, child: donutWidget),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 7, child: recentWidget),
+                    missionsColumn,
+                    const SizedBox(height: 16),
+                    analyticsColumn,
                   ],
                 );
               },
@@ -788,34 +1107,44 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Componentes Auxiliares Elegantes (Estilo LogiFlow)
-// ---------------------------------------------------------------------------
+// =============================================================================
+// SUB-WIDGETS TÁTICOS (Google Stitch Aerospace Design)
+// =============================================================================
 
-class _ModernKpiCard extends StatefulWidget {
+class _TacticalMetricCard extends StatefulWidget {
   final String title;
   final String value;
-  final String badgeText;
-  final Color badgeColor;
-  final bool isDark;
-  final Widget trailingWidget;
+  final String unit;
+  final IconData icon;
+  final Color iconColor;
+  final String statusText;
+  final IconData statusIcon;
+  final Color statusColor;
+  final String? badgeText;
+  final String? linkText;
+  final Color? valueColor;
   final VoidCallback onTap;
 
-  const _ModernKpiCard({
+  const _TacticalMetricCard({
     required this.title,
     required this.value,
-    required this.badgeText,
-    required this.badgeColor,
-    required this.isDark,
-    required this.trailingWidget,
+    required this.unit,
+    required this.icon,
+    required this.iconColor,
+    required this.statusText,
+    required this.statusIcon,
+    required this.statusColor,
+    this.badgeText,
+    this.linkText,
+    this.valueColor,
     required this.onTap,
   });
 
   @override
-  State<_ModernKpiCard> createState() => _ModernKpiCardState();
+  State<_TacticalMetricCard> createState() => _TacticalMetricCardState();
 }
 
-class _ModernKpiCardState extends State<_ModernKpiCard> {
+class _TacticalMetricCardState extends State<_TacticalMetricCard> {
   bool _isHovered = false;
 
   @override
@@ -828,75 +1157,124 @@ class _ModernKpiCardState extends State<_ModernKpiCard> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          transform: Matrix4.identity()..translate(0.0, _isHovered ? -3.0 : 0.0),
-          padding: const EdgeInsets.all(18),
+          transform: Matrix4.identity()..translate(0.0, _isHovered ? -2.0 : 0.0),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: widget.isDark
-                ? (_isHovered ? const Color(0xFF1B2438) : const Color(0xFF151D2A))
-                : (_isHovered ? const Color(0xFFF8FAFC) : Colors.white),
-            borderRadius: BorderRadius.circular(16),
+            color: _isHovered ? AppColors.surfaceContainer : AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: _isHovered
-                  ? widget.badgeColor.withOpacity(0.8)
-                  : (widget.isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)),
-              width: _isHovered ? 1.5 : 1,
+                  ? widget.iconColor.withOpacity(0.6)
+                  : AppColors.outlineVariant.withOpacity(0.35),
             ),
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? widget.badgeColor.withOpacity(0.18)
-                    : Colors.black.withOpacity(widget.isDark ? 0.3 : 0.04),
-                blurRadius: _isHovered ? 16 : 8,
-                offset: Offset(0, _isHovered ? 6 : 2),
+                    ? widget.iconColor.withOpacity(0.12)
+                    : Colors.black.withOpacity(0.25),
+                blurRadius: _isHovered ? 12 : 6,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.onSurfaceVariant,
+                        letterSpacing: 0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    width: 28,
+                    height: 28,
                     decoration: BoxDecoration(
-                      color: widget.badgeColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.surfaceContainerHigh,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(
-                      widget.badgeText,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: widget.badgeColor,
-                      ),
-                    ),
+                    child: Icon(widget.icon, size: 16, color: widget.iconColor),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              // Main Value
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     widget.value,
                     style: TextStyle(
                       fontSize: 26,
-                      fontWeight: FontWeight.w900,
-                      color: widget.isDark ? Colors.white : const Color(0xFF0F172A),
-                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w700,
+                      color: widget.valueColor ?? Colors.white,
+                      fontFamily: 'monospace',
                     ),
                   ),
-                  widget.trailingWidget,
+                  const SizedBox(width: 6),
+                  Text(
+                    widget.unit,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                      color: AppColors.outline,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Footer telemetry
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(widget.statusIcon, size: 12, color: widget.statusColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.statusText,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
+                          color: widget.statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (widget.badgeText != null)
+                    Text(
+                      widget.badgeText!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontFamily: 'monospace',
+                        color: AppColors.outline,
+                      ),
+                    ),
+                  if (widget.linkText != null)
+                    Text(
+                      widget.linkText!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontFamily: 'monospace',
+                        color: _isHovered ? AppColors.primary : AppColors.outline,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -907,264 +1285,338 @@ class _ModernKpiCardState extends State<_ModernKpiCard> {
   }
 }
 
-// Mini Bar Sparkline
-class _MiniBarSparkline extends StatelessWidget {
+class _TacticalMissionItemCard extends StatelessWidget {
+  final CautelaModel cautela;
+  final VoidCallback onInspect;
+
+  const _TacticalMissionItemCard({
+    required this.cautela,
+    required this.onInspect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: Title, ID badge, and inspect button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      cautela.nome,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '#${cautela.id.toString().padLeft(4, '0')}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.tertiary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: AppColors.tertiary.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.timer_outlined, size: 12, color: AppColors.tertiary),
+                        SizedBox(width: 4),
+                        Text(
+                          'ATIVA',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.tertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  IconButton(
+                    onPressed: onInspect,
+                    icon: const Icon(Icons.visibility_outlined, size: 16, color: AppColors.primary),
+                    tooltip: 'Inspecionar Cautela',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // Responsável
+          Row(
+            children: [
+              const Icon(Icons.person_outline, size: 13, color: AppColors.outline),
+              const SizedBox(width: 4),
+              Text(
+                'Responsável: ',
+                style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+              ),
+              Text(
+                cautela.responsavelNome,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '(SARAM ${cautela.responsavelSaram})',
+                style: const TextStyle(fontSize: 10.5, fontFamily: 'monospace', color: AppColors.secondary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Equipment chips preview
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.inventory_2_outlined, size: 13, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  '${cautela.itensCautelados} item(ns) em carga',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  cautela.tipo == 'MISSAO' ? 'MISSÃO TÁTICA' : 'CAUTELA FIXA',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.tertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Footer
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.verified_user_outlined, size: 12, color: AppColors.tertiary),
+                  SizedBox(width: 4),
+                  Text(
+                    'Assinatura Digital Válida',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                      color: AppColors.tertiary,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                'Criado: ${AppDateUtils.formatDateTime(cautela.criadoEm)}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  color: AppColors.outline,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TacticalMovementRow extends StatelessWidget {
+  final ItemMovementModel movement;
+
+  const _TacticalMovementRow({required this.movement});
+
+  @override
+  Widget build(BuildContext context) {
+    Color badgeColor;
+    String badgeText = movement.tipoMovimentacao.toUpperCase();
+
+    switch (badgeText) {
+      case 'DEVOLUCAO':
+        badgeColor = AppColors.tertiary;
+        badgeText = 'DEVOLVIDO';
+        break;
+      case 'CAUTELA':
+        badgeColor = AppColors.primary;
+        badgeText = 'CAUTELA';
+        break;
+      case 'TRANSFERENCIA':
+        badgeColor = AppColors.secondary;
+        badgeText = 'TRANSF';
+        break;
+      default:
+        badgeColor = AppColors.error;
+        badgeText = 'MANUT';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 80,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: badgeColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: badgeColor.withOpacity(0.4)),
+              ),
+              child: Text(
+                badgeText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  color: badgeColor,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          SizedBox(
+            width: 84,
+            child: Text(
+              'BMP-${11000 + (movement.itemId % 9000)}',
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              movement.itemNome ?? 'Material #${movement.itemId}',
+              style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SizedBox(
+            width: 65,
+            child: Text(
+              DateFormat('HH:mm').format(movement.criadoEm),
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                fontSize: 10,
+                fontFamily: 'monospace',
+                color: AppColors.outline,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TacticalCategoryLegend extends StatelessWidget {
+  final String label;
   final Color color;
-  const _MiniBarSparkline({required this.color});
+  final String count;
+
+  const _TacticalCategoryLegend({
+    required this.label,
+    required this.color,
+    required this.count,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _bar(8, 0.4),
-        const SizedBox(width: 3),
-        _bar(14, 0.6),
-        const SizedBox(width: 3),
-        _bar(18, 0.8),
-        const SizedBox(width: 3),
-        _bar(12, 0.5),
-        const SizedBox(width: 3),
-        _bar(22, 1.0),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Text(
+          count,
+          style: TextStyle(
+            fontSize: 11,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
       ],
     );
   }
-
-  Widget _bar(double h, double opacity) {
-    return Container(
-      width: 4,
-      height: h,
-      decoration: BoxDecoration(
-        color: color.withOpacity(opacity),
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
-  }
 }
 
-// Mini Gauge Arc
-class _GaugeArc extends StatelessWidget {
-  final double ratio;
-  final Color color;
-  const _GaugeArc({required this.ratio, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 38,
-      height: 22,
-      child: CustomPaint(
-        painter: _GaugePainter(ratio: ratio, color: color),
-      ),
-    );
-  }
-}
-
-class _GaugePainter extends CustomPainter {
-  final double ratio;
-  final Color color;
-  _GaugePainter({required this.ratio, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height);
-    final radius = size.width / 2;
-
-    final bgPaint = Paint()
-      ..color = const Color(0xFF232B3E)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-
-    final activePaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 4;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      math.pi,
-      math.pi,
-      false,
-      bgPaint,
-    );
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      math.pi,
-      math.pi * ratio.clamp(0.0, 1.0),
-      false,
-      activePaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Pulse Sparkline
-class _PulseSparkline extends StatelessWidget {
-  final Color color;
-  const _PulseSparkline({required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 44,
-      height: 20,
-      child: CustomPaint(
-        painter: _PulseLinePainter(color: color),
-      ),
-    );
-  }
-}
-
-class _PulseLinePainter extends CustomPainter {
-  final Color color;
-  _PulseLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.5)
-      ..lineTo(size.width * 0.25, size.height * 0.5)
-      ..lineTo(size.width * 0.4, 0)
-      ..lineTo(size.width * 0.6, size.height)
-      ..lineTo(size.width * 0.75, size.height * 0.5)
-      ..lineTo(size.width, size.height * 0.5);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Wave Chart Painter (LogiFlow neon wave chart)
-class _WaveChartPainter extends CustomPainter {
-  final bool isDark;
-  _WaveChartPainter({required this.isDark});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // Grid horizontal lines
-    final gridPaint = Paint()
-      ..color = (isDark ? const Color(0xFF232B3E) : const Color(0xFFE2E8F0)).withOpacity(0.5)
-      ..strokeWidth = 1;
-
-    for (int i = 0; i <= 4; i++) {
-      final y = h * (i / 4.0);
-      canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
-    }
-
-    // Cyan curve (Saídas)
-    final cyanPaint = Paint()
-      ..color = AppColors.cyan
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final cyanFillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          AppColors.cyan.withOpacity(0.25),
-          AppColors.cyan.withOpacity(0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, w, h))
-      ..style = PaintingStyle.fill;
-
-    final pathCyan = Path()
-      ..moveTo(0, h * 0.7)
-      ..cubicTo(w * 0.2, h * 0.2, w * 0.35, h * 0.9, w * 0.5, h * 0.3)
-      ..cubicTo(w * 0.65, h * 0.6, w * 0.8, h * 0.1, w, h * 0.5);
-
-    final fillPathCyan = Path.from(pathCyan)
-      ..lineTo(w, h)
-      ..lineTo(0, h)
-      ..close();
-
-    canvas.drawPath(fillPathCyan, cyanFillPaint);
-    canvas.drawPath(pathCyan, cyanPaint);
-
-    // Indigo curve (Devoluções)
-    final indigoPaint = Paint()
-      ..color = const Color(0xFF818CF8)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final pathIndigo = Path()
-      ..moveTo(0, h * 0.85)
-      ..cubicTo(w * 0.2, h * 0.45, w * 0.35, h * 0.7, w * 0.5, h * 0.6)
-      ..cubicTo(w * 0.65, h * 0.4, w * 0.8, h * 0.35, w, h * 0.4);
-
-    canvas.drawPath(pathIndigo, indigoPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Radar Visual Galeão
-class _RadarPainter extends CustomPainter {
+class _TacticalDonutChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-
-    final ringPaint = Paint()
-      ..color = AppColors.cyan.withOpacity(0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    canvas.drawCircle(center, radius * 0.35, ringPaint);
-    canvas.drawCircle(center, radius * 0.7, ringPaint);
-    canvas.drawCircle(center, radius * 0.95, ringPaint);
-
-    // Cross lines
-    canvas.drawLine(Offset(center.dx, 0), Offset(center.dx, size.height), ringPaint);
-    canvas.drawLine(Offset(0, center.dy), Offset(size.width, center.dy), ringPaint);
-
-    // Sweep slice
-    final sweepPaint = Paint()
-      ..shader = SweepGradient(
-        colors: [
-          AppColors.cyan.withOpacity(0.0),
-          AppColors.cyan.withOpacity(0.35),
-        ],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
-
-    canvas.drawCircle(center, radius * 0.95, sweepPaint);
-
-    // Glowing blip points (Postos Operacionais)
-    final blipPaint = Paint()..color = AppColors.cyan;
-    canvas.drawCircle(Offset(center.dx + 15, center.dy - 20), 3, blipPaint);
-    canvas.drawCircle(Offset(center.dx - 22, center.dy + 12), 2.5, blipPaint);
-    canvas.drawCircle(Offset(center.dx + 18, center.dy + 25), 2.5, blipPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Donut Chart Painter
-class _DonutChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-    const strokeWidth = 18.0;
+    const strokeWidth = 14.0;
 
     void drawSegment(double startAngle, double sweepAngle, Color color) {
       final paint = Paint()
@@ -1182,46 +1634,12 @@ class _DonutChartPainter extends CustomPainter {
       );
     }
 
-    drawSegment(-math.pi / 2, 2.2, AppColors.cyan);
-    drawSegment(0.8, 1.4, const Color(0xFF38BDF8));
-    drawSegment(2.3, 1.1, const Color(0xFF818CF8));
-    drawSegment(3.5, 0.8, const Color(0xFFA855F7));
+    drawSegment(-math.pi / 2, 2.4, AppColors.primary);
+    drawSegment(1.0, 1.4, AppColors.secondary);
+    drawSegment(2.5, 1.1, AppColors.tertiary);
+    drawSegment(3.7, 0.8, const Color(0xFFC084FC));
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Legenda de Categoria
-class _CategoryLegendItem extends StatelessWidget {
-  final String label;
-  final Color color;
-  final bool isDark;
-
-  const _CategoryLegendItem({required this.label, required this.color, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
 }
