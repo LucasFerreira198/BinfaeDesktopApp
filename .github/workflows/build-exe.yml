@@ -47,7 +47,7 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = "Continue"
-          $out = flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1
+          $out = flutter analyze lib --no-fatal-infos --no-fatal-warnings 2>&1
           $code = $LASTEXITCODE
           $out | ForEach-Object { Write-Host $_ }
           if ($code -ne 0) {

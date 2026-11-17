@@ -542,6 +542,7 @@ class _DashboardViewState extends State<DashboardView> {
     final auth = Provider.of<AuthProvider>(context);
     final themeProv = Provider.of<ThemeProvider>(context);
     final stock = Provider.of<StockProvider>(context);
+    final apiService = Provider.of<ApiService>(context, listen: false);
 
     final user = auth.user;
     final isAdmin = user?.admin == true;
