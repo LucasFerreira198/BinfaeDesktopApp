@@ -1031,7 +1031,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      item.especificacao ?? item.grupoNome ?? 'Material Geral',
+                      item.subgrupo?.nome ?? item.observacoes ?? 'Material Geral',
                       style: const TextStyle(fontSize: 10.5, color: AppColors.outline),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1060,7 +1060,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        item.localizacaoFisica ?? 'Almoxarifado',
+                        item.localizacaoAtual,
                         style: const TextStyle(fontSize: 11, color: Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

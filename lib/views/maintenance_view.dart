@@ -507,7 +507,13 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
           item: item,
           isRepaired: true,
           onReturn: () async {
-            await stock.returnRepairedItem(item.id);
+            await stock.moveItem(
+              itemId: item.id,
+              tipoMovimentacao: 'RETORNO_MANUTENCAO',
+              quantidade: item.quantidade,
+              destinoLocalId: item.origemLocalId,
+              motivo: 'Retorno de manutenção técnica',
+            );
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -591,7 +597,12 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
                 return;
               }
               Navigator.of(ctx).pop();
-              await stock.concludeRepair(item.id, laudo);
+              await stock.moveItem(
+                itemId: item.id,
+                tipoMovimentacao: 'CONCLUIR_REPARO',
+                quantidade: item.quantidade,
+                motivo: laudo,
+              );
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

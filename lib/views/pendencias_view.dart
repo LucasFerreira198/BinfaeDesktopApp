@@ -221,13 +221,13 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
                 if (t.isEmpty) return;
                 Navigator.of(ctx).pop();
                 try {
-                  await _api.createPendencia(
-                    titulo: t,
-                    descricao: descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
-                    tipo: tipo,
-                    prioridade: prioridade,
-                    prazo: prazo,
-                  );
+                  await _api.createPendencia({
+                    'titulo': t,
+                    if (descCtrl.text.trim().isNotEmpty) 'descricao': descCtrl.text.trim(),
+                    'tipo': tipo,
+                    'prioridade': prioridade,
+                    if (prazo != null) 'prazo_limite': prazo!.toIso8601String(),
+                  });
                   _loadPendencias();
                 } catch (e) {
                   if (mounted) {
@@ -251,7 +251,7 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
 
   Future<void> _concluirPendencia(PendenciaModel p) async {
     try {
-      await _api.concluirPendencia(p.id);
+      await _api.concluirPendencia(p.id, resolucao: 'Concluída via painel tático');
       await _loadPendencias();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -755,9 +755,9 @@ class _TacticalPendenciaCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    if (pendencia.prazo != null)
+                    if (pendencia.prazoLimite != null)
                       Text(
-                        'Prazo: ${DateFormat('dd/MM/yyyy').format(pendencia.prazo!)}',
+                        'Prazo: ${DateFormat('dd/MM/yyyy').format(pendencia.prazoLimite!)}',
                         style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline),
                       ),
                   ],
@@ -781,7 +781,7 @@ class _TacticalPendenciaCard extends StatelessWidget {
                 ],
                 const SizedBox(height: 6),
                 Text(
-                  'Responsável: ${pendencia.criador?.nomeGuerra ?? "S2 SILVA"} • Criado: ${DateFormat('dd/MM HH:mm').format(pendencia.criadoEm)}',
+                  'Responsável: ${pendencia.militarResponsavelNome ?? pendencia.criadoPorNome ?? "C&TI"} • Criado: ${pendencia.criadoEm != null ? DateFormat('dd/MM HH:mm').format(pendencia.criadoEm!) : "Recente"}',
                   style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.outline),
                 ),
               ],

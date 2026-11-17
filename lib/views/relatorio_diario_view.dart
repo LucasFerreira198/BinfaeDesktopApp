@@ -416,10 +416,14 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
           LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
+              final plantonistaDisplay = rel?.militarServicoGuerra != null
+                  ? '${rel!.militarServicoPosto ?? ""} ${rel.militarServicoGuerra}'.trim()
+                  : (rel?.militarServicoNome ?? 'Plantão TI');
+              final movsTotal = (rel?.cautelasPeriodo.length ?? 0) + (rel?.devolucoesPeriodo.length ?? 0);
               final cards = [
-                _buildTurnKpiCard('Plantonista Titular', rel?.militarServicoNomeGuerra ?? '2º Sgt Silva', 'SARAM ${rel?.militarServicoSaram ?? "6842910"}', Icons.badge, AppColors.tertiary),
-                _buildTurnKpiCard('Materiais Movimentados', '${rel?.snapshotMovimentacoes.length ?? 0}', 'Entradas & Saídas', Icons.sync_alt, AppColors.primary),
-                _buildTurnKpiCard('Equipamentos Consertados', '${rel?.snapshotItensConsertados.length ?? 0}', 'Bancada TI', Icons.build, AppColors.secondary),
+                _buildTurnKpiCard('Plantonista Titular', plantonistaDisplay, 'SERVIÇO 24H // C&TI', Icons.badge, AppColors.tertiary),
+                _buildTurnKpiCard('Materiais Movimentados', '$movsTotal', 'Cautelas & Devoluções', Icons.sync_alt, AppColors.primary),
+                _buildTurnKpiCard('Equipamentos Consertados', '${rel?.itensConsertados.length ?? 0}', 'Bancada TI', Icons.build, AppColors.secondary),
                 _buildTurnKpiCard('Sistemas & Enlaces', '100% ONLINE', 'CINDACTA-GL // LINK FAB', Icons.network_check, AppColors.tertiary),
               ];
 
@@ -461,30 +465,33 @@ class _RelatorioDiarioViewState extends State<RelatorioDiarioView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSnapshotBox(
-                                  'Materiais Movimentados no Turno (${rel.snapshotMovimentacoes.length})',
+                                  'Movimentações de Cautela no Turno (${rel.cautelasPeriodo.length + rel.devolucoesPeriodo.length})',
                                   Icons.sync_alt,
                                   AppColors.primary,
-                                  rel.snapshotMovimentacoes.isEmpty
+                                  (rel.cautelasPeriodo.isEmpty && rel.devolucoesPeriodo.isEmpty)
                                       ? 'Nenhuma movimentação de material durante o período.'
-                                      : rel.snapshotMovimentacoes.map((m) => '• [${m['tipo_movimentacao']}] ${m['item_nome'] ?? m['item_id']} - ${m['responsavel_nome'] ?? ""}').join('\n'),
+                                      : [
+                                          ...rel.cautelasPeriodo.map((m) => '• [CAUTELA] ${m['item_nome'] ?? m['nome'] ?? m['item_id'] ?? ""} - ${m['militar_nome'] ?? m['responsavel_nome'] ?? ""}'),
+                                          ...rel.devolucoesPeriodo.map((m) => '• [DEVOLUÇÃO] ${m['item_nome'] ?? m['nome'] ?? m['item_id'] ?? ""} - ${m['militar_nome'] ?? m['responsavel_nome'] ?? ""}'),
+                                        ].join('\n'),
                                 ),
                                 const SizedBox(height: 10),
                                 _buildSnapshotBox(
-                                  'Reparos Concluídos na Bancada (${rel.snapshotItensConsertados.length})',
+                                  'Reparos Concluídos na Bancada (${rel.itensConsertados.length})',
                                   Icons.check_circle_outline,
                                   AppColors.tertiary,
-                                  rel.snapshotItensConsertados.isEmpty
+                                  rel.itensConsertados.isEmpty
                                       ? 'Nenhum equipamento finalizado na bancada neste turno.'
-                                      : rel.snapshotItensConsertados.map((item) => '• ${item['nome']} (BMP ${item['bmp'] ?? "S/N"}) - Laudo: ${item['laudo_reparo'] ?? "Ok"}').join('\n'),
+                                      : rel.itensConsertados.map((item) => '• ${item['nome'] ?? item['item_nome'] ?? "Item"} (BMP ${item['bmp'] ?? "S/N"}) - Laudo: ${item['laudo_reparo'] ?? item['laudo'] ?? "Ok"}').join('\n'),
                                 ),
                                 const SizedBox(height: 10),
                                 _buildSnapshotBox(
-                                  'Cautelas Ativas no Turno (${rel.snapshotCautelas.length})',
+                                  'Cautelas & Missões Ativas (${rel.missoesCautelas.length})',
                                   Icons.assignment,
                                   AppColors.secondary,
-                                  rel.snapshotCautelas.isEmpty
+                                  rel.missoesCautelas.isEmpty
                                       ? 'Sem cautelas em carga ativa.'
-                                      : rel.snapshotCautelas.map((c) => '• ${c['nome']} (${c['tipo']}) - Responsável: ${c['responsavel_nome'] ?? ""}').join('\n'),
+                                      : rel.missoesCautelas.map((c) => '• ${c['nome'] ?? "Missão"} (${c['tipo'] ?? "MISSAO"}) - ${c['status'] ?? "ATIVA"}').join('\n'),
                                 ),
                               ],
                             ),

@@ -1554,7 +1554,9 @@ class _TacticalMovementRow extends StatelessWidget {
           SizedBox(
             width: 65,
             child: Text(
-              DateFormat('HH:mm').format(movement.criadoEm),
+              movement.criadoEm != null
+                  ? DateFormat('HH:mm').format(AppDateUtils.parseToLocal(movement.criadoEm))
+                  : '--:--',
               textAlign: TextAlign.right,
               style: const TextStyle(
                 fontSize: 10,

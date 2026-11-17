@@ -169,4 +169,21 @@ class CautelaModel {
   int get itensPendentes => itensCautelados;
   bool get isMissao => tipo.toUpperCase() == 'MISSAO';
   bool get isFixa => tipo.toUpperCase() == 'FIXA';
+
+  String get responsavelNome {
+    if (itens.isNotEmpty && itens.first.militarResponsavel != null) {
+      final m = itens.first.militarResponsavel!;
+      return '${m.postoGraduacao ?? ''} ${m.nomeGuerra}'.trim();
+    }
+    return criadoPor?.displayName ?? 'C&TI BINFAE-GL';
+  }
+
+  String get responsavelSaram {
+    if (itens.isNotEmpty && itens.first.militarSaram.isNotEmpty) {
+      return itens.first.militarSaram;
+    }
+    return criadoPor?.saram?.toString() ?? 'N/A';
+  }
+
+  DateTime get criadoEm => dataInicio;
 }
