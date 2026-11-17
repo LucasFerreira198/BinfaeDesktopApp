@@ -43,8 +43,51 @@ jobs:
           flutter create . --platforms=windows --project-name=binfae_desktop
           flutter pub get
 
+      - name: Verificar Código Dart (Flutter Analyze)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Continue"
+          $out = flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1
+          $code = $LASTEXITCODE
+          $out | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) {
+            $errLines = $out | Where-Object { $_ -match '^\s*error\s+' }
+            $count = 0
+            foreach ($line in $errLines) {
+              if ($count -lt 8) {
+                $clean = ($line.ToString() -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A')
+                Write-Host "::error::$clean"
+                $count++
+              }
+            }
+            if ($errLines.Count -gt 8) {
+              $rest = ($errLines | Select-Object -Skip 8 | ForEach-Object { $_.ToString().Trim() }) -join " | "
+              if ($rest.Length -gt 3500) { $rest = $rest.Substring(0, 3500) }
+              Write-Host "::error::MORE ERRORS ($($errLines.Count - 8)): $rest"
+            } elseif ($errLines.Count -eq 0) {
+              $tail = ($out | Select-Object -Last 15) -join " | "
+              Write-Host "::error::ANALYZE FAILED: $tail"
+            }
+            exit $code
+          }
+
       - name: Compilar Release Nativo Windows
-        run: flutter build windows --release --dart-define=APP_VERSION=v${{ steps.version.outputs.val }}
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Continue"
+          $out = flutter build windows --release --dart-define=APP_VERSION=v${{ steps.version.outputs.val }} 2>&1
+          $code = $LASTEXITCODE
+          $out | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) {
+            $errLines = $out | Where-Object { $_ -match 'Error:|error C|error LNK|Exception|lib/' }
+            $summary = ($errLines | Select-Object -First 25 | ForEach-Object { $_.ToString().Trim() }) -join " | "
+            if (-not $summary) {
+              $summary = ($out | Select-Object -Last 20 | ForEach-Object { $_.ToString().Trim() }) -join " | "
+            }
+            if ($summary.Length -gt 3500) { $summary = $summary.Substring(0, 3500) }
+            Write-Host "::error::BUILD FAILED: $summary"
+            exit $code
+          }
 
       - name: Criar Pacote Portátil ZIP
         shell: powershell
