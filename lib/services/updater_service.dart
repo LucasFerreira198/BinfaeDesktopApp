@@ -23,7 +23,7 @@ class ReleaseInfo {
 }
 
 class UpdaterService {
-  static const String currentVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v2.4.10');
+  static const String currentVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v2.5.0');
   static const String repoOwner = 'LucasFerreira198';
   static const String repoName = 'BinfaeDesktopApp';
 
@@ -46,7 +46,8 @@ class UpdaterService {
       final uri = Uri.parse('https://api.github.com/repos/$repoOwner/$repoName/releases/latest');
       final response = await http.get(uri, headers: {
         'Accept': 'application/vnd.github.v3+json',
-      }).timeout(const Duration(seconds: 8));
+        'User-Agent': 'BinfaeDesktopApp-$currentVersion',
+      }).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
@@ -68,8 +69,10 @@ class UpdaterService {
           }
         }
 
+        downloadUrl ??= 'https://github.com/$repoOwner/$repoName/releases/download/latest/BinfaeDesktop-Setup.exe';
+
         return ReleaseInfo(
-          tag: tag,
+          tag: tag.isNotEmpty ? tag : 'latest',
           version: version,
           title: title,
           body: body,

@@ -114,8 +114,24 @@ class _DashboardViewState extends State<DashboardView> {
             );
           }
         }
+      } else if (manual && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Servidor de atualizações inacessível no momento. Verifique sua conexão com a internet ou proxy.'),
+          ),
+        );
       }
-    } catch (_) {}
+    } catch (e) {
+      if (manual && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Erro ao verificar atualizações: $e'),
+          ),
+        );
+      }
+    }
   }
 
   void _openCommandPalette() {

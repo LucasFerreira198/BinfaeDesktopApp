@@ -127,18 +127,13 @@ jobs:
             - **[BinfaeDesktop-Portable-x64.zip](https://github.com/LucasFerreira198/BinfaeDesktopApp/releases/download/latest/BinfaeDesktop-Portable-x64.zip)**: Versão portátil (basta descompactar e executar).
             
             ### 🚀 Novidades da Versão ${{ steps.version.outputs.val }}:
-            - 🔐 **Nova Tela de Login & Opção Lembrar por 24 Horas**: Interface reformulada com estética militar moderna, badge de ping em tempo real para a nuvem Vercel SP e botão "Lembrar por 24 horas". Se desmarcado, ao fechar o app o login é solicitado novamente; se marcado, a sessão dura exatamente 24 horas com expiração estrita.
-            - ⚙️ **Configuração de Servidor e Proxy na Tela de Login**: Acesso facilitado para testar e configurar o endereço da API sem precisar entrar no sistema.
-            - ⚡ **Servidor em Nuvem no Brasil (Vercel SP)**: Conexão ultrarrápida com latência reduzida a milissegundos e suporte nativo a proxy corporativo autenticado.
-            - 🔄 **Correção do Verificador de Atualizações**: Resolução definitiva do ciclo de aviso de atualização (versão interna compilada dinamicamente).
-            - 🎯 **Correção e Aprimoramento do Módulo de Cautelas**: Exibição precisa do status "Em Uso" para itens ativos, sem marcar falsamente como devolvido.
-            - 🔄 **Menu de Opções de Devolução**: Descautelação manual ou por scanner/leitor USB direcionado exclusivamente para o material selecionado, com bloqueio estrito de códigos de outros itens.
-            - 👤 **Identificação Completa do Militar Responsável**: SARAM, posto, nome de guerra e telefone de contato visíveis nos detalhes da missão.
-            - ⏱️ **Estabilidade de Conexão com Servidor**: Timeout de integridade expandido para 12 segundos, absorvendo a inicialização do backend.
-            - 🔒 **Sessão Estrita de 24 Horas & Cache Seguro**: Prevenção de logout acidental ao fechar e reabrir a janela, com expiração rigorosa em 24h e suporte a refresh token silencioso.
-            - 🔍 **Seletor de Militares com Busca em Tempo Real**: Na criação de novos usuários, pesquisa ágil por nome de guerra, nome completo, SARAM ou seção.
-            - 🏢 **Gravação e Persistência de Seção do Militar**: Suporte integrado no cadastro e edição do efetivo militar, com persistência no banco de dados e backend.
-            - 🎖️ **Padronização dos Postos S2 e S1**: Graduações normalizadas de Soldado de 2ª e 1ª Classe em todo o sistema.
+            - 🛰️ **Novo Design Tático Aerospace Command**: Redesign completo de todas as 14 telas do sistema alinhadas ao padrão de interface tática aeroespacial Google Stitch.
+            - 📊 **Auditoria de Movimentações Reais no Dashboard**: Removidos dados fictícios/mockados; histórico sincronizado em tempo real com BMPs, descrições e militares reais.
+            - 🏷️ **Grid Tático de Estoque com Status e Ações Rápidas**: Identificação precisa de materiais em setor, cautela fixa, missão e manutenção, com botões dedicados de Despacho para Manutenção, Histórico e QR Code / Etiqueta patrimonial.
+            - 📅 **Escala de Sobreaviso Mensal Resiliente**: Prevenção de quebras por parsing de data e geração dinâmica de template tático para rápida atribuição e homologação.
+            - 👥 **Painel Administrativo com Filtros Avançados**: Barra de pesquisa para militares e usuários por nome de guerra, SARAM e posto, normalização inteligente de graduações (Major/Capitão) e seletor rápido para Chefia de TI.
+            - 👤 **Foto de Perfil com Renderização Contínua**: Eliminação de cintilação e reload de imagem com clock tático desacoplado.
+            - 🔄 **Auto-Atualizador Tático Aperfeiçoado**: Detecção precisa de novas versões com cabeçalho User-Agent oficial e botão de verificação manual nas configurações.
           files: |
             dist/BinfaeDesktop-Setup.exe
             dist/BinfaeDesktop-Portable-x64.zip

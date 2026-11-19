@@ -29,6 +29,47 @@ class _SettingsViewState extends State<SettingsView> {
   final TextEditingController _proxyBypassCtrl = TextEditingController(text: '10.52.*.*, localhost, 127.0.0.1, 10.14.0.0/16');
   bool _isTestingProxy = false;
   String? _proxyTestResult;
+  bool _isCheckingUpdate = false;
+
+  Future<void> _checkUpdate() async {
+    setState(() => _isCheckingUpdate = true);
+    try {
+      final release = await UpdaterService.checkLatestRelease();
+      if (mounted) {
+        setState(() => _isCheckingUpdate = false);
+        if (release != null) {
+          final hasNew = UpdaterService.isNewerVersion(release);
+          if (hasNew) {
+            UpdaterService.showUpdateModal(context, release);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                backgroundColor: AppColors.success,
+                content: Text('Você já está na versão mais recente do Informatica - BINFAE-GL! (${UpdaterService.currentVersion})'),
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: AppColors.danger,
+              content: Text('Servidor de atualizações inacessível no momento. Verifique sua conexão com o GitHub ou proxy.'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isCheckingUpdate = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.danger,
+            content: Text('Erro ao checar atualização: $e'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -1021,6 +1062,42 @@ class _SettingsViewState extends State<SettingsView> {
               Text(
                 'BINFAE-GL ${UpdaterService.currentVersion} • Módulo Tático C&TI Homologado',
                 style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color(0xFF8C909F)),
+              ),
+              const SizedBox(width: 14),
+              InkWell(
+                onTap: _isCheckingUpdate ? null : _checkUpdate,
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isCheckingUpdate)
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.primaryLight),
+                        )
+                      else
+                        const Icon(Icons.sync_rounded, size: 13, color: AppColors.primaryLight),
+                      const SizedBox(width: 6),
+                      Text(
+                        _isCheckingUpdate ? 'Verificando...' : 'Verificar Atualização',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryLight,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
