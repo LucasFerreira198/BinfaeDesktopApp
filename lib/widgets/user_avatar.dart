@@ -30,25 +30,12 @@ class UserAvatar extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius),
           child: Image.network(
             cleanUrl,
+            key: ValueKey(cleanUrl),
             width: radius * 2,
             height: radius * 2,
             fit: BoxFit.cover,
+            gaplessPlayback: true,
             errorBuilder: (_, __, ___) => _buildFallback(),
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return Container(
-                width: radius * 2,
-                height: radius * 2,
-                color: const Color(0xFF151D2A),
-                child: Center(
-                  child: SizedBox(
-                    width: iconSize * 0.8,
-                    height: iconSize * 0.8,
-                    child: const CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFF00D2B4)),
-                  ),
-                ),
-              );
-            },
           ),
         );
       } else if (cleanUrl.startsWith('data:image')) {
@@ -60,9 +47,11 @@ class UserAvatar extends StatelessWidget {
             borderRadius: BorderRadius.circular(radius),
             child: Image.memory(
               bytes,
+              key: ValueKey(b64.hashCode),
               width: radius * 2,
               height: radius * 2,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
               errorBuilder: (_, __, ___) => _buildFallback(),
             ),
           );

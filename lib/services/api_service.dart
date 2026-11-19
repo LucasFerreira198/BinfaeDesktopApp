@@ -1395,8 +1395,15 @@ class ApiService {
 
   Future<EscalaMensalModel> getEscalaMensal(int ano, int mes) async {
     await _ensureAuth();
-    final uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
-    final response = await _get(uri, headers: _headers());
+    var uri = Uri.parse('$_baseUrl/escalas/$ano/$mes');
+    var response = await _get(uri, headers: _headers());
+    if (response.statusCode != 200) {
+      final altUri = Uri.parse('$_baseUrl/escalas/mensal?ano=$ano&mes=$mes');
+      final altResponse = await _get(altUri, headers: _headers());
+      if (altResponse.statusCode == 200) {
+        response = altResponse;
+      }
+    }
     if (response.statusCode != 200) {
       throw Exception(_extractError(response, 'Falha ao carregar escala do mês'));
     }

@@ -128,7 +128,7 @@ class EscalaDiaModel {
   factory EscalaDiaModel.fromJson(Map<String, dynamic> json) {
     return EscalaDiaModel(
       id: json['id'] as int?,
-      data: DateTime.parse(json['data']),
+      data: DateTime.tryParse(json['data']?.toString() ?? '') ?? DateTime.now(),
       diaMes: json['dia_mes'] as int? ?? 1,
       diaSemana: json['dia_semana'] as String? ?? '',
       semanaDoMes: json['semana_do_mes'] as int? ?? 1,

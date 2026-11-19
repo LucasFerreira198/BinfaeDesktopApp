@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../models/config_ti.dart';
@@ -39,7 +40,47 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   final TextEditingController _smtpFromCtrl = TextEditingController();
   final TextEditingController _militarySearchCtrl = TextEditingController();
   String _militarySearchQuery = '';
+  final TextEditingController _userSearchCtrl = TextEditingController();
+  String _userSearchQuery = '';
   bool _obscureSmtpPassword = true;
+
+  static String _cleanText(String? str) {
+    if (str == null) return '';
+    var s = str.toLowerCase();
+    s = s.replaceAll(RegExp(r'[áàâãä]'), 'a');
+    s = s.replaceAll(RegExp(r'[éèêë]'), 'e');
+    s = s.replaceAll(RegExp(r'[íìîï]'), 'i');
+    s = s.replaceAll(RegExp(r'[óòôõö]'), 'o');
+    s = s.replaceAll(RegExp(r'[úùûü]'), 'u');
+    s = s.replaceAll(RegExp(r'[ç]'), 'c');
+    return s.trim();
+  }
+
+  String _normalizePosto(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return 'S2';
+    final clean = raw.trim().toUpperCase();
+
+    if (clean == 'MAJ' || clean == 'MAJOR') return 'Maj';
+    if (clean == 'TC' || clean == 'TEN CEL' || clean == 'TENENTE-CORONEL' || clean == 'TENENTE CORONEL') return 'TC';
+    if (clean == 'CEL' || clean == 'CORONEL') return 'Cel';
+    if (clean == 'CAP' || clean == 'CAPITAO' || clean == 'CAPITÃO') return 'Cap';
+    if (clean == '1T' || clean == '1º TEN' || clean == '1º TENENTE' || clean == '1 TEN' || clean == '1 TENENTE') return '1T';
+    if (clean == '2T' || clean == '2º TEN' || clean == '2º TENENTE' || clean == '2 TEN' || clean == '2 TENENTE') return '2T';
+    if (clean == 'ASP' || clean == 'ASPIRANTE') return 'Asp';
+    if (clean == 'SO' || clean == 'SUBOFICIAL') return 'SO';
+    if (clean == '1S' || clean == '1º SGT' || clean == '1º SARGENTO' || clean == '1SGT') return '1S';
+    if (clean == '2S' || clean == '2º SGT' || clean == '2º SARGENTO' || clean == '2SGT') return '2S';
+    if (clean == '3S' || clean == '3º SGT' || clean == '3º SARGENTO' || clean == '3SGT') return '3S';
+    if (clean == 'CB' || clean == 'CABO') return 'CB';
+    if (clean == 'S1' || clean == 'SOLDADO 1' || clean == 'SD1') return 'S1';
+    if (clean == 'S2' || clean == 'SOLDADO 2' || clean == 'SD2') return 'S2';
+    if (clean == 'CIVIL') return 'Civil';
+
+    for (final p in _postosGraduacoes) {
+      if (p.toUpperCase() == clean) return p;
+    }
+    return 'S2';
+  }
 
   final List<String> _postosGraduacoes = [
     'S2',
@@ -86,6 +127,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     _smtpPasswordCtrl.dispose();
     _smtpFromCtrl.dispose();
     _militarySearchCtrl.dispose();
+    _userSearchCtrl.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -1453,7 +1495,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     );
     final celularController = TextEditingController(text: military?.celular ?? '');
     final fotoUrlController = TextEditingController(text: military?.fotoUrl ?? '');
-    String posto = military?.postoGraduacao ?? 'S2';
+    String posto = _normalizePosto(military?.postoGraduacao);
     bool isInformatica = military?.isInformatica ?? (military?.secao?.toLowerCase().contains('inform') ?? false);
 
     showDialog(
@@ -1488,13 +1530,13 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                           const SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _postosGraduacoes.contains(posto) ? posto : _postosGraduacoes.first,
+                              value: _postosGraduacoes.contains(_normalizePosto(posto)) ? _normalizePosto(posto) : _postosGraduacoes.first,
                               decoration: const InputDecoration(
                                 labelText: 'Posto / Graduação *',
                                 prefixIcon: Icon(Icons.military_tech_outlined, size: 18),
                               ),
                               items: _postosGraduacoes.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
-                              onChanged: (val) => setModalState(() => posto = val ?? 'S2'),
+                              onChanged: (val) => setModalState(() => posto = _normalizePosto(val)),
                             ),
                           ),
                         ],
@@ -2035,6 +2077,19 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   }
 
   Widget _buildUsersTab(bool isDark) {
+    final filteredUsers = _users.where((u) {
+      if (_userSearchQuery.isEmpty) return true;
+      final q = _cleanText(_userSearchQuery);
+      final queryWords = q.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+
+      final mil = u.militar;
+      final fullText = _cleanText(
+        '${u.username} ${u.displayName} ${u.email ?? ''} ${u.role} ${mil?.postoGraduacao ?? ''} ${mil?.nomeGuerra ?? ''} ${mil?.nomeCompleto ?? ''} ${mil?.saram ?? ''} ${mil?.secao ?? ''}',
+      );
+
+      return queryWords.every((word) => fullText.contains(word));
+    }).toList();
+
     return Column(
       children: [
         Row(
@@ -2043,7 +2098,9 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
             Row(
               children: [
                 Text(
-                  '${_users.length} contas cadastradas',
+                  _userSearchQuery.isEmpty
+                      ? '${_users.length} contas cadastradas'
+                      : '${filteredUsers.length} de ${_users.length} contas',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                 ),
                 const SizedBox(width: 6),
@@ -2056,6 +2113,33 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
             ),
             Row(
               children: [
+                SizedBox(
+                  width: 250,
+                  height: 38,
+                  child: TextField(
+                    controller: _userSearchCtrl,
+                    style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar guerra, posto, SARAM...',
+                      hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
+                      prefixIcon: const Icon(Icons.search, size: 16),
+                      suffixIcon: _userSearchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, size: 16),
+                              onPressed: () {
+                                _userSearchCtrl.clear();
+                                setState(() => _userSearchQuery = '');
+                              },
+                            )
+                          : null,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onChanged: (val) => setState(() => _userSearchQuery = val.trim()),
+                  ),
+                ),
+                const SizedBox(width: 10),
                 OutlinedButton.icon(
                   onPressed: () => _openSendEmailDialog(),
                   style: OutlinedButton.styleFrom(
@@ -2128,11 +2212,30 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: ListView.separated(
-                          itemCount: _users.length,
-                          separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1C243E) : const Color(0xFFF1F5F9)),
-                          itemBuilder: (context, index) {
-                            final u = _users[index];
+                        child: filteredUsers.isEmpty
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(32),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.person_search_rounded, size: 48, color: isDark ? Colors.white24 : Colors.grey[400]),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        _userSearchQuery.isEmpty
+                                            ? 'Nenhum usuário cadastrado'
+                                            : 'Nenhum usuário encontrado para "${_userSearchQuery}"',
+                                        style: TextStyle(fontSize: 14, color: isDark ? Colors.white60 : Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                itemCount: filteredUsers.length,
+                                separatorBuilder: (_, __) => Divider(height: 1, color: isDark ? const Color(0xFF1C243E) : const Color(0xFFF1F5F9)),
+                                itemBuilder: (context, index) {
+                                  final u = filteredUsers[index];
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                               child: Row(
@@ -2252,13 +2355,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
   Widget _buildMilitariesTab(bool isDark) {
     final filtered = _militaries.where((m) {
       if (_militarySearchQuery.isEmpty) return true;
-      final q = _militarySearchQuery.toLowerCase();
-      final g = m.nomeGuerra.toLowerCase();
-      final c = m.nomeCompleto.toLowerCase();
-      final s = m.saram.toString();
-      final sec = (m.secao ?? '').toLowerCase();
-      final p = (m.postoGraduacao ?? '').toLowerCase();
-      return g.contains(q) || c.contains(q) || s.contains(q) || sec.contains(q) || p.contains(q);
+      final q = _cleanText(_militarySearchQuery);
+      final queryWords = q.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+
+      final fullText = _cleanText(
+        '${m.postoGraduacao ?? ''} ${m.nomeGuerra} ${m.nomeCompleto} ${m.saram} ${m.secao ?? ''} ${m.celular ?? ''} ${m.email ?? ''}',
+      );
+
+      return queryWords.every((word) => fullText.contains(word));
     }).toList();
 
     return Column(
@@ -2768,48 +2872,22 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
               const Divider(height: 32),
 
               // 1º Militar mais antigo
-              const Text('1º Militar Mais Antigo da Seção de TI *',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<int?>(
-                value: cfg.militarAntigo1Id,
-                decoration: InputDecoration(
-                  hintText: 'Selecione o 1º militar mais antigo...',
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                items: [
-                  const DropdownMenuItem<int?>(value: null, child: Text('(Nenhum selecionado)')),
-                  ..._militaries.map((m) => DropdownMenuItem<int?>(
-                        value: m.id ?? m.saram,
-                        child: Text('${m.postoGraduacao} ${m.nomeGuerra} (SARAM: ${m.saram})'),
-                      )),
-                ],
-                onChanged: (id) => setState(() => cfg.militarAntigo1Id = id),
+              _buildSearchableMilitarySelectorTile(
+                context: context,
+                isDark: isDark,
+                label: '1º Militar Mais Antigo da Seção de TI *',
+                selectedId: cfg.militarAntigo1Id,
+                onSelected: (id) => setState(() => cfg.militarAntigo1Id = id),
               ),
               const SizedBox(height: 18),
 
               // 2º Militar mais antigo
-              const Text('2º Militar Mais Antigo da Seção de TI *',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<int?>(
-                value: cfg.militarAntigo2Id,
-                decoration: InputDecoration(
-                  hintText: 'Selecione o 2º militar mais antigo...',
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                items: [
-                  const DropdownMenuItem<int?>(value: null, child: Text('(Nenhum selecionado)')),
-                  ..._militaries.map((m) => DropdownMenuItem<int?>(
-                        value: m.id ?? m.saram,
-                        child: Text('${m.postoGraduacao} ${m.nomeGuerra} (SARAM: ${m.saram})'),
-                      )),
-                ],
-                onChanged: (id) => setState(() => cfg.militarAntigo2Id = id),
+              _buildSearchableMilitarySelectorTile(
+                context: context,
+                isDark: isDark,
+                label: '2º Militar Mais Antigo da Seção de TI *',
+                selectedId: cfg.militarAntigo2Id,
+                onSelected: (id) => setState(() => cfg.militarAntigo2Id = id),
               ),
               const Divider(height: 32),
 
@@ -2865,6 +2943,212 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchableMilitarySelectorTile({
+    required BuildContext context,
+    required bool isDark,
+    required String label,
+    required int? selectedId,
+    required ValueChanged<int?> onSelected,
+  }) {
+    final selectedMil = _militaries.firstWhereOrNull((m) => (m.id ?? m.saram) == selectedId);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: () => _showMilitarySearchPickerDialog(
+            context: context,
+            title: label,
+            currentSelectedId: selectedId,
+            onSelected: onSelected,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: selectedMil != null ? AppColors.primary.withOpacity(0.5) : (isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+              ),
+            ),
+            child: Row(
+              children: [
+                if (selectedMil != null) ...[
+                  UserAvatar(
+                    fotoUrl: selectedMil.fotoUrl,
+                    name: selectedMil.nomeGuerra,
+                    radius: 14,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${selectedMil.postoGraduacao} ${selectedMil.nomeGuerra}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(
+                          'SARAM: ${selectedMil.saram} • ${selectedMil.nomeCompleto}',
+                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.clear, size: 16, color: Colors.grey),
+                    tooltip: 'Desmarcar',
+                    onPressed: () => onSelected(null),
+                  ),
+                ] else ...[
+                  const Icon(Icons.search, size: 18, color: Colors.grey),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      'Clique para buscar militar por nome, guerra ou SARAM...',
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                  ),
+                ],
+                const Icon(Icons.arrow_drop_down, color: Colors.grey),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showMilitarySearchPickerDialog({
+    required BuildContext context,
+    required String title,
+    required int? currentSelectedId,
+    required ValueChanged<int?> onSelected,
+  }) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String filterQuery = '';
+        final searchCtrl = TextEditingController();
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final filtered = _militaries.where((m) {
+              if (filterQuery.isEmpty) return true;
+              final q = _cleanText(filterQuery);
+              final queryWords = q.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+              final fullText = _cleanText(
+                '${m.postoGraduacao ?? ''} ${m.nomeGuerra} ${m.nomeCompleto} ${m.saram} ${m.secao ?? ''}',
+              );
+              return queryWords.every((word) => fullText.contains(word));
+            }).toList();
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.person_search, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Selecionar Militar: $title', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 480,
+                height: 450,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: searchCtrl,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Digite nome de guerra, SARAM ou posto...',
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        suffixIcon: filterQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  searchCtrl.clear();
+                                  setDialogState(() => filterQuery = '');
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        isDense: true,
+                      ),
+                      onChanged: (val) => setDialogState(() => filterQuery = val.trim()),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? const Center(child: Text('Nenhum militar encontrado', style: TextStyle(color: Colors.grey)))
+                          : ListView.separated(
+                              itemCount: filtered.length,
+                              separatorBuilder: (_, __) => const Divider(height: 1),
+                              itemBuilder: (context, i) {
+                                final m = filtered[i];
+                                final mId = m.id ?? m.saram;
+                                final isSelected = mId == currentSelectedId;
+                                return ListTile(
+                                  dense: true,
+                                  selected: isSelected,
+                                  selectedTileColor: AppColors.primary.withOpacity(0.12),
+                                  leading: UserAvatar(
+                                    fotoUrl: m.fotoUrl,
+                                    name: m.nomeGuerra,
+                                    radius: 14,
+                                  ),
+                                  title: Text(
+                                    '${m.postoGraduacao} ${m.nomeGuerra}',
+                                    style: TextStyle(
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                      color: isSelected ? AppColors.primary : null,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    'SARAM: ${m.saram} • ${m.nomeCompleto}',
+                                    style: const TextStyle(fontSize: 11),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  onTap: () {
+                                    onSelected(mId);
+                                    Navigator.pop(ctx);
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                if (currentSelectedId != null)
+                  TextButton(
+                    onPressed: () {
+                      onSelected(null);
+                      Navigator.pop(ctx);
+                    },
+                    child: const Text('Desmarcar', style: TextStyle(color: Colors.red)),
+                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Fechar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

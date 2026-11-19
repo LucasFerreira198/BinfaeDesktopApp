@@ -54,9 +54,48 @@ class _EscalaViewState extends State<EscalaView> {
       }
     } catch (e) {
       if (mounted) {
+        if (_escala == null || _escala!.mes != _mes || _escala!.ano != _ano) {
+          final totalDias = DateUtils.getDaysInMonth(_ano, _mes);
+          final dias = List.generate(totalDias, (index) {
+            final diaNum = index + 1;
+            final dt = DateTime(_ano, _mes, diaNum);
+            final diaSemanaIdx = dt.weekday; // 1 = Seg, 7 = Dom
+            const nomesSemana = ['', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado', 'domingo'];
+            final isFds = diaSemanaIdx == DateTime.saturday || diaSemanaIdx == DateTime.sunday;
+            final semana = ((diaNum - 1) ~/ 7) + 1;
+            return EscalaDiaModel(
+              data: dt,
+              diaMes: diaNum,
+              diaSemana: nomesSemana[diaSemanaIdx],
+              semanaDoMes: semana,
+              isFimDeSemana: isFds,
+            );
+          });
+          _escala = EscalaMensalModel(
+            ano: _ano,
+            mes: _mes,
+            titulo: 'ESCALA DE SOBREAVISO DA CÉLULA DE GESTÃO DE MATERIAL DO GSD-GL - ${_meses[_mes].toUpperCase()} DE $_ano',
+            dias: dias,
+            estatisticas: [],
+          );
+        }
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar escala: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.info_outline, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Nova escala para ${_meses[_mes]}/$_ano inicializada em modo de rascunho. Preencha os militares e clique em Salvar.',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF1E293B),
+            duration: const Duration(seconds: 4),
+          ),
         );
       }
     }

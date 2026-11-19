@@ -229,11 +229,18 @@ class ItemModel {
     if (cautelaAtiva != null && ((cautelaAtiva!['tipo'] ?? '') == 'FIXA' || (cautelaAtiva!['cautela_tipo'] ?? '') == 'FIXA')) {
       return true;
     }
-    if (local != null && local!.tipo?.toUpperCase() == 'SETOR') {
-      return true;
-    }
     if (status == 'EM_USO') {
       return true;
+    }
+    if (local != null) {
+      final t = (local!.tipo ?? '').toUpperCase();
+      final path = (local!.caminhoCompleto ?? local!.nome).toUpperCase();
+      if (t == 'SETOR' || t == 'SALA' || t == 'BANCADA') return true;
+      if (path.contains('SEÇÃO') || path.contains('SECAO') || path.contains('SETOR') || path.contains('BANCADA') || path.contains('SALA')) {
+        if (!path.contains('DEPÓSITO') && !path.contains('DEPOSITO') && !path.contains('ALMOXARIFADO')) {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -295,6 +302,7 @@ class ItemMovementModel {
   final String? motivo;
   final String? criadoEm;
   final String? itemNome;
+  final String? itemBmp;
   final String? usuarioNome;
   final LocationModel? origem;
   final LocationModel? destino;
@@ -310,6 +318,7 @@ class ItemMovementModel {
     this.motivo,
     this.criadoEm,
     this.itemNome,
+    this.itemBmp,
     this.usuarioNome,
     this.origem,
     this.destino,
@@ -327,6 +336,7 @@ class ItemMovementModel {
       motivo: json['motivo'] as String?,
       criadoEm: (json['data_hora'] ?? json['criado_em']) as String?,
       itemNome: json['item_nome'] as String?,
+      itemBmp: json['item_bmp'] as String?,
       usuarioNome: json['usuario_nome'] as String?,
       origem: json['origem'] != null ? LocationModel.fromJson(json['origem']) : null,
       destino: json['destino'] != null ? LocationModel.fromJson(json['destino']) : null,

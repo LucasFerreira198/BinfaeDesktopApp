@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -1479,6 +1480,9 @@ class _TacticalMovementRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final stock = Provider.of<StockProvider>(context, listen: false);
+    final realItem = stock.allItems.firstWhereOrNull((i) => i.id == movement.itemId);
+
     Color badgeColor;
     String badgeText = movement.tipoMovimentacao.toUpperCase();
 
@@ -1495,10 +1499,29 @@ class _TacticalMovementRow extends StatelessWidget {
         badgeColor = AppColors.secondary;
         badgeText = 'TRANSF';
         break;
-      default:
+      case 'MANUTENCAO':
+      case 'EM_MANUTENCAO':
         badgeColor = AppColors.error;
         badgeText = 'MANUT';
+        break;
+      case 'ENTRADA_SALDO':
+      case 'ENTRADA_INICIAL':
+      case 'ENTRADA':
+        badgeColor = AppColors.tertiary;
+        badgeText = 'ENTRADA';
+        break;
+      case 'SAIDA_SALDO':
+      case 'SAIDA':
+        badgeColor = AppColors.warning;
+        badgeText = 'SAÍDA';
+        break;
+      default:
+        badgeColor = AppColors.outline;
+        badgeText = badgeText.length > 8 ? badgeText.substring(0, 8) : badgeText;
     }
+
+    final displayBmp = movement.itemBmp ?? realItem?.bmp ?? (realItem != null ? 'ID #${realItem.id}' : '#${movement.itemId}');
+    final displayName = movement.itemNome ?? realItem?.nome ?? 'Material #${movement.itemId}';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -1534,18 +1557,20 @@ class _TacticalMovementRow extends StatelessWidget {
           SizedBox(
             width: 84,
             child: Text(
-              'BMP-${11000 + (movement.itemId % 9000)}',
+              displayBmp,
               style: const TextStyle(
                 fontSize: 10.5,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           Expanded(
             child: Text(
-              movement.itemNome ?? 'Material #${movement.itemId}',
+              displayName,
               style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

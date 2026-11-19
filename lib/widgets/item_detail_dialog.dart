@@ -16,8 +16,14 @@ import '../utils/date_utils.dart';
 class ItemDetailDialog extends StatefulWidget {
   final ItemModel item;
   final void Function(int targetViewIndex)? onNavigateView;
+  final int initialTabIndex;
 
-  const ItemDetailDialog({super.key, required this.item, this.onNavigateView});
+  const ItemDetailDialog({
+    super.key,
+    required this.item,
+    this.onNavigateView,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<ItemDetailDialog> createState() => _ItemDetailDialogState();
@@ -35,7 +41,7 @@ class _ItemDetailDialogState extends State<ItemDetailDialog> with SingleTickerPr
   void initState() {
     super.initState();
     _currentItem = widget.item;
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialTabIndex.clamp(0, 3));
     _loadItemHistory();
   }
 

@@ -38,8 +38,6 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   int _selectedIndex = 0;
   final FocusNode _searchFocusNode = FocusNode();
-  DateTime _now = DateTime.now();
-  Timer? _nowTimer;
 
   // Wedge Barcode Scanner buffer
   String _barcodeBuffer = '';
@@ -74,11 +72,6 @@ class _DashboardViewState extends State<DashboardView> {
 
     // Registra listener de teclado global para atalhos e scanner USB Wedge
     HardwareKeyboard.instance.addHandler(_handleKeyEvent);
-
-    // Timer de Telemetria e Relógios Táticos (BRT / ZULU)
-    _nowTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() => _now = DateTime.now());
-    });
   }
 
   Future<void> _toggleFullScreen() async {
@@ -97,7 +90,6 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   void dispose() {
-    _nowTimer?.cancel();
     HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     _searchFocusNode.dispose();
     super.dispose();
@@ -1116,40 +1108,7 @@ class _DashboardViewState extends State<DashboardView> {
 
                           // Relógios Táticos Dual (BRT / ZULU)
                           if (screenWidth >= 980) ...[
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: isDark ? AppColors.surfaceContainerLow : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'BRT: ${_now.hour.toString().padLeft(2, '0')}:${_now.minute.toString().padLeft(2, '0')}:${_now.second.toString().padLeft(2, '0')}',
-                                    style: const TextStyle(
-                                      fontFamily: 'JetBrains Mono',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 6),
-                                    child: Text('|', style: TextStyle(color: AppColors.outlineVariant)),
-                                  ),
-                                  Text(
-                                    'ZULU: ${_now.toUtc().hour.toString().padLeft(2, '0')}:${_now.toUtc().minute.toString().padLeft(2, '0')}:${_now.toUtc().second.toString().padLeft(2, '0')}Z',
-                                    style: const TextStyle(
-                                      fontFamily: 'JetBrains Mono',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.tertiary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            const _LiveTacticalClock(),
                             const SizedBox(width: 8),
                           ],
 
@@ -1583,6 +1542,79 @@ class _NavHoverItemState extends State<_NavHoverItem> {
                 )
               : content,
         ),
+      ),
+    );
+  }
+}
+
+class _LiveTacticalClock extends StatefulWidget {
+  const _LiveTacticalClock();
+
+  @override
+  State<_LiveTacticalClock> createState() => _LiveTacticalClockState();
+}
+
+class _LiveTacticalClockState extends State<_LiveTacticalClock> {
+  late DateTime _now;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _now = DateTime.now());
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final brt =
+        '${_now.hour.toString().padLeft(2, '0')}:${_now.minute.toString().padLeft(2, '0')}:${_now.second.toString().padLeft(2, '0')}';
+    final zulu =
+        '${_now.toUtc().hour.toString().padLeft(2, '0')}:${_now.toUtc().minute.toString().padLeft(2, '0')}:${_now.toUtc().second.toString().padLeft(2, '0')}Z';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceContainerLow : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'BRT: $brt',
+            style: const TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6),
+            child: Text('|', style: TextStyle(color: AppColors.outlineVariant)),
+          ),
+          Text(
+            'ZULU: $zulu',
+            style: const TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.tertiary,
+            ),
+          ),
+        ],
       ),
     );
   }

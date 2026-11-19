@@ -341,6 +341,13 @@ class StorageService {
           if (!item.estaEmSetor) return false;
         } else if (status == 'NO_DEPOSITO') {
           if (!item.estaNoDeposito) return false;
+        } else if (status == 'CAUTELA_FIXA') {
+          final t = item.cautelaAtiva?['tipo'] ?? item.cautelaAtiva?['cautela_tipo'] ?? '';
+          if (t != 'FIXA') return false;
+        } else if (status == 'CAUTELA_MISSAO' || status == 'CAUTELADO') {
+          final t = item.cautelaAtiva?['tipo'] ?? item.cautelaAtiva?['cautela_tipo'] ?? '';
+          if (item.status.toUpperCase() != 'CAUTELADO' && item.cautelaAtiva == null) return false;
+          if (t == 'FIXA') return false;
         } else if (item.status != status) {
           return false;
         }

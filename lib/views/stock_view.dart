@@ -395,7 +395,9 @@ class _StockViewState extends State<StockView> {
                         const SizedBox(width: 8),
                         _buildTacticalChip('No Setor', '${stock.metrics.noSetor}', stock.selectedStatus == 'NO_SETOR', AppColors.secondary, () => stock.setStatus('NO_SETOR')),
                         const SizedBox(width: 8),
-                        _buildTacticalChip('Cautelado Missão', '${stock.metrics.cautelado}', stock.selectedStatus == 'CAUTELADO', AppColors.primary, () => stock.setStatus('CAUTELADO')),
+                        _buildTacticalChip('Em Cautela Fixa', '${stock.allItems.where((i) => i.cautelaAtiva != null && (i.cautelaAtiva!['tipo'] == 'FIXA' || i.cautelaAtiva!['cautela_tipo'] == 'FIXA')).length}', stock.selectedStatus == 'CAUTELA_FIXA', const Color(0xFFF59E0B), () => stock.setStatus('CAUTELA_FIXA')),
+                        const SizedBox(width: 8),
+                        _buildTacticalChip('Em Missão', '${stock.allItems.where((i) => (i.status.toUpperCase() == 'CAUTELADO' || i.cautelaAtiva != null) && (i.cautelaAtiva?['tipo'] != 'FIXA' && i.cautelaAtiva?['cautela_tipo'] != 'FIXA')).length}', stock.selectedStatus == 'CAUTELA_MISSAO', AppColors.primary, () => stock.setStatus('CAUTELA_MISSAO')),
                         const SizedBox(width: 8),
                         _buildTacticalChip('Em Manutenção', '${stock.metrics.manutencao}', stock.selectedStatus == 'EM_MANUTENCAO', AppColors.error, () => stock.setStatus('EM_MANUTENCAO')),
                         const SizedBox(width: 8),
@@ -726,7 +728,7 @@ class _StockViewState extends State<StockView> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 120,
+                                  width: 135,
                                   child: Text(
                                     'STATUS',
                                     style: TextStyle(
@@ -739,7 +741,7 @@ class _StockViewState extends State<StockView> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 110,
+                                  width: 195,
                                   child: Text(
                                     'AÇÕES',
                                     textAlign: TextAlign.right,
@@ -942,6 +944,91 @@ class _TacticalStockRow extends StatefulWidget {
 class _TacticalStockRowState extends State<_TacticalStockRow> {
   bool _isHovered = false;
 
+  void _openSendToMaintenanceDialog(ItemModel item) {
+    final noteController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.build_outlined, color: AppColors.error, size: 22),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Enviar para Manutenção: ${item.nome}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 420,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Deseja registrar o encaminhamento do material ${item.bmp != null ? "(BMP: ${item.bmp})" : ""} para o ciclo de reparo técnico?',
+                style: const TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: noteController,
+                decoration: const InputDecoration(
+                  labelText: 'Motivo / Defeito constatado *',
+                  hintText: 'Ex: Troca de fonte, lentidão, conector quebrado...',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              final defect = noteController.text.trim().isNotEmpty
+                  ? noteController.text.trim()
+                  : 'Defeito informado pelo operador';
+              Navigator.pop(ctx);
+              final stock = Provider.of<StockProvider>(context, listen: false);
+              try {
+                await stock.moveItem(
+                  itemId: item.id,
+                  tipoMovimentacao: 'MANUTENCAO',
+                  quantidade: item.quantidade,
+                  motivo: defect,
+                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.success,
+                      content: Text('Material "${item.nome}" encaminhado para manutenção! Defeito: "$defect"'),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(backgroundColor: AppColors.danger, content: Text('Erro: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Confirmar Envio', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
@@ -949,23 +1036,24 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
     Color badgeColor;
     String badgeText;
     final upperStatus = item.status.toUpperCase();
-    if (upperStatus == 'DISPONIVEL') {
-      if (item.estaEmSetor) {
-        badgeColor = AppColors.secondary;
-        badgeText = 'No Setor';
-      } else {
-        badgeColor = AppColors.tertiary;
-        badgeText = 'No Depósito';
-      }
-    } else if (upperStatus == 'EM_USO') {
-      badgeColor = AppColors.secondary;
-      badgeText = 'No Setor';
-    } else if (upperStatus == 'CAUTELADO') {
-      badgeColor = AppColors.primary;
-      badgeText = 'Cautelado';
-    } else if (upperStatus == 'EM_MANUTENCAO') {
+    if (upperStatus == 'EM_MANUTENCAO') {
       badgeColor = AppColors.error;
       badgeText = 'Manutenção';
+    } else if (upperStatus == 'CAUTELADO' || item.cautelaAtiva != null) {
+      final tipo = (item.cautelaAtiva?['tipo'] ?? item.cautelaAtiva?['cautela_tipo'] ?? '').toString().toUpperCase();
+      if (tipo == 'FIXA') {
+        badgeColor = const Color(0xFFF59E0B);
+        badgeText = 'Em Cautela Fixa';
+      } else {
+        badgeColor = AppColors.primary;
+        badgeText = 'Em Missão';
+      }
+    } else if (upperStatus == 'EM_USO' || item.estaEmSetor) {
+      badgeColor = AppColors.secondary;
+      badgeText = 'No Setor';
+    } else if (upperStatus == 'DISPONIVEL') {
+      badgeColor = AppColors.tertiary;
+      badgeText = 'No Depósito';
     } else {
       badgeColor = AppColors.outline;
       badgeText = item.status;
@@ -1072,7 +1160,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
               const SizedBox(width: 8),
               // Status Badge
               SizedBox(
-                width: 120,
+                width: 135,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
@@ -1108,10 +1196,41 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
               const SizedBox(width: 8),
               // Ações
               SizedBox(
-                width: 110,
+                width: 195,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.build_outlined, size: 16, color: AppColors.error),
+                      tooltip: 'Enviar para Manutenção',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                      onPressed: () => _openSendToMaintenanceDialog(item),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.history, size: 16, color: AppColors.tertiary),
+                      tooltip: 'Histórico do Material',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => ItemDetailDialog(item: item, initialTabIndex: 1),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.qr_code_2, size: 16, color: AppColors.primary),
+                      tooltip: 'QR Code / Etiqueta',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => ItemDetailDialog(item: item, initialTabIndex: 3),
+                        );
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.swap_horiz, size: 16, color: AppColors.primary),
                       tooltip: 'Transferir / Movimentar',
@@ -1125,7 +1244,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.visibility_outlined, size: 16, color: AppColors.tertiary),
+                      icon: const Icon(Icons.visibility_outlined, size: 16, color: AppColors.outline),
                       tooltip: 'Inspecionar',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
