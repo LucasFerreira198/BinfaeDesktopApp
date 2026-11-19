@@ -2084,7 +2084,7 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
       final mil = u.militar;
       final fullText = _cleanText(
-        '${u.username} ${u.displayName} ${u.email ?? ''} ${u.role} ${mil?.postoGraduacao ?? ''} ${mil?.nomeGuerra ?? ''} ${mil?.nomeCompleto ?? ''} ${mil?.saram ?? ''} ${mil?.secao ?? ''}',
+        '${u.username} ${u.displayName} ${u.email ?? ''} ${u.admin ? 'administrador admin' : 'operador'} ${mil?.postoGraduacao ?? ''} ${mil?.nomeGuerra ?? ''} ${mil?.nomeCompleto ?? ''} ${mil?.saram ?? ''} ${mil?.secao ?? ''}',
       );
 
       return queryWords.every((word) => fullText.contains(word));

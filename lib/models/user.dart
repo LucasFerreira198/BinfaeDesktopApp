@@ -109,6 +109,7 @@ class UserModel {
   };
 
   String? get fotoUrl => _fotoUrl ?? militar?.fotoUrl;
+  String get role => admin ? 'ADMIN' : 'OPERADOR';
 
   String get displayName {
     if (militar != null) {
