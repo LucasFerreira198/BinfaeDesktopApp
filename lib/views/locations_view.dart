@@ -329,16 +329,22 @@ class _LocationsViewState extends State<LocationsView> {
                   ],
                 );
 
+                final totalLocais = stock.locations.length;
+                final locaisRaiz = stock.locations.where((l) => l.parentId == null).length;
+                final sublocais = stock.locations.where((l) => l.parentId != null).length;
+                final itensAlocados = allItems.where((i) => i.localId != null).length;
+                final totalItens = allItems.length;
+
                 final telemetryChips = Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    _buildTelemetryChip('COMPLEXOS', '04', Icons.domain, AppColors.primary),
-                    _buildTelemetryChip('PAVILHÕES', '18', Icons.corporate_fare, AppColors.secondary),
-                    _buildTelemetryChip('CPDs & SALAS', '42', Icons.meeting_room, AppColors.tertiary),
-                    _buildTelemetryChip('RACKS 42U', '156', Icons.dns, Colors.white),
-                    _buildTelemetryChip('ATIVOS BMP', '${allItems.length}', Icons.inventory, AppColors.primary),
+                    _buildTelemetryChip('SETORES', locaisRaiz.toString().padLeft(2, '0'), Icons.domain, AppColors.primary),
+                    _buildTelemetryChip('SUB-LOCAIS & SALAS', sublocais.toString().padLeft(2, '0'), Icons.meeting_room, AppColors.secondary),
+                    _buildTelemetryChip('TOTAL DE NÓS', totalLocais.toString().padLeft(2, '0'), Icons.account_tree_outlined, AppColors.tertiary),
+                    _buildTelemetryChip('ATIVOS ALOCADOS', itensAlocados.toString().padLeft(2, '0'), Icons.dns, Colors.white),
+                    _buildTelemetryChip('TOTAL PATRIMÔNIO', totalItens.toString().padLeft(2, '0'), Icons.inventory, AppColors.primaryLight),
                   ],
                 );
 

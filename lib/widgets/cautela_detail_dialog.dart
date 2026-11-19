@@ -13,11 +13,13 @@ import '../theme/app_theme.dart';
 class CautelaDetailDialog extends StatefulWidget {
   final CautelaModel cautela;
   final VoidCallback onUpdated;
+  final bool autoOpenAdd;
 
   const CautelaDetailDialog({
     super.key,
     required this.cautela,
     required this.onUpdated,
+    this.autoOpenAdd = false,
   });
 
   @override
@@ -34,6 +36,11 @@ class _CautelaDetailDialogState extends State<CautelaDetailDialog> {
     super.initState();
     _cautela = widget.cautela;
     _refreshDetails();
+    if (widget.autoOpenAdd) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openAddMaterialsDialog();
+      });
+    }
   }
 
   Future<void> _refreshDetails() async {
@@ -1402,10 +1409,6 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
     }
 
     final phone = _phoneCtrl.text.trim();
-    if (phone.isEmpty) {
-      setState(() => _modalError = 'Informe o telefone de contato do militar no canto direito.');
-      return;
-    }
 
     if (!_isBatchMode && _selectedItem == null) {
       setState(() => _modalError = 'Escolha ou escaneie um material para cautelar.');
@@ -1835,21 +1838,95 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                                 ),
                               ),
                             ] else ...[
-                              Expanded(
-                                child: Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.barcode_reader, size: 36, color: Colors.grey.withOpacity(0.4)),
-                                      const SizedBox(height: 8),
-                                      const Text(
-                                        'Use o leitor USB de código de barras ou\ndigite o BMP / Serial acima.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              Builder(
+                                builder: (context) {
+                                  final availableItems = stock.allItems.where((it) {
+                                    if (it.status == 'CAUTELADO' || it.estaEmManutencao) return false;
+                                    final filter = _itemScannerCtrl.text.trim().toLowerCase();
+                                    if (filter.isEmpty) return true;
+                                    return it.nome.toLowerCase().contains(filter) ||
+                                        (it.bmp?.toLowerCase().contains(filter) ?? false) ||
+                                        (it.numeroSerie?.toLowerCase().contains(filter) ?? false) ||
+                                        it.id.toString().contains(filter);
+                                  }).take(15).toList();
+
+                                  return Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Text(
+                                              'Materiais Disponíveis no Depósito:',
+                                              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.grey),
+                                            ),
+                                            Text(
+                                              '${availableItems.length} listados',
+                                              style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Expanded(
+                                          child: availableItems.isEmpty
+                                              ? const Center(child: Text('Nenhum material disponível encontrado.', style: TextStyle(fontSize: 12, color: Colors.grey)))
+                                              : ListView.separated(
+                                                  itemCount: availableItems.length,
+                                                  separatorBuilder: (_, __) => const SizedBox(height: 4),
+                                                  itemBuilder: (context, idx) {
+                                                    final it = availableItems[idx];
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _selectedItem = it;
+                                                          _modalError = null;
+                                                        });
+                                                      },
+                                                      borderRadius: BorderRadius.circular(6),
+                                                      child: Container(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                                        decoration: BoxDecoration(
+                                                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                                          borderRadius: BorderRadius.circular(6),
+                                                          border: Border.all(
+                                                            color: isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            const Icon(Icons.add_circle_outline, size: 16, color: AppColors.primary),
+                                                            const SizedBox(width: 8),
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    it.nome,
+                                                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                                    maxLines: 1,
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                  Text(
+                                                                    'BMP: ${it.bmp ?? "S/N"} • Local: ${it.localizacaoAtual}',
+                                                                    style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                                                                    maxLines: 1,
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ] else ...[

@@ -676,7 +676,7 @@ class _StockViewState extends State<StockView> {
                             child: const Row(
                               children: [
                                 SizedBox(
-                                  width: 110,
+                                  width: 100,
                                   child: Text(
                                     'BMP / CÓDIGO',
                                     style: TextStyle(
@@ -702,7 +702,7 @@ class _StockViewState extends State<StockView> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 120,
+                                  width: 110,
                                   child: Text(
                                     'S/N - SÉRIE',
                                     style: TextStyle(
@@ -728,7 +728,7 @@ class _StockViewState extends State<StockView> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 135,
+                                  width: 125,
                                   child: Text(
                                     'STATUS',
                                     style: TextStyle(
@@ -741,7 +741,7 @@ class _StockViewState extends State<StockView> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 195,
+                                  width: 180,
                                   child: Text(
                                     'AÇÕES',
                                     textAlign: TextAlign.right,
@@ -1074,7 +1074,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
             children: [
               // BMP / Código
               SizedBox(
-                width: 110,
+                width: 100,
                 child: Row(
                   children: [
                     Text(
@@ -1130,7 +1130,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
               const SizedBox(width: 8),
               // S/N
               SizedBox(
-                width: 120,
+                width: 110,
                 child: Text(
                   item.numeroSerie ?? 'N/A',
                   style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.onSurfaceVariant),
@@ -1160,7 +1160,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
               const SizedBox(width: 8),
               // Status Badge
               SizedBox(
-                width: 135,
+                width: 125,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
@@ -1196,7 +1196,7 @@ class _TacticalStockRowState extends State<_TacticalStockRow> {
               const SizedBox(width: 8),
               // Ações
               SizedBox(
-                width: 195,
+                width: 180,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

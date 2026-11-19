@@ -113,44 +113,172 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
     }
   }
 
-  void _simulateBarcodeBeep() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.barcode_reader, color: AppColors.primary, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+  void _openQuickScanner() {
+    final scanController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String? message;
+        ItemModel? foundItem;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            void handleSearch(String val) {
+              final q = val.trim().toLowerCase();
+              if (q.isEmpty) return;
+              final stock = Provider.of<StockProvider>(context, listen: false);
+              final match = stock.allItems.where((i) =>
+                (i.bmp != null && i.bmp!.toLowerCase() == q) ||
+                (i.numeroSerie != null && i.numeroSerie!.toLowerCase() == q) ||
+                (i.codigoInterno != null && i.codigoInterno!.toLowerCase() == q) ||
+                (i.id.toString() == q) ||
+                i.nome.toLowerCase().contains(q)
+              ).firstOrNull;
+
+              setModalState(() {
+                if (match != null) {
+                  foundItem = match;
+                  message = null;
+                } else {
+                  foundItem = null;
+                  message = 'Material com código "$val" não foi localizado no estoque.';
+                }
+              });
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.surfaceContainerHigh,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: AppColors.primary),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.qr_code_scanner, color: AppColors.primary),
+                  SizedBox(width: 10),
                   Text(
-                    'BIP SIMULADO // LEITOR USB',
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    'BMP-051902 interceptado -> Rádio Transceptor Motorola APX 8000',
-                    style: TextStyle(fontSize: 12),
+                    'Leitor de Código de Barras / BMP',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.surfaceContainerHigh,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppColors.primaryContainer),
-        ),
-      ),
+              content: SizedBox(
+                width: 440,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Aponte o leitor USB ou digite o BMP, Série ou ID do material:',
+                      style: TextStyle(fontSize: 12, color: AppColors.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: scanController,
+                      autofocus: true,
+                      style: const TextStyle(fontSize: 13, color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Ex: BMP-123456 ou 426CQZ5747...',
+                        hintStyle: const TextStyle(fontSize: 12, color: AppColors.outline),
+                        prefixIcon: const Icon(Icons.barcode_reader, size: 18, color: AppColors.primary),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.search, size: 18, color: AppColors.primary),
+                          onPressed: () => handleSearch(scanController.text),
+                        ),
+                        filled: true,
+                        fillColor: AppColors.surfaceContainerLowest,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: AppColors.outlineVariant.withOpacity(0.4)),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      onSubmitted: handleSearch,
+                    ),
+                    if (message != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.error.withOpacity(0.4)),
+                        ),
+                        child: Text(
+                          message!,
+                          style: const TextStyle(fontSize: 11, color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                    if (foundItem != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.tertiary.withOpacity(0.4)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    foundItem!.nome,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.tertiary.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    foundItem!.status,
+                                    style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.tertiary, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text('BMP: ${foundItem!.bmp ?? "Sem BMP"} • S/N: ${foundItem!.numeroSerie ?? "N/A"}', style: const TextStyle(fontSize: 11, color: AppColors.outline)),
+                            Text('Localização: ${foundItem!.localizacaoAtual}', style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Fechar', style: TextStyle(color: AppColors.outline)),
+                ),
+                if (foundItem != null)
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.arrow_forward, size: 16),
+                    label: const Text('Ver no Acervo'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      widget.onNavigate(1);
+                    },
+                  ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -366,15 +494,15 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                         ),
                       ),
-                      // Simular Bip Ctrl+B
+                      // Leitor / Escanear BMP
                       OutlinedButton.icon(
-                        onPressed: _simulateBarcodeBeep,
-                        icon: const Icon(Icons.barcode_reader, size: 16, color: AppColors.tertiary),
+                        onPressed: _openQuickScanner,
+                        icon: const Icon(Icons.qr_code_scanner, size: 16, color: AppColors.tertiary),
                         label: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Text(
-                              'SIMULAR BIP',
+                              'ESCANEAR BMP',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontFamily: 'monospace',
@@ -967,7 +1095,7 @@ class _HomeDashboardViewState extends State<HomeDashboardView> {
                                         ),
                                       ),
                                       SizedBox(
-                                        width: 90,
+                                        width: 140,
                                         child: Text(
                                           'BMP / ITEM',
                                           style: TextStyle(
@@ -1521,7 +1649,20 @@ class _TacticalMovementRow extends StatelessWidget {
     }
 
     final displayBmp = movement.itemBmp ?? realItem?.bmp ?? (realItem != null ? 'ID #${realItem.id}' : '#${movement.itemId}');
-    final displayName = movement.itemNome ?? realItem?.nome ?? 'Material #${movement.itemId}';
+    final itemName = realItem?.nome ?? movement.itemNome ?? '';
+
+    final userStr = movement.usuarioNome ?? (movement.usuarioId != null ? 'Op. #${movement.usuarioId}' : null);
+    String details = '';
+    if (movement.origem != null || movement.destino != null) {
+      final orig = movement.origem?.nome ?? 'Depósito';
+      final dest = movement.destino?.nome ?? 'Depósito';
+      details = '$orig → $dest';
+    } else if (movement.motivo != null && movement.motivo!.trim().isNotEmpty) {
+      details = movement.motivo!.trim();
+    } else {
+      details = 'Movimentação Operacional';
+    }
+    final fullDetail = userStr != null ? '$userStr • $details' : details;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -1553,24 +1694,41 @@ class _TacticalMovementRow extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           SizedBox(
-            width: 84,
-            child: Text(
-              displayBmp,
-              style: const TextStyle(
-                fontSize: 10.5,
-                fontFamily: 'monospace',
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            width: 140,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  displayBmp,
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (itemName.isNotEmpty)
+                  Text(
+                    itemName,
+                    style: const TextStyle(
+                      fontSize: 9.5,
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
             ),
           ),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
-              displayName,
+              fullDetail,
               style: const TextStyle(fontSize: 11, color: AppColors.onSurfaceVariant),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

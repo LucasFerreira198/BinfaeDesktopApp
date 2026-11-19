@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class UserAvatar extends StatelessWidget {
@@ -8,6 +9,8 @@ class UserAvatar extends StatelessWidget {
   final double iconSize;
   final Color? borderColor;
   final double borderWidth;
+
+  static final Map<String, Uint8List> _base64Cache = {};
 
   const UserAvatar({
     super.key,
@@ -35,6 +38,9 @@ class UserAvatar extends StatelessWidget {
             height: radius * 2,
             fit: BoxFit.cover,
             gaplessPlayback: true,
+            filterQuality: FilterQuality.medium,
+            cacheWidth: (radius * 4).round(),
+            cacheHeight: (radius * 4).round(),
             errorBuilder: (_, __, ___) => _buildFallback(),
           ),
         );
@@ -42,7 +48,7 @@ class UserAvatar extends StatelessWidget {
         try {
           final commaIdx = cleanUrl.indexOf(',');
           final b64 = commaIdx != -1 ? cleanUrl.substring(commaIdx + 1) : cleanUrl;
-          final bytes = base64Decode(b64);
+          final bytes = _base64Cache.putIfAbsent(b64, () => base64Decode(b64));
           avatarContent = ClipRRect(
             borderRadius: BorderRadius.circular(radius),
             child: Image.memory(
@@ -52,6 +58,9 @@ class UserAvatar extends StatelessWidget {
               height: radius * 2,
               fit: BoxFit.cover,
               gaplessPlayback: true,
+              filterQuality: FilterQuality.medium,
+              cacheWidth: (radius * 4).round(),
+              cacheHeight: (radius * 4).round(),
               errorBuilder: (_, __, ___) => _buildFallback(),
             ),
           );

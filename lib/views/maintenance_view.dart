@@ -221,11 +221,16 @@ class _MaintenanceViewState extends State<MaintenanceView> with SingleTickerProv
           LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
+              final naBancada = stock.repairWaitingItems.length;
+              final consertados = stock.repairedItems.length;
+              final totalEmManutencao = stock.maintenanceItems.length;
+              final historicoReparados = stock.allItems.where((i) => i.manutencaoInfo != null && !i.estaEmManutencao).length;
+
               final counters = [
-                _buildTriageCard('Na Bancada / Diagnóstico', '${stock.repairWaitingItems.length}', 'ATIVAS', Icons.precision_manufacturing, AppColors.error),
-                _buildTriageCard('Aguardando Peça / RMA', '00', 'ESPERA', Icons.hourglass_top, AppColors.secondary),
-                _buildTriageCard('Consertados / Pronto Retorno', '${stock.repairedItems.length}', 'PRONTOS', Icons.check_circle_outline, AppColors.tertiary),
-                _buildTriageCard('Concluídos Este Mês', '14', 'TOTAL', Icons.verified, AppColors.primary),
+                _buildTriageCard('Na Bancada / Diagnóstico', '${naBancada.toString().padLeft(2, '0')}', 'ATIVAS', Icons.precision_manufacturing, AppColors.error),
+                _buildTriageCard('Total em Manutenção', '${totalEmManutencao.toString().padLeft(2, '0')}', 'EM CICLO', Icons.build_circle_outlined, AppColors.secondary),
+                _buildTriageCard('Consertados / Pronto Retorno', '${consertados.toString().padLeft(2, '0')}', 'PRONTOS', Icons.check_circle_outline, AppColors.tertiary),
+                _buildTriageCard('Histórico de Reparos', '${historicoReparados.toString().padLeft(2, '0')}', 'CONCLUÍDOS', Icons.verified, AppColors.primary),
               ];
 
               if (width >= 900) {

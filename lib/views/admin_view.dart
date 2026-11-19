@@ -58,28 +58,28 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
 
   String _normalizePosto(String? raw) {
     if (raw == null || raw.trim().isEmpty) return 'S2';
-    final clean = raw.trim().toUpperCase();
+    final clean = raw.trim().toUpperCase().replaceAll('.', '');
 
-    if (clean == 'MAJ' || clean == 'MAJOR') return 'Maj';
-    if (clean == 'TC' || clean == 'TEN CEL' || clean == 'TENENTE-CORONEL' || clean == 'TENENTE CORONEL') return 'TC';
-    if (clean == 'CEL' || clean == 'CORONEL') return 'Cel';
-    if (clean == 'CAP' || clean == 'CAPITAO' || clean == 'CAPITÃO') return 'Cap';
-    if (clean == '1T' || clean == '1º TEN' || clean == '1º TENENTE' || clean == '1 TEN' || clean == '1 TENENTE') return '1T';
-    if (clean == '2T' || clean == '2º TEN' || clean == '2º TENENTE' || clean == '2 TEN' || clean == '2 TENENTE') return '2T';
-    if (clean == 'ASP' || clean == 'ASPIRANTE') return 'Asp';
-    if (clean == 'SO' || clean == 'SUBOFICIAL') return 'SO';
-    if (clean == '1S' || clean == '1º SGT' || clean == '1º SARGENTO' || clean == '1SGT') return '1S';
-    if (clean == '2S' || clean == '2º SGT' || clean == '2º SARGENTO' || clean == '2SGT') return '2S';
-    if (clean == '3S' || clean == '3º SGT' || clean == '3º SARGENTO' || clean == '3SGT') return '3S';
-    if (clean == 'CB' || clean == 'CABO') return 'CB';
-    if (clean == 'S1' || clean == 'SOLDADO 1' || clean == 'SD1') return 'S1';
-    if (clean == 'S2' || clean == 'SOLDADO 2' || clean == 'SD2') return 'S2';
-    if (clean == 'CIVIL') return 'Civil';
+    if (clean.startsWith('CEL') || clean.startsWith('CORONEL')) return 'Cel';
+    if (clean.startsWith('TC') || clean.startsWith('TEN CEL') || clean.startsWith('TENENTE-CORONEL') || clean.startsWith('TENENTE CORONEL')) return 'TC';
+    if (clean.startsWith('MAJ') || clean.startsWith('MAJOR')) return 'Maj';
+    if (clean.startsWith('CAP') || clean.startsWith('CAPIT')) return 'Cap';
+    if (clean.startsWith('1T') || clean.startsWith('1º TEN') || clean.startsWith('1 TEN') || clean.startsWith('1ºTEN') || clean.startsWith('1TEN')) return '1T';
+    if (clean.startsWith('2T') || clean.startsWith('2º TEN') || clean.startsWith('2 TEN') || clean.startsWith('2ºTEN') || clean.startsWith('2TEN')) return '2T';
+    if (clean.startsWith('ASP') || clean.startsWith('ASPIRANTE')) return 'Asp';
+    if (clean.startsWith('SO') || clean.startsWith('SUBOFICIAL') || clean.startsWith('SUB')) return 'SO';
+    if (clean.startsWith('1S') || clean.startsWith('1º S') || clean.startsWith('1 S') || clean.startsWith('1ºS')) return '1S';
+    if (clean.startsWith('2S') || clean.startsWith('2º S') || clean.startsWith('2 S') || clean.startsWith('2ºS')) return '2S';
+    if (clean.startsWith('3S') || clean.startsWith('3º S') || clean.startsWith('3 S') || clean.startsWith('3ºS')) return '3S';
+    if (clean.startsWith('CB') || clean.startsWith('CABO')) return 'CB';
+    if (clean.startsWith('S1') || clean.startsWith('SOLDADO 1') || clean.startsWith('SD1')) return 'S1';
+    if (clean.startsWith('S2') || clean.startsWith('SOLDADO 2') || clean.startsWith('SD2')) return 'S2';
+    if (clean.startsWith('CIVIL')) return 'Civil';
 
     for (final p in _postosGraduacoes) {
-      if (p.toUpperCase() == clean) return p;
+      if (p.toUpperCase() == clean || clean.startsWith(p.toUpperCase())) return p;
     }
-    return 'S2';
+    return raw.trim();
   }
 
   final List<String> _postosGraduacoes = [
@@ -1529,14 +1529,22 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _postosGraduacoes.contains(_normalizePosto(posto)) ? _normalizePosto(posto) : _postosGraduacoes.first,
-                              decoration: const InputDecoration(
-                                labelText: 'Posto / Graduação *',
-                                prefixIcon: Icon(Icons.military_tech_outlined, size: 18),
-                              ),
-                              items: _postosGraduacoes.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
-                              onChanged: (val) => setModalState(() => posto = _normalizePosto(val)),
+                            child: Builder(
+                              builder: (context) {
+                                final normPosto = _normalizePosto(posto);
+                                final availablePostos = _postosGraduacoes.contains(normPosto)
+                                    ? _postosGraduacoes
+                                    : [normPosto, ..._postosGraduacoes];
+                                return DropdownButtonFormField<String>(
+                                  value: normPosto,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Posto / Graduação *',
+                                    prefixIcon: Icon(Icons.military_tech_outlined, size: 18),
+                                  ),
+                                  items: availablePostos.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+                                  onChanged: (val) => setModalState(() => posto = _normalizePosto(val)),
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -2093,6 +2101,62 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     return Column(
       children: [
         Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 42,
+                child: TextField(
+                  controller: _userSearchCtrl,
+                  style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar usuário por nome de guerra, posto, SARAM, login ou e-mail...',
+                    hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
+                    prefixIcon: const Icon(Icons.search, size: 18),
+                    suffixIcon: _userSearchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 16),
+                            onPressed: () {
+                              _userSearchCtrl.clear();
+                              setState(() => _userSearchQuery = '');
+                            },
+                          )
+                        : null,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onChanged: (val) => setState(() => _userSearchQuery = val.trim()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            OutlinedButton.icon(
+              onPressed: () => _openSendEmailDialog(),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+              icon: const Icon(Icons.mark_email_read_outlined, size: 18),
+              label: const Text('Enviar Comunicado', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: _openCreateUserDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+              icon: const Icon(Icons.person_add_alt_1_outlined, size: 18),
+              label: const Text('Novo Usuário', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
@@ -2100,66 +2164,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 Text(
                   _userSearchQuery.isEmpty
                       ? '${_users.length} contas cadastradas'
-                      : '${filteredUsers.length} de ${_users.length} contas',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+                      : '${filteredUsers.length} de ${_users.length} contas encontradas',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                 ),
                 const SizedBox(width: 6),
                 IconButton(
                   icon: const Icon(Icons.refresh, size: 18),
                   tooltip: 'Atualizar Lista de Usuários',
                   onPressed: _isLoadingUsers ? null : _loadUsers,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 250,
-                  height: 38,
-                  child: TextField(
-                    controller: _userSearchCtrl,
-                    style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar guerra, posto, SARAM...',
-                      hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
-                      prefixIcon: const Icon(Icons.search, size: 16),
-                      suffixIcon: _userSearchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, size: 16),
-                              onPressed: () {
-                                _userSearchCtrl.clear();
-                                setState(() => _userSearchQuery = '');
-                              },
-                            )
-                          : null,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onChanged: (val) => setState(() => _userSearchQuery = val.trim()),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                OutlinedButton.icon(
-                  onPressed: () => _openSendEmailDialog(),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  icon: const Icon(Icons.mark_email_read_outlined, size: 18),
-                  label: const Text('Enviar Comunicado', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: _openCreateUserDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  icon: const Icon(Icons.person_add_alt_1_outlined, size: 18),
-                  label: const Text('Novo Usuário', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -2368,6 +2380,62 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     return Column(
       children: [
         Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 42,
+                child: TextField(
+                  controller: _militarySearchCtrl,
+                  style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar militar por nome de guerra, posto, SARAM, nome completo ou seção...',
+                    hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
+                    prefixIcon: const Icon(Icons.search, size: 18),
+                    suffixIcon: _militarySearchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 16),
+                            onPressed: () {
+                              _militarySearchCtrl.clear();
+                              setState(() => _militarySearchQuery = '');
+                            },
+                          )
+                        : null,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onChanged: (val) => setState(() => _militarySearchQuery = val.trim()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            OutlinedButton.icon(
+              onPressed: _openImportExcelDialog,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+                side: BorderSide(color: isDark ? AppColors.primaryLight : AppColors.primary),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+              icon: const Icon(Icons.upload_file_rounded, size: 18),
+              label: const Text('Importar Planilha Excel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: () => _openMilitaryDialog(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+              icon: const Icon(Icons.person_add_alt, size: 18),
+              label: const Text('Cadastrar Militar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
@@ -2375,68 +2443,14 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 Text(
                   _militarySearchQuery.isEmpty
                       ? '${_militaries.length} militares no efetivo'
-                      : '${filtered.length} de ${_militaries.length} militares',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
+                      : '${filtered.length} de ${_militaries.length} militares encontrados',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                 ),
                 const SizedBox(width: 6),
                 IconButton(
                   icon: const Icon(Icons.refresh, size: 18),
                   tooltip: 'Atualizar Lista de Militares',
                   onPressed: _isLoadingMilitaries ? null : _loadMilitaries,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 250,
-                  height: 38,
-                  child: TextField(
-                    controller: _militarySearchCtrl,
-                    style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black87),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar guerra, nome, SARAM...',
-                      hintStyle: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
-                      prefixIcon: const Icon(Icons.search, size: 16),
-                      suffixIcon: _militarySearchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, size: 16),
-                              onPressed: () {
-                                _militarySearchCtrl.clear();
-                                setState(() => _militarySearchQuery = '');
-                              },
-                            )
-                          : null,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onChanged: (val) => setState(() => _militarySearchQuery = val.trim()),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                OutlinedButton.icon(
-                  onPressed: _openImportExcelDialog,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
-                    side: BorderSide(color: isDark ? AppColors.primaryLight : AppColors.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  ),
-                  icon: const Icon(Icons.upload_file_rounded, size: 18),
-                  label: const Text('Importar Planilha Excel', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: () => _openMilitaryDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  ),
-                  icon: const Icon(Icons.person_add_alt, size: 18),
-                  label: const Text('Cadastrar Militar', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -3037,11 +3051,15 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
       context: context,
       builder: (ctx) {
         String filterQuery = '';
+        bool onlyInfo = false;
         final searchCtrl = TextEditingController();
 
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final filtered = _militaries.where((m) {
+              if (onlyInfo && !m.isInformatica && !(m.secao?.toLowerCase().contains('inform') ?? false)) {
+                return false;
+              }
               if (filterQuery.isEmpty) return true;
               final q = _cleanText(filterQuery);
               final queryWords = q.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
@@ -3063,8 +3081,8 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 ],
               ),
               content: SizedBox(
-                width: 480,
-                height: 450,
+                width: 520,
+                height: 480,
                 child: Column(
                   children: [
                     TextField(
@@ -3086,6 +3104,24 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                         isDense: true,
                       ),
                       onChanged: (val) => setDialogState(() => filterQuery = val.trim()),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        ChoiceChip(
+                          label: const Text('Todos os Militares', style: TextStyle(fontSize: 11)),
+                          selected: !onlyInfo,
+                          onSelected: (v) => setDialogState(() => onlyInfo = false),
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: const Text('Seção de Informática', style: TextStyle(fontSize: 11)),
+                          selected: onlyInfo,
+                          onSelected: (v) => setDialogState(() => onlyInfo = true),
+                        ),
+                        const Spacer(),
+                        Text('${filtered.length} militares', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     Expanded(

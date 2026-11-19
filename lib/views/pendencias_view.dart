@@ -434,11 +434,16 @@ class _PendenciasViewState extends State<PendenciasView> with SingleTickerProvid
           LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
+              final totalPendencias = _ativas.length + _concluidas.length;
+              final taxaResolucao = totalPendencias > 0
+                  ? ((_concluidas.length / totalPendencias) * 100).toStringAsFixed(0)
+                  : '100';
+
               final kpis = [
                 _buildKpiCard('Pendências em Aberto', '${_ativas.length}', '$urgentesCount Críticas', Icons.priority_high, AppColors.error),
                 _buildKpiCard('Metas Estratégicas', '$metasCount', 'OKRs Ativos', Icons.track_changes, AppColors.tertiary),
-                _buildKpiCard('Concluídas no Mês', '${_concluidas.length}', '100% Auditadas', Icons.check_circle, AppColors.primary),
-                _buildKpiCard('SLA Médio de Resolução', '04h 15m', '-18m vs Mês Anterior', Icons.timer, AppColors.secondary),
+                _buildKpiCard('Concluídas no Total', '${_concluidas.length}', '100% Auditadas', Icons.check_circle, AppColors.primary),
+                _buildKpiCard('Taxa de Resolução', '$taxaResolucao%', '${_concluidas.length} de $totalPendencias resolvidas', Icons.insights, AppColors.secondary),
               ];
 
               if (width >= 900) {

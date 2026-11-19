@@ -113,6 +113,8 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
     final nameCtrl = TextEditingController();
     final obsCtrl = TextEditingController();
 
+    CautelaModel? createdModel;
+
     final created = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -206,7 +208,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 
               try {
                 final api = Provider.of<ApiService>(context, listen: false);
-                await api.createCautela(
+                createdModel = await api.createCautela(
                   nome,
                   tipo: tipo,
                   observacoes: obsCtrl.text.trim().isEmpty ? null : obsCtrl.text.trim(),
@@ -228,6 +230,9 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 
     if (created == true) {
       await _loadCautelas();
+      if (createdModel != null) {
+        _openCautelaDetail(createdModel!, autoOpenAdd: true);
+      }
     }
   }
 
@@ -365,13 +370,14 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
     );
   }
 
-  void _openCautelaDetail(CautelaModel cautela) {
+  void _openCautelaDetail(CautelaModel cautela, {bool autoOpenAdd = false}) {
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (ctx) => CautelaDetailDialog(
         cautela: cautela,
         onUpdated: _loadCautelas,
+        autoOpenAdd: autoOpenAdd,
       ),
     );
   }
@@ -728,6 +734,7 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
                               return _TacticalCautelaCard(
                                 cautela: c,
                                 onInspect: () => _openCautelaDetail(c),
+                                onAddMaterials: () => _openCautelaDetail(c, autoOpenAdd: true),
                               );
                             },
                           ),
@@ -755,10 +762,12 @@ class _CautelasViewState extends State<CautelasView> with SingleTickerProviderSt
 class _TacticalCautelaCard extends StatelessWidget {
   final CautelaModel cautela;
   final VoidCallback onInspect;
+  final VoidCallback? onAddMaterials;
 
   const _TacticalCautelaCard({
     required this.cautela,
     required this.onInspect,
+    this.onAddMaterials,
   });
 
   @override
@@ -770,109 +779,129 @@ class _TacticalCautelaCard extends StatelessWidget {
         ? AppColors.outline
         : (isMission ? AppColors.primary : AppColors.secondary);
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onInspect,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header row: Title, type badge, inspect button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Wrap(
-                  spacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text(
-                      cautela.nome,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: badgeColor.withOpacity(0.18),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: badgeColor.withOpacity(0.35)),
-                      ),
-                      child: Text(
-                        isMission ? '#MS-${cautela.id.toString().padLeft(4, '0')}' : '#FX-${cautela.id.toString().padLeft(4, '0')}',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.bold,
-                          color: badgeColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        hoverColor: AppColors.surfaceContainerHigh.withOpacity(0.3),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.outlineVariant.withOpacity(0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row: Title, type badge, inspect button
               Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: isConcluded ? AppColors.outline.withOpacity(0.15) : AppColors.tertiary.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: isConcluded ? AppColors.outline.withOpacity(0.3) : AppColors.tertiary.withOpacity(0.4),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Icon(
-                          isConcluded ? Icons.check_circle_outline : Icons.timer_outlined,
-                          size: 13,
-                          color: isConcluded ? AppColors.outline : AppColors.tertiary,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          isConcluded ? 'CONCLUÍDA' : 'EM CURSO',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontFamily: 'monospace',
+                          cautela.nome,
+                          style: const TextStyle(
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: isConcluded ? AppColors.outline : AppColors.tertiary,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: badgeColor.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: badgeColor.withOpacity(0.35)),
+                          ),
+                          child: Text(
+                            isMission ? '#MS-${cautela.id.toString().padLeft(4, '0')}' : '#FX-${cautela.id.toString().padLeft(4, '0')}',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                              color: badgeColor,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    onPressed: onInspect,
-                    icon: const Icon(Icons.visibility_outlined, size: 14),
-                    label: const Text('Inspecionar', style: TextStyle(fontSize: 11, fontFamily: 'monospace')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.surfaceContainerHigh,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: isConcluded ? AppColors.outline.withOpacity(0.15) : AppColors.tertiary.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isConcluded ? AppColors.outline.withOpacity(0.3) : AppColors.tertiary.withOpacity(0.4),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isConcluded ? Icons.check_circle_outline : Icons.timer_outlined,
+                              size: 13,
+                              color: isConcluded ? AppColors.outline : AppColors.tertiary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isConcluded ? 'CONCLUÍDA' : 'EM CURSO',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.bold,
+                                color: isConcluded ? AppColors.outline : AppColors.tertiary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isConcluded && onAddMaterials != null) ...[
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: onAddMaterials,
+                          icon: const Icon(Icons.add_shopping_cart, size: 14),
+                          label: const Text('Cautelar Materiais', style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryContainer,
+                            foregroundColor: const Color(0xFF00285D),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: onInspect,
+                        icon: const Icon(Icons.visibility_outlined, size: 14),
+                        label: const Text('Inspecionar', style: TextStyle(fontSize: 11, fontFamily: 'monospace')),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.surfaceContainerHigh,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
 
           const SizedBox(height: 8),
 
@@ -947,6 +976,8 @@ class _TacticalCautelaCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
