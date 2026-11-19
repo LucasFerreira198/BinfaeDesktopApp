@@ -1541,20 +1541,39 @@ class _TacticalMissionItemCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.inventory_2_outlined, size: 13, color: AppColors.primary),
+                Icon(
+                  cautela.status == 'CONCLUIDA' ? Icons.task_alt : Icons.inventory_2_outlined,
+                  size: 13,
+                  color: cautela.status == 'CONCLUIDA' ? AppColors.tertiary : AppColors.primary,
+                ),
                 const SizedBox(width: 6),
-                Text(
-                  '${cautela.itensCautelados} item(ns) em carga',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                Builder(
+                  builder: (context) {
+                    final isConcluded = cautela.status == 'CONCLUIDA';
+                    final totalCount = cautela.totalItens > 0
+                        ? cautela.totalItens
+                        : (cautela.itensDevolvidos > 0 ? cautela.itensDevolvidos : cautela.itens.length);
+                    final text = isConcluded
+                        ? (totalCount > 0 ? '$totalCount item(ns) devolvidos' : 'Sem itens')
+                        : (cautela.itensCautelados > 0
+                            ? '${cautela.itensCautelados} item(ns) em carga'
+                            : (totalCount > 0 ? '$totalCount item(ns) devolvidos' : 'Sem itens'));
+                    return Text(
+                      text,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        color: isConcluded ? AppColors.tertiary : Colors.white,
+                      ),
+                    );
+                  },
                 ),
                 const Spacer(),
                 Text(
-                  cautela.tipo == 'MISSAO' ? 'MISSÃO TÁTICA' : 'CAUTELA FIXA',
+                  cautela.status == 'CONCLUIDA'
+                      ? 'CONCLUÍDA'
+                      : (cautela.tipo == 'MISSAO' ? 'MISSÃO TÁTICA' : 'CAUTELA FIXA'),
                   style: const TextStyle(
                     fontSize: 10,
                     fontFamily: 'monospace',

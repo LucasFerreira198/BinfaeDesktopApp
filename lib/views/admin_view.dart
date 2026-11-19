@@ -1452,6 +1452,86 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
     }
   }
 
+  Future<void> _confirmDeleteMilitary(MilitaryModel military) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF151D2F) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 24),
+            SizedBox(width: 10),
+            Text('Excluir Militar do Efetivo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Deseja realmente excluir permanentemente o registro de "${military.postoGraduacao} ${military.nomeGuerra}" (SARAM: ${military.saram})?'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.danger.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+              ),
+              child: const Text(
+                'Atenção: A exclusão só será permitida se o militar não possuir conta de usuário vinculada, histórico de cautelas ou escalas de serviço atribuídas a ele.',
+                style: TextStyle(fontSize: 12, color: AppColors.danger, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Excluir Militar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final api = Provider.of<ApiService>(context, listen: false);
+        await api.deleteMilitary(military.saram);
+        if (mounted) {
+          _loadMilitaries();
+          _loadUsers();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.success,
+              content: Text('Militar ${military.postoGraduacao} ${military.nomeGuerra} excluído com sucesso!'),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.danger,
+              content: Text(e.toString().replaceAll('Exception: ', '')),
+            ),
+          );
+        }
+      }
+    }
+  }
+
   // --- Diálogo: Importar Militares via Planilha Excel ---
   Future<void> _openImportExcelDialog() async {
     try {
@@ -1655,6 +1735,16 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                 ),
               ),
               actions: [
+                if (military != null) ...[
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _confirmDeleteMilitary(military);
+                    },
+                    icon: const Icon(Icons.delete_outline, size: 16, color: AppColors.danger),
+                    label: const Text('Excluir Militar', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold)),
+                  ),
+                ],
                 TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
                 ElevatedButton(
                   onPressed: isSubmitting
@@ -2592,6 +2682,11 @@ class _AdminViewState extends State<AdminView> with SingleTickerProviderStateMix
                                     icon: const Icon(Icons.edit_outlined, size: 18),
                                     tooltip: 'Editar Militar',
                                     onPressed: () => _openMilitaryDialog(m),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
+                                    tooltip: 'Excluir Militar',
+                                    onPressed: () => _confirmDeleteMilitary(m),
                                   ),
                                 ],
                               ),

@@ -1798,6 +1798,7 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                             ),
+                            onChanged: (_) => setState(() {}),
                             onSubmitted: _handleItemScanOrInput,
                           ),
                           const SizedBox(height: 12),
@@ -1848,7 +1849,7 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                                         (it.bmp?.toLowerCase().contains(filter) ?? false) ||
                                         (it.numeroSerie?.toLowerCase().contains(filter) ?? false) ||
                                         it.id.toString().contains(filter);
-                                  }).take(15).toList();
+                                  }).take(35).toList();
 
                                   return Expanded(
                                     child: Column(
@@ -1930,7 +1931,7 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                               ),
                             ],
                           ] else ...[
-                            // Modo Conjunto / Lote: Lista de materiais adicionados
+                            // Modo Conjunto / Lote: Lista de materiais adicionados + lista de materiais para seleção
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -1945,54 +1946,203 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 6),
-                            Expanded(
-                              child: _batchItems.isEmpty
-                                  ? Center(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
+                            const SizedBox(height: 4),
+
+                            if (_batchItems.isNotEmpty) ...[
+                              Container(
+                                constraints: const BoxConstraints(maxHeight: 90),
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF1E293B).withOpacity(0.6) : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Wrap(
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: _batchItems.map((it) {
+                                      return Chip(
+                                        backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+                                        side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                                        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        avatar: const Icon(Icons.check_circle, size: 14, color: AppColors.primary),
+                                        label: Text(
+                                          '${it.nome} (BMP ${it.bmp ?? "S/N"})',
+                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                        ),
+                                        deleteIcon: const Icon(Icons.close, size: 14, color: AppColors.danger),
+                                        onDeleted: () => setState(() => _batchItems.removeWhere((b) => b.id == it.id)),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                            ] else ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.touch_app_outlined, size: 15, color: AppColors.primaryLight),
+                                    SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        'Clique nos materiais abaixo para adicioná-los ao lote ou bipe com o leitor USB.',
+                                        style: TextStyle(fontSize: 10.5, color: AppColors.primaryLight),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                            ],
+
+                            // LISTA DE MATERIAIS DISPONÍVEIS PARA ADICIONAR AO LOTE
+                            Builder(
+                              builder: (context) {
+                                final availableItems = stock.allItems.where((it) {
+                                  if (it.status == 'CAUTELADO' || it.estaEmManutencao) return false;
+                                  final filter = _itemScannerCtrl.text.trim().toLowerCase();
+                                  if (filter.isEmpty) return true;
+                                  return it.nome.toLowerCase().contains(filter) ||
+                                      (it.bmp?.toLowerCase().contains(filter) ?? false) ||
+                                      (it.numeroSerie?.toLowerCase().contains(filter) ?? false) ||
+                                      it.id.toString().contains(filter);
+                                }).take(50).toList();
+
+                                return Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Icon(Icons.playlist_add, size: 36, color: Colors.grey.withOpacity(0.4)),
-                                          const SizedBox(height: 8),
                                           const Text(
-                                            'Escaneie materiais consecutivamente.\nEles serão adicionados a esta lista para cautela conjunta.',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 11.5, color: Colors.grey),
+                                            'Materiais Disponíveis para o Lote:',
+                                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.grey),
+                                          ),
+                                          Text(
+                                            '${availableItems.length} listados',
+                                            style: const TextStyle(fontSize: 10.5, color: Colors.grey),
                                           ),
                                         ],
                                       ),
-                                    )
-                                  : ListView.separated(
-                                      itemCount: _batchItems.length,
-                                      separatorBuilder: (_, __) => const SizedBox(height: 4),
-                                      itemBuilder: (context, idx) {
-                                        final it = _batchItems[idx];
-                                        return Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(
-                                              color: isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
+                                      const SizedBox(height: 6),
+                                      Expanded(
+                                        child: availableItems.isEmpty
+                                            ? const Center(
                                                 child: Text(
-                                                  '${it.nome} (BMP ${it.bmp ?? "S/N"})',
-                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                                  'Nenhum material disponível encontrado.',
+                                                  style: TextStyle(fontSize: 12, color: Colors.grey),
                                                 ),
+                                              )
+                                            : ListView.separated(
+                                                itemCount: availableItems.length,
+                                                separatorBuilder: (_, __) => const SizedBox(height: 4),
+                                                itemBuilder: (context, idx) {
+                                                  final it = availableItems[idx];
+                                                  final isSelected = _batchItems.any((b) => b.id == it.id);
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (isSelected) {
+                                                          _batchItems.removeWhere((b) => b.id == it.id);
+                                                        } else {
+                                                          _batchItems.add(it);
+                                                          _modalError = null;
+                                                        }
+                                                      });
+                                                    },
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                                      decoration: BoxDecoration(
+                                                        color: isSelected
+                                                            ? AppColors.primary.withOpacity(0.12)
+                                                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                                                        borderRadius: BorderRadius.circular(6),
+                                                        border: Border.all(
+                                                          color: isSelected
+                                                              ? AppColors.primary
+                                                              : (isDark ? const Color(0xFF2E3D5B) : const Color(0xFFE2E8F0)),
+                                                          width: isSelected ? 1.5 : 1.0,
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                                                            size: 18,
+                                                            color: isSelected ? AppColors.primary : Colors.grey,
+                                                          ),
+                                                          const SizedBox(width: 8),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Text(
+                                                                  it.nome,
+                                                                  style: TextStyle(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: isSelected ? AppColors.primaryLight : null,
+                                                                  ),
+                                                                  maxLines: 1,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                                Text(
+                                                                  'BMP: ${it.bmp ?? "S/N"} • S/N: ${it.numeroSerie ?? "N/A"} • Local: ${it.localizacaoAtual}',
+                                                                  style: const TextStyle(fontSize: 10.5, color: Colors.grey),
+                                                                  maxLines: 1,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                            decoration: BoxDecoration(
+                                                              color: isSelected
+                                                                  ? AppColors.success.withOpacity(0.15)
+                                                                  : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+                                                              borderRadius: BorderRadius.circular(4),
+                                                              border: Border.all(
+                                                                color: isSelected
+                                                                    ? AppColors.success
+                                                                    : (isDark ? const Color(0xFF2E3D5B) : const Color(0xFFCBD5E1)),
+                                                              ),
+                                                            ),
+                                                            child: Text(
+                                                              isSelected ? 'No Lote' : '+ Adicionar',
+                                                              style: TextStyle(
+                                                                fontSize: 10.5,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: isSelected
+                                                                    ? AppColors.success
+                                                                    : (isDark ? Colors.white70 : const Color(0xFF475569)),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
-                                              IconButton(
-                                                icon: const Icon(Icons.remove_circle_outline, size: 16, color: AppColors.danger),
-                                                onPressed: () => setState(() => _batchItems.removeAt(idx)),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ],
@@ -2024,7 +2174,9 @@ class _AddCautelaMaterialModalState extends State<_AddCautelaMaterialModal> {
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : const Icon(Icons.check, size: 18),
                   label: Text(
-                    _isBatchMode ? 'Confirmar Cautela do Lote' : 'Confirmar Cautela',
+                    _isBatchMode
+                        ? (_batchItems.isEmpty ? 'Confirmar Cautela do Lote' : 'Confirmar Cautela (${_batchItems.length} materiais)')
+                        : 'Confirmar Cautela',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

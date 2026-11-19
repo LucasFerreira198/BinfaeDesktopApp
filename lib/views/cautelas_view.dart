@@ -931,22 +931,57 @@ class _TacticalCautelaCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.2)),
+              border: Border.all(
+                color: isConcluded
+                    ? AppColors.tertiary.withOpacity(0.25)
+                    : AppColors.outlineVariant.withOpacity(0.2),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.primary),
+                Icon(
+                  isConcluded ? Icons.task_alt : Icons.inventory_2_outlined,
+                  size: 14,
+                  color: isConcluded ? AppColors.tertiary : AppColors.primary,
+                ),
                 const SizedBox(width: 6),
-                Text(
-                  '${cautela.itensCautelados} equipamentos em carga ativa',
-                  style: const TextStyle(fontSize: 11.5, fontFamily: 'monospace', fontWeight: FontWeight.bold, color: Colors.white),
+                Builder(
+                  builder: (context) {
+                    final totalCount = cautela.totalItens > 0
+                        ? cautela.totalItens
+                        : (cautela.itensDevolvidos > 0 ? cautela.itensDevolvidos : cautela.itens.length);
+
+                    final text = isConcluded
+                        ? (totalCount > 0
+                            ? '$totalCount equipamento(s) movimentado(s) e devolvido(s)'
+                            : 'Nenhum equipamento vinculado à missão')
+                        : (cautela.itensCautelados > 0
+                            ? '${cautela.itensCautelados} equipamento(s) em carga ativa${cautela.itensDevolvidos > 0 ? ' • ${cautela.itensDevolvidos} devolvido(s)' : ''}'
+                            : (totalCount > 0
+                                ? '$totalCount equipamento(s) devolvido(s)'
+                                : 'Nenhum equipamento em carga'));
+
+                    return Text(
+                      text,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        color: isConcluded ? AppColors.tertiary : Colors.white,
+                      ),
+                    );
+                  },
                 ),
                 const Spacer(),
-                const Icon(Icons.verified_user_outlined, size: 13, color: AppColors.tertiary),
+                Icon(
+                  isConcluded ? Icons.check_circle_outline : Icons.verified_user_outlined,
+                  size: 13,
+                  color: AppColors.tertiary,
+                ),
                 const SizedBox(width: 4),
-                const Text(
-                  'Assinatura Digital Válida',
-                  style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.tertiary),
+                Text(
+                  isConcluded ? 'Missão Concluída' : 'Assinatura Digital Válida',
+                  style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: AppColors.tertiary),
                 ),
               ],
             ),
